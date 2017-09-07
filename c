@@ -1,3 +1,2 @@
-#!/bin/sh
-/Wendy/node_modules/typescript/bin/tsc --version
-/Wendy/node_modules/typescript/bin/tsc --rootDir source/ --outDir distrib/  source/*.ts source/host/*.ts source/os/*.ts
+call dir *.ts /b /s > ts-files.txt
+call tsc --outDir distrib/ @ts-file.txt
