@@ -80,7 +80,40 @@ module TSOS {
             this.commandList[this.commandList.length] = sc;
 
             // ps  - list the running processes and their IDs
+            /*sc = new ShellCommand(this.shellPs,
+                                  "ps",
+                                  "- List the running processes and their IDs.");
+            this.commandList[this.commandList.length] = sc;
+
             // kill <id> - kills the specified process id.
+            sc = new ShellCommand(this.shellKill,
+                                  "kill",
+                                  "<id> - Kills the specified process id.");
+            this.commandList[this.commandList.length] = sc; */
+
+            // date - displays the current date and time
+            sc = new ShellCommand(this.shellDate,
+                                  "date",
+                                  "- Displays the current date and time.");
+            this.commandList[this.commandList.length] = sc;
+
+            // whereami - displays the users current location
+            sc = new ShellCommand(this.shellWhereami,
+                                  "whereami",
+                                  "- Displays the users current location.");
+            this.commandList[this.commandList.length] = sc;
+
+            // whomai - displays the users identity
+            sc = new ShellCommand(this.shellWhoami,
+                                  "whoami",
+                                  "- Displays the users identity.");
+            this.commandList[this.commandList.length] = sc;
+
+            // meow - flushes the toilet
+            sc = new ShellCommand(this.shellMeow,
+                                  "meow",
+                                  "- Flushes the toilet.");
+            this.commandList[this.commandList.length] = sc;
 
             //
             // Display the initial prompt.
@@ -177,6 +210,8 @@ module TSOS {
         // Shell Command Functions.  Kinda not part of Shell() class exactly, but
         // called from here, so kept here to avoid violating the law of least astonishment.
         //
+
+        // Invalid commands
         public shellInvalidCommand() {
             _StdOut.putText("Invalid Command. ");
             if (_SarcasticMode) {
@@ -188,6 +223,7 @@ module TSOS {
             }
         }
 
+        // Curse
         public shellCurse() {
             _StdOut.putText("Oh, so that's how it's going to be, eh? Fine.");
             _StdOut.advanceLine();
@@ -195,6 +231,7 @@ module TSOS {
             _SarcasticMode = true;
         }
 
+        // apology
         public shellApology() {
            if (_SarcasticMode) {
               _StdOut.putText("I think we can put our differences behind us.");
@@ -206,10 +243,12 @@ module TSOS {
            }
         }
 
+        // ver
         public shellVer(args) {
-            _StdOut.putText(APP_NAME + " version " + APP_VERSION);
+            _StdOut.putText(APP_NAME + " version " + APP_VERSION + " or so I thought");
         }
 
+        // help
         public shellHelp(args) {
             _StdOut.putText("Commands:");
             for (var i in _OsShell.commandList) {
@@ -218,6 +257,7 @@ module TSOS {
             }
         }
 
+        // shutdown
         public shellShutdown(args) {
              _StdOut.putText("Shutting down...");
              // Call Kernel shutdown routine.
@@ -225,21 +265,89 @@ module TSOS {
             // TODO: Stop the final prompt from being displayed.  If possible.  Not a high priority.  (Damn OCD!)
         }
 
+        // cls
         public shellCls(args) {
             _StdOut.clearScreen();
             _StdOut.resetXY();
         }
 
+        // man
         public shellMan(args) {
             if (args.length > 0) {
+                // explains what each topic does
+
                 var topic = args[0];
                 switch (topic) {
+
+                    // help
                     case "help":
                         _StdOut.putText("Help displays a list of (hopefully) valid commands.");
                         break;
-                    // TODO: Make descriptive MANual page entries for the the rest of the shell commands here.
+                    // Descriptive MANual page entries for the the rest of the shell commands here.
+
+                    // ver
+                    case "ver":
+                        _StdOut.putText("Ver displays the version of the OS");
+                        break;
+
+                    // shutdown
+                    case "shutdown":
+                        _StdOut.putText("Shuts down the OS.");
+                        break;
+
+                    // cls
+                    case "cls":
+                        _StdOut.putText("Cls clears the CLI");
+                        break;
+
+                    // trace
+                    case "trace":
+                        _StdOut.putText("Trace followed by on would turn on the OS trace on and followed by off would turn it off.");
+                        break;
+
+                    // rot13
+                    case "rot13":
+                        _StdOut.putText("Rot13 followed by a string would rotate each letter of the string by 13 places. E.g. 'ace' would be 'npr'.");
+                        break;
+
+                    // prompt
+                    case "prompt":
+                        _StdOut.putText("Prompt followed by a string would set the prompt as the string instead of the default >.");
+                        break;
+
+                    // ps
+                    case "ps":
+                        _StdOut.putText("Ps displays a list of current processes and their IDs.");
+                        break;
+
+                    // kill <id>
+                    case "kill":
+                        _StdOut.putText("Kill followed by the process ID would kill that process.");
+                        break;
+
+                    // date
+                    case "date":
+                        _StdOut.putText("Date displays the current date and time in EST.");
+                        break;
+
+                    // whereami
+                    case "whereami":
+                        _StdOut.putText("Whereami displays the users current location.");
+                        break;
+
+                    // whoami
+                    case "whoami":
+                        _StdOut.putText("Whoami displays the users identity.");
+                        break;
+
+                    // meow
+                    case "whereami":
+                        _StdOut.putText("Meow flushes the toilet.");
+                        break;
+
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
+
                 }
             } else {
                 _StdOut.putText("Usage: man <topic>  Please supply a topic.");
@@ -287,5 +395,33 @@ module TSOS {
             }
         }
 
+        // date
+        public shellDate(args) {
+            var currentDate = new Date();
+            var dateTime: string = currentDate.getDate() + "/"
+                                + (currentDate.getMonth()+1)  + "/"
+                                + currentDate.getFullYear() + " @ "
+                                + currentDate.getHours() + ":"
+                                + currentDate.getMinutes() + ":"
+                                + currentDate.getSeconds();
+            _StdOut.putText(dateTime);
+        }
+
+        // whereami
+        public shellWhereami(args) {
+            _StdOut.putText("Definitely not here.");
+        }
+
+        // whoami
+        public shellWhoami(args) {
+            _StdOut.putText("Nope. Wrong. Not my father.");
+        }
+
+        // meow
+        public shellMeow(args) {
+            var audio = new Audio('meow.mp3');
+            audio.play();
+            _StdOut.putText("He's a cat~ Meow~ Flushing the toliet~");
+        }
     }
 }
