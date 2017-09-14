@@ -10,8 +10,8 @@
 //
 // Global CONSTANTS (TypeScript 1.5 introduced const. Very cool.)
 //
-var APP_NAME = "HeliOS"; // Greek gods?
-var APP_VERSION = "73337"; // i do not know why
+var APP_NAME = "OreOS"; // Cause I'm craving thoses now
+var APP_VERSION = "30"; // The amount that I want to eat
 var CPU_CLOCK_INTERVAL = 100; // This is in ms (milliseconds) so 1000 = 1 second.
 var TIMER_IRQ = 0; // Pages 23 (timer), 9 (interrupts), and 561 (interrupt priority).
 // NOTE: The timer is different from hardware/host clock pulses. Don't confuse these.

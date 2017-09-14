@@ -91,28 +91,40 @@ module TSOS {
                                   "<id> - Kills the specified process id.");
             this.commandList[this.commandList.length] = sc; */
 
-            // date - displays the current date and time
+            // date
             sc = new ShellCommand(this.shellDate,
                                   "date",
                                   "- Displays the current date and time.");
             this.commandList[this.commandList.length] = sc;
 
-            // whereami - displays the users current location
+            // whereami
             sc = new ShellCommand(this.shellWhereami,
                                   "whereami",
                                   "- Displays the users current location.");
             this.commandList[this.commandList.length] = sc;
 
-            // whomai - displays the users identity
+            // whomai
             sc = new ShellCommand(this.shellWhoami,
                                   "whoami",
                                   "- Displays the users identity.");
             this.commandList[this.commandList.length] = sc;
 
-            // meow - flushes the toilet
+            // meow
             sc = new ShellCommand(this.shellMeow,
                                   "meow",
-                                  "- Flushes the toilet.");
+                                  "- Flushes the toilet. [audio warning]");
+            this.commandList[this.commandList.length] = sc;
+
+            // load
+            sc = new ShellCommand(this.shellLoad,
+                "load",
+                "- Validates the user code in user program input.");
+            this.commandList[this.commandList.length] = sc;
+
+            // welp
+            sc = new ShellCommand(this.shellWelp,
+                "welp",
+                "- Displays BSOD when the kernel traps an OS error.");
             this.commandList[this.commandList.length] = sc;
 
             //
@@ -302,17 +314,23 @@ module TSOS {
 
                     // trace
                     case "trace":
-                        _StdOut.putText("Trace followed by on would turn on the OS trace on and followed by off would turn it off.");
+                        _StdOut.putText("Trace followed by on would turn on the OS trace on and ");
+                        _StdOut.advanceLine();
+                        _StdOut.putText("followed by off would turn it off.");
                         break;
 
                     // rot13
                     case "rot13":
-                        _StdOut.putText("Rot13 followed by a string would rotate each letter of the string by 13 places. E.g. 'ace' would be 'npr'.");
+                        _StdOut.putText("Rot13 followed by a string would rotate each letter of the ");
+                        _StdOut.advanceLine();
+                        _StdOut.putText("string by 13 places. E.g. 'ace' would be 'npr'.");
                         break;
 
                     // prompt
                     case "prompt":
-                        _StdOut.putText("Prompt followed by a string would set the prompt as the string instead of the default >.");
+                        _StdOut.putText("Prompt followed by a string would set the prompt as the ");
+                        _StdOut.advanceLine();
+                        _StdOut.putText("string instead of the default >.");
                         break;
 
                     // ps
@@ -341,8 +359,20 @@ module TSOS {
                         break;
 
                     // meow
-                    case "whereami":
+                    case "meow":
                         _StdOut.putText("Meow flushes the toilet.");
+                        break;
+
+                    // load
+                    case "load":
+                        _StdOut.putText("Load validates the user input in the User Program Input ");
+                        _StdOut.advanceLine();
+                        _StdOut.putText("box.");
+                        break;
+
+                    // welp
+                    case "welp":
+                        _StdOut.putText("Welp triggers the BSOD, when the kernel traps an OS error.");
                         break;
 
                     default:
@@ -398,12 +428,15 @@ module TSOS {
         // date
         public shellDate(args) {
             var currentDate = new Date();
-            var dateTime: string = currentDate.getDate() + "/"
-                                + (currentDate.getMonth()+1)  + "/"
-                                + currentDate.getFullYear() + " @ "
+            var dateTime: string = currentDate.getMonth() + "/"
+                                + (currentDate.getDate()+1)  + "/"
+                                + currentDate.getFullYear() + " "
                                 + currentDate.getHours() + ":"
                                 + currentDate.getMinutes() + ":"
-                                + currentDate.getSeconds();
+                                + currentDate.getSeconds() + " (or for most, "
+                                + (currentDate.getHours() % 12) + ":"
+                                + currentDate.getMinutes() + ":"
+                                + currentDate.getSeconds() + ")";
             _StdOut.putText(dateTime);
         }
 
@@ -419,9 +452,32 @@ module TSOS {
 
         // meow
         public shellMeow(args) {
-            var audio = new Audio('meow.mp3');
+            var audio = new Audio('distrib/audio/meow.mp3');
             audio.play();
             _StdOut.putText("He's a cat~ Meow~ Flushing the toliet~");
+        }
+
+        //load
+        public shellLoad(args) {
+            // gets text of textarea
+            var userIn: string = (<HTMLInputElement> document.getElementById("taProgramInput")).value;
+
+            // checks if text only contains hex decimals and spaces
+            var valText = /^[a-f\d\s]+$/i;
+            if (valText.test(userIn)) {
+                _StdOut.putText("Your input is valid.");
+            }
+            else {
+                _StdOut.putText("Only hex digits and spaces are allowed. Please enter a new");
+                _StdOut.advanceLine();
+                _StdOut.putText("code.");
+            }
+        }
+
+        //welp
+        public shellWelp(args) {
+            // adds element that Interrupt Handler does not know how to handle
+            _KernelInterruptQueue.enqueue(777);
         }
     }
 }

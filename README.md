@@ -1,3 +1,6 @@
+Wendy Ni's OS Repo
+============================================
+
 Browser-based Operating System in TypeScript
 ============================================
 
