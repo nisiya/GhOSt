@@ -1,11 +1,12 @@
 /* TSOS.css */
 
 body {
-  background: #909193 url(distrib/images/jellypaper.jpg);
+  background: #909193 url(distrib/images/grey.jpg);
   font-family: Helvetica, Verdana, Arial, sans-serif;
   font-size: 12pt;
   font-weight: normal;
   font-style: normal;
+  text-align: center;
 }
 
 h1 {
@@ -33,20 +34,51 @@ h3 {
 
 #display {
   background-color:#DFDBC3;
-  border: 2px solid red;
+  border: 2px solid #0101FF;
   cursor: default;
+  position: fixed;  
+  align-self: auto;
+}
+
+textarea{
+  border: 2px solid #0101ff;
 }
 
 .normal_button {
-  width: 100px;
+  width: 40px;
+  height: 40px;
+  background-color: transparent;
+  background-size: 40px;
+  border: none;
 }
 
+.stop_button {
+  background-image: url(distrib/images/ghostVul.png);  
+}
+
+#btnStartOS {
+  background-image: url(distrib/images/pac_man.png);
+}
+
+#btnStartOS:disabled {
+  background-image: url(distrib/images/pacman.png);
+}
+
+#btnHaltOS:disabled {
+  background-image: url(distrib/images/ghostGreen.png);
+}
+
+#btnReset:disabled {
+  background-image: url(distrib/images/ghostRed.png);
+}
+
+
 label {
-  color: white;
+  color: #FEF200;
 }
 
 .footerText {
-  color: white;
+  color: #FEF200;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 8pt;
   text-align: center;
