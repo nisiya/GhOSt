@@ -89,8 +89,13 @@ module TSOS {
 
             // TODO: Handle scrolling. (iProject 1)
             if (this.currentYPosition > _Canvas.height){ 
-                alert(this.currentYPosition);           
+                // uncomment for debugging
+                // alert(this.currentYPosition);           
+
+                // clear screen and reset XY
                 this.init();
+
+                // check if ended with key press or text output and print accordingly
                 if (this.savedText.length>1){
                     this.putText(this.savedText);
                     this.advanceLine();
