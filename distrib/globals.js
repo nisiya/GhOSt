@@ -48,6 +48,12 @@ var _hardwareClockID = null;
 // For testing (and enrichment)...
 var Glados = null; // This is the function Glados() in glados.js on Labouseur.com.
 var _GLaDOS = null; // If the above is linked in, this is the instantiated instance of Glados.
+// current time and date
+var _DateTime = new Date();
+var _Date = _DateTime.toDateString();
+var _Time = _DateTime.toLocaleTimeString();
 var onDocumentLoad = function () {
     TSOS.Control.hostInit();
+    var clock = document.getElementById("clock");
+    clock.innerHTML = _Date + " " + _Time;
 };

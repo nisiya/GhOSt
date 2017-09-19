@@ -39,36 +39,47 @@
 
 <div id="divMain" style="width:100%;">
   <img src="distrib/images/title.png" alt="title" style="padding:10px;">
-  <div id="divButtonBar" style="margin:4px;">
-        <input type="button"
-              id = "btnStartOS"
-              name="brnStartOS"
-              class="normal_button"
-              value=""
-              title="Start"
-              tabindex="0"
-              onclick="TSOS.Control.hostBtnStartOS_click(this);">
+  <div id="divButtonBar" style="margin:4px;">      
+    <table style="display:inline-table;">
+      <tr>
+        <th>
+            <input type="button"
+                  id = "btnStartOS"
+                  name="brnStartOS"
+                  class="normal_button"
+                  value=""
+                  title="Start"
+                  tabindex="0"
+                  onclick="TSOS.Control.hostBtnStartOS_click(this);">
 
-        <input type="button"
-              id = "btnHaltOS"
-              name="brnHaltOS"
-              class="normal_button stop_button"
-              disabled="disabled"
-              value=""
-              title="Halt"
-              tabindex="1"
-              onclick="TSOS.Control.hostBtnHaltOS_click(this);">
+            <input type="button"
+                  id = "btnHaltOS"
+                  name="brnHaltOS"
+                  class="normal_button stop_button"
+                  disabled="disabled"
+                  value=""
+                  title="Halt"
+                  tabindex="1"
+                  onclick="TSOS.Control.hostBtnHaltOS_click(this);">
 
-        <input type="button"
-              id = "btnReset"
-              name="brnReset"
-              class="normal_button stop_button"
-              disabled="disabled"
-              value=""
-              title="Reset"
-              tabindex="2"
-              onclick="TSOS.Control.hostBtnReset_click(this);">
+            <input type="button"
+                  id = "btnReset"
+                  name="brnReset"
+                  class="normal_button stop_button"
+                  disabled="disabled"
+                  value=""
+                  title="Reset"
+                  tabindex="2"
+                  onclick="TSOS.Control.hostBtnReset_click(this);">
+        </th>
+        <th>
+          <text id="clock"> </text><br />
+          <text id="usrStatus"> <b>Status: </b> I Lurve Operating Systems </text>
+        </th>
+      </tr>
+    </table>
   </div>
+      
 
   <div id="divConsole" style="margin:4px; width:500px; height:500px; float:left;">
     <label>

@@ -79,6 +79,11 @@ module TSOS {
         // Host Events
         //
         public static hostBtnStartOS_click(btn): void {
+            document.body.style.backgroundImage = "url(distrib/images/pacBack.png)";
+            document.getElementById("display").style.border = "5px solid #0101FF";
+            document.getElementById("taHostLog").style.border = "5px solid #0101FF";
+            document.getElementById("taProgramInput").style.border = "5px solid #0101FF";            
+
             // Disable the (passed-in) start button...
             btn.disabled = true;
 

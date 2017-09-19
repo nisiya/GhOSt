@@ -127,6 +127,12 @@ module TSOS {
                 "- Displays BSOD when the kernel traps an OS error.");
             this.commandList[this.commandList.length] = sc;
 
+            // prompt <string>
+            sc = new ShellCommand(this.shellStatus,
+                "status",
+                "<string> - Sets the user status.");
+            this.commandList[this.commandList.length] = sc;
+
             //
             // Display the initial prompt.
             this.putPrompt();
@@ -375,6 +381,13 @@ module TSOS {
                         _StdOut.putText("Welp triggers the BSOD, when the kernel traps an OS error.");
                         break;
 
+                    // prompt
+                    case "status":
+                    _StdOut.putText("Status followed by a string would set the user status as");
+                    _StdOut.advanceLine();
+                    _StdOut.putText("the string.");
+                    break;
+
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
 
@@ -427,17 +440,8 @@ module TSOS {
 
         // date
         public shellDate(args) {
-            var currentDate = new Date();
-            var dateTime: string = currentDate.getMonth() + "/"
-                                + (currentDate.getDate()+1)  + "/"
-                                + currentDate.getFullYear() + " "
-                                + currentDate.getHours() + ":"
-                                + currentDate.getMinutes() + ":"
-                                + currentDate.getSeconds() + " (or for most, "
-                                + (currentDate.getHours() % 12) + ":"
-                                + currentDate.getMinutes() + ":"
-                                + currentDate.getSeconds() + ")";
-            _StdOut.putText(dateTime);
+            var currDate: string = _Date + " " + _Time;
+            _StdOut.putText(currDate);
         }
 
         // whereami
@@ -474,10 +478,22 @@ module TSOS {
             }
         }
 
-        //welp
+        // welp aka BSOD
         public shellWelp(args) {
             // adds element that Interrupt Handler does not know how to handle
             _KernelInterruptQueue.enqueue(777);
+        }
+
+        // status
+        public shellStatus(args) {
+            if (args.length > 0) {
+                var status = document.getElementById("usrStatus");
+                // change user status
+                status.innerHTML = args.join(" ");
+                _StdOut.putText("Your status has changed.");
+            } else {
+                _StdOut.putText("Usage: status <string>  Please supply a string.");
+            }
         }
     }
 }

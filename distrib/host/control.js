@@ -66,6 +66,10 @@ var TSOS;
         // Host Events
         //
         Control.hostBtnStartOS_click = function (btn) {
+            document.body.style.backgroundImage = "url(distrib/images/pacBack.png)";
+            document.getElementById("display").style.border = "5px solid #0101FF";
+            document.getElementById("taHostLog").style.border = "5px solid #0101FF";
+            document.getElementById("taProgramInput").style.border = "5px solid #0101FF";
             // Disable the (passed-in) start button...
             btn.disabled = true;
             // .. enable the Halt and Reset buttons ...

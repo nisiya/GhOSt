@@ -35,12 +35,12 @@ h3 {
 
 #display {
   background-color:#FFFFFF;
-  border: 5px solid #0101FF;
+  border: 2px solid #000000;
   cursor: default;
 }
 
 textarea{
-  border: 5px solid #0101ff;
+  border: 2px solid #000000;
 }
 
 .normal_button {
@@ -69,6 +69,11 @@ textarea{
 
 #btnReset:disabled {
   background-image: url(distrib/images/ghostRed.png);
+}
+
+text{
+  color: #FFFFFF;
+  font-weight: normal;
 }
 
 label {
