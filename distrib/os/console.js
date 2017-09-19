@@ -10,17 +10,19 @@
 var TSOS;
 (function (TSOS) {
     var Console = /** @class */ (function () {
-        function Console(currentFont, currentFontSize, currentXPosition, currentYPosition, buffer, savedText) {
+        function Console(currentFont, currentFontSize, currentXPosition, currentYPosition, del, buffer, savedText) {
             if (currentFont === void 0) { currentFont = _DefaultFontFamily; }
             if (currentFontSize === void 0) { currentFontSize = _DefaultFontSize; }
             if (currentXPosition === void 0) { currentXPosition = 0; }
             if (currentYPosition === void 0) { currentYPosition = _DefaultFontSize; }
+            if (del === void 0) { del = 2; }
             if (buffer === void 0) { buffer = ""; }
             if (savedText === void 0) { savedText = ""; }
             this.currentFont = currentFont;
             this.currentFontSize = currentFontSize;
             this.currentXPosition = currentXPosition;
             this.currentYPosition = currentYPosition;
+            this.del = del;
             this.buffer = buffer;
             this.savedText = savedText;
         }
@@ -47,6 +49,12 @@ var TSOS;
                     // ... and reset our buffer.
                     this.buffer = "";
                 }
+                else if (chr === String.fromCharCode(8)) {
+                    // delete a character
+                    chr = this.buffer[this.buffer.length - 1];
+                    alert("remove " + chr);
+                    this.removeText(chr);
+                }
                 else {
                     // This is a "normal" character, so ...
                     // ... draw it on the screen...
@@ -68,11 +76,28 @@ var TSOS;
             //         Consider fixing that.
             if (text !== "") {
                 // Draw the text at the current X and Y coordinates.
-                _DrawingContext.drawText(this.currentFont, this.currentFontSize, this.currentXPosition, this.currentYPosition, text);
+                _DrawingContext.drawText(this.currentFont, this.currentFontSize, this.currentXPosition, this.currentYPosition, text, this.del);
                 // Move the current X position.
                 var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, text);
                 this.currentXPosition = this.currentXPosition + offset;
                 this.savedText = text;
+            }
+        };
+        Console.prototype.removeText = function (chr) {
+            if (this.buffer !== "") {
+                // Draw the text at the current X and Y coordinates.
+                _DrawingContext.save();
+                // Move cursor back to X position before chr written.
+                var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, chr);
+                this.currentXPosition = this.currentXPosition - offset;
+                // write over with canvas color
+                this.del = 1;
+                _DrawingContext.drawText(this.currentFont, this.currentFontSize, this.currentXPosition, this.currentYPosition, chr, this.del);
+                // Move cursor back to X position again to be ready for new text
+                this.del = 2;
+                // remove from buffer
+                var newBuffer = this.buffer.substring(0, this.buffer.length - 1);
+                this.buffer = newBuffer;
             }
         };
         Console.prototype.advanceLine = function () {
