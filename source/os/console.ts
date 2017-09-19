@@ -17,7 +17,8 @@ module TSOS {
                     public currentFontSize = _DefaultFontSize,
                     public currentXPosition = 0,
                     public currentYPosition = _DefaultFontSize,
-                    public buffer = "") {
+                    public buffer = "",
+                    public savedText = "") {
         }
 
         public init(): void {
@@ -71,6 +72,7 @@ module TSOS {
                 // Move the current X position.
                 var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, text);
                 this.currentXPosition = this.currentXPosition + offset;
+                this.savedText = text;
             }
          }
 
@@ -86,6 +88,17 @@ module TSOS {
                                      _FontHeightMargin;
 
             // TODO: Handle scrolling. (iProject 1)
+            if (this.currentYPosition > _Canvas.height){ 
+                alert(this.currentYPosition);           
+                this.init();
+                if (this.savedText.length>1){
+                    this.putText(this.savedText);
+                    this.advanceLine();
+                } else {
+                    this.putText(">" + this.buffer);
+                    this.advanceLine();
+                }
+            }
         }
     }
  }

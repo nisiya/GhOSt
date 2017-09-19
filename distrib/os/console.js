@@ -10,17 +10,19 @@
 var TSOS;
 (function (TSOS) {
     var Console = /** @class */ (function () {
-        function Console(currentFont, currentFontSize, currentXPosition, currentYPosition, buffer) {
+        function Console(currentFont, currentFontSize, currentXPosition, currentYPosition, buffer, savedText) {
             if (currentFont === void 0) { currentFont = _DefaultFontFamily; }
             if (currentFontSize === void 0) { currentFontSize = _DefaultFontSize; }
             if (currentXPosition === void 0) { currentXPosition = 0; }
             if (currentYPosition === void 0) { currentYPosition = _DefaultFontSize; }
             if (buffer === void 0) { buffer = ""; }
+            if (savedText === void 0) { savedText = ""; }
             this.currentFont = currentFont;
             this.currentFontSize = currentFontSize;
             this.currentXPosition = currentXPosition;
             this.currentYPosition = currentYPosition;
             this.buffer = buffer;
+            this.savedText = savedText;
         }
         Console.prototype.init = function () {
             this.clearScreen();
@@ -70,6 +72,7 @@ var TSOS;
                 // Move the current X position.
                 var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, text);
                 this.currentXPosition = this.currentXPosition + offset;
+                this.savedText = text;
             }
         };
         Console.prototype.advanceLine = function () {
@@ -83,6 +86,18 @@ var TSOS;
                 _DrawingContext.fontDescent(this.currentFont, this.currentFontSize) +
                 _FontHeightMargin;
             // TODO: Handle scrolling. (iProject 1)
+            if (this.currentYPosition > _Canvas.height) {
+                alert(this.currentYPosition);
+                this.init();
+                if (this.savedText.length > 1) {
+                    this.putText(this.savedText);
+                    this.advanceLine();
+                }
+                else {
+                    this.putText(">" + this.buffer);
+                    this.advanceLine();
+                }
+            }
         };
         return Console;
     }());
