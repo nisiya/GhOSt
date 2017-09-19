@@ -7,6 +7,7 @@ body {
   font-weight: normal;
   font-style: normal;
   text-align: center;
+  position: relative;
 }
 
 h1 {
@@ -33,15 +34,13 @@ h3 {
 }
 
 #display {
-  background-color:#DFDBC3;
-  border: 2px solid #0101FF;
+  background-color:#FFFFFF;
+  border: 5px solid #0101FF;
   cursor: default;
-  position: fixed;  
-  align-self: auto;
 }
 
 textarea{
-  border: 2px solid #0101ff;
+  border: 5px solid #0101ff;
 }
 
 .normal_button {
@@ -71,7 +70,6 @@ textarea{
 #btnReset:disabled {
   background-image: url(distrib/images/ghostRed.png);
 }
-
 
 label {
   color: #FEF200;

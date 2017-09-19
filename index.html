@@ -38,70 +38,73 @@
 <body onload="onDocumentLoad()">
 
 <div id="divMain" style="width:100%;">
-<img src="distrib/images/title.png" alt="title" style="padding:10px;">
-<div id="divButtonBar" style="margin:4px;">
-      <input type="button"
-             id = "btnStartOS"
-             name="brnStartOS"
-             class="normal_button"
-             value=""
-             title="Start"
-             tabindex="0"
-             onclick="TSOS.Control.hostBtnStartOS_click(this);">
+  <img src="distrib/images/title.png" alt="title" style="padding:10px;">
+  <div id="divButtonBar" style="margin:4px;">
+        <input type="button"
+              id = "btnStartOS"
+              name="brnStartOS"
+              class="normal_button"
+              value=""
+              title="Start"
+              tabindex="0"
+              onclick="TSOS.Control.hostBtnStartOS_click(this);">
 
-      <input type="button"
-             id = "btnHaltOS"
-             name="brnHaltOS"
-             class="normal_button stop_button"
-             disabled="disabled"
-             value=""
-             title="Halt"
-             tabindex="1"
-             onclick="TSOS.Control.hostBtnHaltOS_click(this);">
+        <input type="button"
+              id = "btnHaltOS"
+              name="brnHaltOS"
+              class="normal_button stop_button"
+              disabled="disabled"
+              value=""
+              title="Halt"
+              tabindex="1"
+              onclick="TSOS.Control.hostBtnHaltOS_click(this);">
 
-      <input type="button"
-             id = "btnReset"
-             name="brnReset"
-             class="normal_button stop_button"
-             disabled="disabled"
-             value=""
-             title="Reset"
-             tabindex="2"
-             onclick="TSOS.Control.hostBtnReset_click(this);">
-   </div>
+        <input type="button"
+              id = "btnReset"
+              name="brnReset"
+              class="normal_button stop_button"
+              disabled="disabled"
+              value=""
+              title="Reset"
+              tabindex="2"
+              onclick="TSOS.Control.hostBtnReset_click(this);">
+  </div>
 
-   <div id="divConsole" style="margin:4px; width:500px; height:500px; float:left;">
+  <div id="divConsole" style="margin:4px; width:500px; height:500px; float:left;">
+    <label>
+      Console
       <canvas id="display"
-              width="500px"
-              height="500px"
-              tabindex="3"
-               >
+            width="500px"
+            height="500px"
+            tabindex="3"
+              >
       </canvas>
-   </div>
+    <label>
+  </div>
 
-   <div id="divLog" style="margin-left:520px;">
-      <label>
-         Host Log
-         <br>
-         <textarea name="taHostLog"
-                   id  ="taHostLog"
-                   rows="26"
-                   cols="48"
-         ></textarea>
-      </label>
-   </div>
+  <div id="divLog" style="margin-left:0px;">
+    <label>
+        Host Log
+        <br>
+        <textarea name="taHostLog"
+                  id  ="taHostLog"
+                  rows="26"
+                  cols="48"
+        ></textarea>
+    </label>
+  </div>
 
-   <div id="divUserProgramInput" style="margin-left:520px;">
-      <label>
-         User Program Input
-         <br>
-         <textarea name="taProgramInput"
-                   id  ="taProgramInput"
-                   rows="8"
-                   cols="48"
-         >A9 A9 A2 01 EC 13 00 AC 0B 00 8D 14 00 EE 0B 00 D0 F5 00 00</textarea>
-      </label>
-   </div>
+  <div id="divUserProgramInput" style="margin-left:0px;">
+    <label>
+        User Program Input
+        <br>
+        <textarea name="taProgramInput"
+                  id  ="taProgramInput"
+                  rows="8"
+                  cols="48"
+        >A9 A9 A2 01 EC 13 00 AC 0B 00 8D 14 00 EE 0B 00 D0 F5 00 00</textarea>
+    </label>
+  </div>
 </div>
 
 <p class="footerText" style="clear:both;">
