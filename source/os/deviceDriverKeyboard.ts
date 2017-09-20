@@ -52,9 +52,23 @@ module TSOS {
             } else if (((keyCode >= 48) && (keyCode <= 57)) ||   // digits
                         (keyCode == 32)                     ||   // space
                         (keyCode == 13)                     ||   // enter
-                        (keyCode == 8)) {                        // backspace
+                        (keyCode == 8)                      ||   // backspace
+                        (keyCode == 38)                     ||   // up
+                        (keyCode == 40)) {                       // down
                 chr = String.fromCharCode(keyCode);
+                // for symbol above digits
+                // if (isShifted) {
+                //     // chr = String.fromCharCode(_ChrCodeArr[keyCode].shChr);
+                //     console.log(_ChrCodeArr[keyCode].noShChr);
+                // }
                 _KernelInputQueue.enqueue(chr);
+            }
+            else if (((keyCode >= 186) && (keyCode <= 192))) // punctuations
+            {
+                // console.log(_ChrCodeArr[keyCode].noShChr);
+                // if (isShifted) {
+                //     console.log(_ChrCodeArr[keyCode].shChr);
+                // }
             }
         }
     }

@@ -10,19 +10,19 @@
 var TSOS;
 (function (TSOS) {
     var Console = /** @class */ (function () {
-        function Console(currentFont, currentFontSize, currentXPosition, currentYPosition, buffer, savedText) {
+        function Console(currentFont, currentFontSize, currentXPosition, currentYPosition, buffer, prevCmd) {
             if (currentFont === void 0) { currentFont = _DefaultFontFamily; }
             if (currentFontSize === void 0) { currentFontSize = _DefaultFontSize; }
             if (currentXPosition === void 0) { currentXPosition = 0; }
             if (currentYPosition === void 0) { currentYPosition = _DefaultFontSize; }
             if (buffer === void 0) { buffer = ""; }
-            if (savedText === void 0) { savedText = ""; }
+            if (prevCmd === void 0) { prevCmd = []; }
             this.currentFont = currentFont;
             this.currentFontSize = currentFontSize;
             this.currentXPosition = currentXPosition;
             this.currentYPosition = currentYPosition;
             this.buffer = buffer;
-            this.savedText = savedText;
+            this.prevCmd = prevCmd;
         }
         Console.prototype.init = function () {
             this.clearScreen();
@@ -52,6 +52,29 @@ var TSOS;
                     chr = this.buffer[this.buffer.length - 1];
                     this.removeChr(chr);
                 }
+                else if (chr === String.fromCharCode(38)) {
+                    // go back a command
+                    // remove current command
+                    if (this.buffer !== "") {
+                        var i = this.buffer.length - 1;
+                        while (this.buffer.length > 0) {
+                            this.removeChr(this.buffer[i]);
+                            i--;
+                        }
+                    }
+                    this.putText(this.prevCmd[0]);
+                }
+                else if (chr === String.fromCharCode(40)) {
+                    // go down a command
+                    // remove current command
+                    if (this.buffer !== "") {
+                        var i = this.buffer.length - 1;
+                        while (this.buffer.length > 0) {
+                            this.removeChr(this.buffer[i]);
+                            i--;
+                        }
+                    }
+                }
                 else {
                     // This is a "normal" character, so ...
                     // ... draw it on the screen...
@@ -77,8 +100,8 @@ var TSOS;
                 // Move the current X position.
                 var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, text);
                 this.currentXPosition = this.currentXPosition + offset;
-                this.savedText = text;
             }
+            console.log(this.currentXPosition);
         };
         Console.prototype.removeChr = function (chr) {
             if (this.buffer !== "") {
@@ -94,6 +117,7 @@ var TSOS;
                     _DrawingContext.fontDescent(this.currentFont, this.currentFontSize));
                 // offset is the width of the rectangle
                 _DrawingContext.clearRect(this.currentXPosition, chrTop, offset, chrHeight);
+                console.log(this.currentXPosition);
                 // save for future debugging
                 // console.log(chrHeight + "," + chrTop)
                 // _DrawingContext.beginPath();
@@ -105,6 +129,8 @@ var TSOS;
             }
         };
         Console.prototype.advanceLine = function () {
+            //add command to previous command list
+            this.prevCmd.push(this.buffer);
             this.currentXPosition = 0;
             /*
              * Font size measures from the baseline to the highest point in the font.

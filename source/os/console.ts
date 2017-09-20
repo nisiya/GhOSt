@@ -18,7 +18,7 @@ module TSOS {
                     public currentXPosition = 0,
                     public currentYPosition = _DefaultFontSize,
                     public buffer = "",
-                    public savedText = "") {
+                    public prevCmd: string[] = []) {
         }
 
         public init(): void {
@@ -50,7 +50,29 @@ module TSOS {
                     // delete a character
                     chr = this.buffer[this.buffer.length-1];
                     this.removeChr(chr);
-                } else {
+                } else if (chr === String.fromCharCode(38)) { //   Up key
+                    // go back a command
+                    // remove current command
+                    if(this.buffer !== ""){
+                        var i = this.buffer.length - 1;
+                        while (this.buffer.length > 0){
+                            this.removeChr(this.buffer[i]);
+                            i--;
+                        }
+                    }
+                    this.putText(this.prevCmd[0]);                    
+                } else if (chr === String.fromCharCode(40)) { //   Down key
+                    // go down a command
+                    // remove current command
+                    if(this.buffer !== ""){
+                        var i = this.buffer.length - 1;
+                        while (this.buffer.length > 0){
+                            this.removeChr(this.buffer[i]);
+                            i--;
+                        }
+                    }
+                } 
+                else {
                     // This is a "normal" character, so ...
                     // ... draw it on the screen...
                     this.putText(chr);
@@ -76,8 +98,8 @@ module TSOS {
                 // Move the current X position.
                 var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, text);
                 this.currentXPosition = this.currentXPosition + offset;
-                this.savedText = text;
             }
+            console.log(this.currentXPosition);
         }
 
         public removeChr(chr): void {
@@ -95,6 +117,7 @@ module TSOS {
                                 _DrawingContext.fontDescent(this.currentFont, this.currentFontSize));    
                 // offset is the width of the rectangle
                 _DrawingContext.clearRect(this.currentXPosition, chrTop , offset, chrHeight); 
+                console.log(this.currentXPosition);
                 
                 // save for future debugging
                 // console.log(chrHeight + "," + chrTop)
@@ -109,6 +132,8 @@ module TSOS {
         }
 
         public advanceLine(): void {
+            //add command to previous command list
+            this.prevCmd.push(this.buffer);
             this.currentXPosition = 0;
             /*
              * Font size measures from the baseline to the highest point in the font.

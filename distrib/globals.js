@@ -10,8 +10,8 @@
 //
 // Global CONSTANTS (TypeScript 1.5 introduced const. Very cool.)
 //
-var APP_NAME = "OreOS"; // Cause I'm craving thoses now
-var APP_VERSION = "30"; // The amount that I want to eat
+var APP_NAME = "GhOSt"; // Cause I'm craving thoses now
+var APP_VERSION = "7"; // The amount that I want to eat
 var CPU_CLOCK_INTERVAL = 100; // This is in ms (milliseconds) so 1000 = 1 second.
 var TIMER_IRQ = 0; // Pages 23 (timer), 9 (interrupts), and 561 (interrupt priority).
 // NOTE: The timer is different from hardware/host clock pulses. Don't confuse these.
@@ -52,6 +52,31 @@ var _GLaDOS = null; // If the above is linked in, this is the instantiated insta
 var _DateTime = new Date();
 var _Date = _DateTime.toDateString();
 var _Time = _DateTime.toLocaleTimeString();
+var _ChrCodeArr = [
+    // above numbers
+    { "key": 48, "noShChr": 48, "shChr": 41 },
+    { "key": 49, "noShChr": 49, "shChr": 33 },
+    { "key": 50, "noShChr": 50, "shChr": 64 },
+    { "key": 51, "noShChr": 51, "shChr": 35 },
+    { "key": 52, "noShChr": 52, "shChr": 36 },
+    { "key": 53, "noShChr": 53, "shChr": 37 },
+    { "key": 54, "noShChr": 54, "shChr": 94 },
+    { "key": 55, "noShChr": 55, "shChr": 38 },
+    { "key": 56, "noShChr": 56, "shChr": 42 },
+    { "key": 57, "noShChr": 57, "shChr": 40 },
+    // others
+    { "key": 186, "noShChr": 59, "shChr": 58 },
+    { "key": 187, "noShChr": 61, "shChr": 43 },
+    { "key": 188, "noShChr": 44, "shChr": 60 },
+    { "key": 189, "noShChr": 45, "shChr": 95 },
+    { "key": 190, "noShChr": 46, "shChr": 62 },
+    { "key": 191, "noShChr": 47, "shChr": 63 },
+    { "key": 192, "noShChr": 96, "shChr": 126 },
+    { "key": 219, "noShChr": 91, "shChr": 123 },
+    { "key": 220, "noShChr": 92, "shChr": 124 },
+    { "key": 221, "noShChr": 93, "shChr": 125 },
+    { "key": 222, "noShChr": 39, "shChr": 34 }
+];
 var onDocumentLoad = function () {
     TSOS.Control.hostInit();
     var clock = document.getElementById("clock");
