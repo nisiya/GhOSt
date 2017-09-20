@@ -33,7 +33,7 @@ module TSOS {
 
         public krnKbdDispatchKeyPress(params) {
             // Parse the params.    TODO: Check that the params are valid and osTrapError if not.
-            var keyCode = params[0];
+            var keyCode: number = params[0];
             var isShifted = params[1];
             _Kernel.krnTrace("Key code:" + keyCode + " shifted:" + isShifted);
             var chr = "";
@@ -57,18 +57,32 @@ module TSOS {
                         (keyCode == 40)) {                       // down
                 chr = String.fromCharCode(keyCode);
                 // for symbol above digits
-                // if (isShifted) {
-                //     // chr = String.fromCharCode(_ChrCodeArr[keyCode].shChr);
-                //     console.log(_ChrCodeArr[keyCode].noShChr);
-                // }
+                if (isShifted) {
+                    // special case 
+                    if (_KeyToChr[keyCode].shChr == 38){
+                        chr = '&';
+                    } else if (_KeyToChr[keyCode].shChr == 40){
+                        chr = '(';
+                    } else {
+                        chr = String.fromCharCode(_KeyToChr[keyCode].shChr);
+                    }
+                }
+                console.log(chr);                                                        
                 _KernelInputQueue.enqueue(chr);
             }
-            else if (((keyCode >= 186) && (keyCode <= 192))) // punctuations
+            else if (((keyCode >= 186) && (keyCode <= 192)) ||
+                     ((keyCode >= 219) && (keyCode <= 222))) // punctuations
             {
-                // console.log(_ChrCodeArr[keyCode].noShChr);
-                // if (isShifted) {
-                //     console.log(_ChrCodeArr[keyCode].shChr);
-                // }
+                // bottom of key
+                chr = String.fromCharCode(_KeyToChr[keyCode].noShChr);
+                console.log(chr);
+                if (isShifted) {
+                    // top of key
+                    console.log(_KeyToChr[keyCode].shChr);
+                    chr = String.fromCharCode(_KeyToChr[keyCode].shChr);
+                    console.log(chr);                    
+                }
+                _KernelInputQueue.enqueue(chr);                
             }
         }
     }

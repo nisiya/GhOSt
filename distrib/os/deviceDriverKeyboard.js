@@ -65,17 +65,33 @@ var TSOS;
                 (keyCode == 40)) {
                 chr = String.fromCharCode(keyCode);
                 // for symbol above digits
-                // if (isShifted) {
-                //     // chr = String.fromCharCode(_ChrCodeArr[keyCode].shChr);
-                //     console.log(_ChrCodeArr[keyCode].noShChr);
-                // }
+                if (isShifted) {
+                    // special case 
+                    if (_KeyToChr[keyCode].shChr == 38) {
+                        chr = '&';
+                    }
+                    else if (_KeyToChr[keyCode].shChr == 40) {
+                        chr = '(';
+                    }
+                    else {
+                        chr = String.fromCharCode(_KeyToChr[keyCode].shChr);
+                    }
+                }
+                console.log(chr);
                 _KernelInputQueue.enqueue(chr);
             }
-            else if (((keyCode >= 186) && (keyCode <= 192))) {
-                // console.log(_ChrCodeArr[keyCode].noShChr);
-                // if (isShifted) {
-                //     console.log(_ChrCodeArr[keyCode].shChr);
-                // }
+            else if (((keyCode >= 186) && (keyCode <= 192)) ||
+                ((keyCode >= 219) && (keyCode <= 222))) {
+                // bottom of key
+                chr = String.fromCharCode(_KeyToChr[keyCode].noShChr);
+                console.log(chr);
+                if (isShifted) {
+                    // top of key
+                    console.log(_KeyToChr[keyCode].shChr);
+                    chr = String.fromCharCode(_KeyToChr[keyCode].shChr);
+                    console.log(chr);
+                }
+                _KernelInputQueue.enqueue(chr);
             }
         };
         return DeviceDriverKeyboard;

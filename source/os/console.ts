@@ -160,14 +160,19 @@ module TSOS {
 
             // TODO: Handle scrolling. (iProject 1)
             if (this.currentYPosition > _Canvas.height){ 
-
-                // 
+                // keep track of position of last line
                 var saveYPosition = this.currentYPosition;
+                // start copying after first line which will "scroll up"
                 var copyYPostion = this.currentYPosition - _Canvas.height;
+                // save screenshot
                 var imgData = _DrawingContext.getImageData(0, copyYPostion, _Canvas.width, _Canvas.height);
+                // use below for debugging
                 // console.log(imgData);
+                // clear screen
                 this.init();
+                // put screenshot to top of screen
                 _DrawingContext.putImageData(imgData, 0, 0);
+                // put cursor back to correct
                 this.currentYPosition = saveYPosition - copyYPostion - _FontHeightMargin;
             }
         }

@@ -70,38 +70,64 @@ var _DateTime = new Date();
 var _Date = _DateTime.toDateString();
 var _Time = _DateTime.toLocaleTimeString()
 
-// for punctuation and symbol
-interface keyToChr {
-    key: number;
-    noShChr: number;
-    shChr: number;
-}
-var _ChrCodeArr: keyToChr [] = [
-    // above numbers
-    { "key": 48, "noShChr": 48, "shChr": 41 },
-    { "key": 49, "noShChr": 49, "shChr": 33 },
-    { "key": 50, "noShChr": 50, "shChr": 64 },
-    { "key": 51, "noShChr": 51, "shChr": 35 },
-    { "key": 52, "noShChr": 52, "shChr": 36 },
-    { "key": 53, "noShChr": 53, "shChr": 37 },
-    { "key": 54, "noShChr": 54, "shChr": 94 },
-    { "key": 55, "noShChr": 55, "shChr": 38 },
-    { "key": 56, "noShChr": 56, "shChr": 42 },
-    { "key": 57, "noShChr": 57, "shChr": 40 },
+// // for punctuation and symbol
+// interface keyToChr {
+//     key: number;
+//     noShChr: number;
+//     shChr: number;
+// }
+// var _ChrCodeArr: keyToChr [] = [
+//     // above numbers
+//     { "key": 48, "noShChr": 48, "shChr": 41 },
+//     { "key": 49, "noShChr": 49, "shChr": 33 },
+//     { "key": 50, "noShChr": 50, "shChr": 64 },
+//     { "key": 51, "noShChr": 51, "shChr": 35 },
+//     { "key": 52, "noShChr": 52, "shChr": 36 },
+//     { "key": 53, "noShChr": 53, "shChr": 37 },
+//     { "key": 54, "noShChr": 54, "shChr": 94 },
+//     { "key": 55, "noShChr": 55, "shChr": 38 },
+//     { "key": 56, "noShChr": 56, "shChr": 42 },
+//     { "key": 57, "noShChr": 57, "shChr": 40 },
+
+//     // others
+//     { "key": 186, "noShChr": 59, "shChr": 58 },
+//     { "key": 187, "noShChr": 61, "shChr": 43 },
+//     { "key": 188, "noShChr": 44, "shChr": 60 },
+//     { "key": 189, "noShChr": 45, "shChr": 95 },
+//     { "key": 190, "noShChr": 46, "shChr": 62 },
+//     { "key": 191, "noShChr": 47, "shChr": 63 },
+//     { "key": 192, "noShChr": 96, "shChr": 126 },
+//     { "key": 219, "noShChr": 91, "shChr": 123 },
+//     { "key": 220, "noShChr": 92, "shChr": 124 },
+//     { "key": 221, "noShChr": 93, "shChr": 125 },
+//     { "key": 222, "noShChr": 39, "shChr": 34 }
+// ]
+
+var _KeyToChr = {
+    "48" : {"noShChr": 48, "shChr": 41},
+    "49" : {"noShChr": 49, "shChr": 33 },
+    "50" : {"noShChr": 50, "shChr": 64 },
+    "51" : {"noShChr": 51, "shChr": 35 },
+    "52" : {"noShChr": 52, "shChr": 36 },
+    "53" : {"noShChr": 53, "shChr": 37 },
+    "54" : {"noShChr": 54, "shChr": 94 },
+    "55" : {"noShChr": 55, "shChr": 38 },
+    "56" : {"noShChr": 56, "shChr": 42 },
+    "57" : {"noShChr": 57, "shChr": 40 },
 
     // others
-    { "key": 186, "noShChr": 59, "shChr": 58 },
-    { "key": 187, "noShChr": 61, "shChr": 43 },
-    { "key": 188, "noShChr": 44, "shChr": 60 },
-    { "key": 189, "noShChr": 45, "shChr": 95 },
-    { "key": 190, "noShChr": 46, "shChr": 62 },
-    { "key": 191, "noShChr": 47, "shChr": 63 },
-    { "key": 192, "noShChr": 96, "shChr": 126 },
-    { "key": 219, "noShChr": 91, "shChr": 123 },
-    { "key": 220, "noShChr": 92, "shChr": 124 },
-    { "key": 221, "noShChr": 93, "shChr": 125 },
-    { "key": 222, "noShChr": 39, "shChr": 34 }
-]
+    "186" : {"noShChr": 59, "shChr": 58 },
+    "187" : {"noShChr": 61, "shChr": 43 },
+    "188" : {"noShChr": 44, "shChr": 60 },
+    "189" : {"noShChr": 45, "shChr": 95 },
+    "190" : {"noShChr": 46, "shChr": 62 },
+    "191" : {"noShChr": 47, "shChr": 63 },
+    "192" : {"noShChr": 96, "shChr": 126 },
+    "219" : {"noShChr": 91, "shChr": 123 },
+    "220" : {"noShChr": 92, "shChr": 124 },
+    "221" : {"noShChr": 93, "shChr": 125 },
+    "222" : {"noShChr": 39, "shChr": 34 }
+}
 
 var onDocumentLoad = function() {
     TSOS.Control.hostInit();
