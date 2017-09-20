@@ -53,21 +53,22 @@ module TSOS {
                         (keyCode == 32)                     ||   // space
                         (keyCode == 13)                     ||   // enter
                         (keyCode == 8)                      ||   // backspace
+                        (keyCode == 9)                      ||   // tab
                         (keyCode == 38)                     ||   // up
                         (keyCode == 40)) {                       // down
-                chr = String.fromCharCode(keyCode);
                 // for symbol above digits
                 if (isShifted) {
-                    // special case 
-                    if (_KeyToChr[keyCode].shChr == 38){
-                        chr = '&';
-                    } else if (_KeyToChr[keyCode].shChr == 40){
-                        chr = '(';
+                    chr = String.fromCharCode(_KeyToChr[keyCode].shChr);
+                } else {
+                    // .. special case so two characters
+                    if (keyCode === 38){
+                        chr = '38'; // up arrow same as &
+                    } else if (keyCode === 40){
+                        chr = '40'; // down arrow same as (
                     } else {
-                        chr = String.fromCharCode(_KeyToChr[keyCode].shChr);
+                    chr = String.fromCharCode(keyCode);                    
                     }
                 }
-                console.log(chr);                                                        
                 _KernelInputQueue.enqueue(chr);
             }
             else if (((keyCode >= 186) && (keyCode <= 192)) ||

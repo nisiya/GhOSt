@@ -57,7 +57,7 @@ var TSOS;
                     chr = this.buffer[this.buffer.length - 1];
                     this.removeChr(chr);
                 }
-                else if (chr === String.fromCharCode(38)) {
+                else if (chr === '38') {
                     // counter is within length of previous command list
                     if (this.updown < this.prevCmd.length) {
                         this.updown++;
@@ -75,7 +75,7 @@ var TSOS;
                         this.buffer = this.prevCmd[this.prevCmd.length - this.updown];
                     }
                 }
-                else if (chr === String.fromCharCode(40)) {
+                else if (chr === '40') {
                     // only if up key was used before
                     if (this.updown > 1) {
                         this.updown--;

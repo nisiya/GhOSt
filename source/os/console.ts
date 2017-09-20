@@ -53,7 +53,7 @@ module TSOS {
                     // delete a character
                     chr = this.buffer[this.buffer.length-1];
                     this.removeChr(chr);
-                } else if (chr === String.fromCharCode(38)) { //   Up key
+                } else if (chr === '38') { //   Up key
                     // counter is within length of previous command list
                     if (this.updown < this.prevCmd.length){
                         this.updown ++;
@@ -70,7 +70,7 @@ module TSOS {
                         // current text is now previous command so add to buffer
                         this.buffer = this.prevCmd[this.prevCmd.length-this.updown];
                     }              
-                } else if (chr === String.fromCharCode(40)) { //   Down key
+                } else if (chr === '40') { //   Down key
                     // only if up key was used before
                     if(this.updown > 1){
                         this.updown--;
@@ -87,7 +87,7 @@ module TSOS {
                         // current text is now that command so add to buffer
                         this.buffer = this.prevCmd[this.prevCmd.length-this.updown];                        
                     }
-                } 
+                }
                 else {
                     // This is a "normal" character, so ...
                     // ... draw it on the screen...
