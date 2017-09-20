@@ -18,7 +18,8 @@ module TSOS {
                     public currentXPosition = 0,
                     public currentYPosition = _DefaultFontSize,
                     public buffer = "",
-                    public prevCmd: string[] = []) {
+                    public prevCmd: string[] = [],
+                    public updown = 0) {
         }
 
         public init(): void {
@@ -51,6 +52,7 @@ module TSOS {
                     chr = this.buffer[this.buffer.length-1];
                     this.removeChr(chr);
                 } else if (chr === String.fromCharCode(38)) { //   Up key
+                    this.updown ++;
                     // go back a command
                     // remove current command
                     if(this.buffer !== ""){
@@ -60,16 +62,21 @@ module TSOS {
                             i--;
                         }
                     }
-                    this.putText(this.prevCmd[0]);                    
+                    this.putText(this.prevCmd[this.prevCmd.length-1]);                    
                 } else if (chr === String.fromCharCode(40)) { //   Down key
+                    if(this.updown !== 0){
+                        this.updown --;
                     // go down a command
                     // remove current command
-                    if(this.buffer !== ""){
-                        var i = this.buffer.length - 1;
-                        while (this.buffer.length > 0){
-                            this.removeChr(this.buffer[i]);
-                            i--;
+                        if(this.buffer !== ""){
+                            var i = this.buffer.length - 1;
+                            while (this.buffer.length > 0){
+                                this.removeChr(this.buffer[i]);
+                                i--;
+                            }
                         }
+                    } else{
+
                     }
                 } 
                 else {

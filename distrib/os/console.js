@@ -10,19 +10,21 @@
 var TSOS;
 (function (TSOS) {
     var Console = /** @class */ (function () {
-        function Console(currentFont, currentFontSize, currentXPosition, currentYPosition, buffer, prevCmd) {
+        function Console(currentFont, currentFontSize, currentXPosition, currentYPosition, buffer, prevCmd, updown) {
             if (currentFont === void 0) { currentFont = _DefaultFontFamily; }
             if (currentFontSize === void 0) { currentFontSize = _DefaultFontSize; }
             if (currentXPosition === void 0) { currentXPosition = 0; }
             if (currentYPosition === void 0) { currentYPosition = _DefaultFontSize; }
             if (buffer === void 0) { buffer = ""; }
             if (prevCmd === void 0) { prevCmd = []; }
+            if (updown === void 0) { updown = 0; }
             this.currentFont = currentFont;
             this.currentFontSize = currentFontSize;
             this.currentXPosition = currentXPosition;
             this.currentYPosition = currentYPosition;
             this.buffer = buffer;
             this.prevCmd = prevCmd;
+            this.updown = updown;
         }
         Console.prototype.init = function () {
             this.clearScreen();
@@ -53,6 +55,7 @@ var TSOS;
                     this.removeChr(chr);
                 }
                 else if (chr === String.fromCharCode(38)) {
+                    this.updown++;
                     // go back a command
                     // remove current command
                     if (this.buffer !== "") {
@@ -62,17 +65,22 @@ var TSOS;
                             i--;
                         }
                     }
-                    this.putText(this.prevCmd[0]);
+                    this.putText(this.prevCmd[this.prevCmd.length - 1]);
                 }
                 else if (chr === String.fromCharCode(40)) {
-                    // go down a command
-                    // remove current command
-                    if (this.buffer !== "") {
-                        var i = this.buffer.length - 1;
-                        while (this.buffer.length > 0) {
-                            this.removeChr(this.buffer[i]);
-                            i--;
+                    if (this.updown !== 0) {
+                        this.updown--;
+                        // go down a command
+                        // remove current command
+                        if (this.buffer !== "") {
+                            var i = this.buffer.length - 1;
+                            while (this.buffer.length > 0) {
+                                this.removeChr(this.buffer[i]);
+                                i--;
+                            }
                         }
+                    }
+                    else {
                     }
                 }
                 else {
