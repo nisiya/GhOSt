@@ -115,20 +115,15 @@ module TSOS {
 
             // TODO: Handle scrolling. (iProject 1)
             if (this.currentYPosition > _Canvas.height){ 
-                // uncomment for debugging
-                // alert(this.currentYPosition);           
 
-                // clear screen and reset XY
+                // 
+                var saveYPosition = this.currentYPosition;
+                var copyYPostion = this.currentYPosition - _Canvas.height;
+                var imgData = _DrawingContext.getImageData(0, copyYPostion, _Canvas.width, _Canvas.height);
+                console.log(imgData);
                 this.init();
-
-                // check if ended with key press or text output and print accordingly
-                if (this.savedText.length>1){
-                    this.putText(this.savedText);
-                    this.advanceLine();
-                } else {
-                    this.putText(">" + this.buffer);
-                    this.advanceLine();
-                }
+                _DrawingContext.putImageData(imgData, 0, 0);
+                this.currentYPosition = saveYPosition - copyYPostion - _FontHeightMargin;
             }
         }
     }
