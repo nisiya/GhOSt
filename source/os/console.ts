@@ -17,7 +17,6 @@ module TSOS {
                     public currentFontSize = _DefaultFontSize,
                     public currentXPosition = 0,
                     public currentYPosition = _DefaultFontSize,
-                    public del = 2,
                     public buffer = "",
                     public savedText = "") {
         }
@@ -50,8 +49,7 @@ module TSOS {
                 } else if (chr === String.fromCharCode(8)) { //   Backspace key
                     // delete a character
                     chr = this.buffer[this.buffer.length-1];
-                    alert("remove " + chr);
-                    this.removeText(chr);
+                    this.removeChr(chr);
                 } else {
                     // This is a "normal" character, so ...
                     // ... draw it on the screen...
@@ -74,7 +72,7 @@ module TSOS {
             //         Consider fixing that.
             if (text !== "") {
                 // Draw the text at the current X and Y coordinates.
-                _DrawingContext.drawText(this.currentFont, this.currentFontSize, this.currentXPosition, this.currentYPosition, text, this.del );
+                _DrawingContext.drawText(this.currentFont, this.currentFontSize, this.currentXPosition, this.currentYPosition, text);
                 // Move the current X position.
                 var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, text);
                 this.currentXPosition = this.currentXPosition + offset;
@@ -82,21 +80,29 @@ module TSOS {
             }
         }
 
-        public removeText(chr): void {
+        public removeChr(chr): void {
             if (this.buffer !== "") {
-                // Draw the text at the current X and Y coordinates.
-                _DrawingContext.save();
                 // Move cursor back to X position before chr written.
                 var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, chr);
                 this.currentXPosition = this.currentXPosition - offset;
                 
-                // write over with canvas color
-                this.del = 1;
-                _DrawingContext.drawText(this.currentFont, this.currentFontSize, this.currentXPosition, this.currentYPosition, chr, this.del);
+                // clear chr with clearRect
+                var chrHeight = _DefaultFontSize + 
+                            _DrawingContext.fontDescent(this.currentFont, this.currentFontSize) +
+                            _FontHeightMargin;
+                // highest point of chr
+                var chrTop = this.currentYPosition - (_DefaultFontSize + 
+                                _DrawingContext.fontDescent(this.currentFont, this.currentFontSize));    
+                // offset is the width of the rectangle
+                _DrawingContext.clearRect(this.currentXPosition, chrTop , offset, chrHeight); 
+                
+                // save for future debugging
+                // console.log(chrHeight + "," + chrTop)
+                // _DrawingContext.beginPath();
+                // _DrawingContext.rect(this.currentXPosition, chrTop , offset, chrHeight);
+                // _DrawingContext.stroke();
 
-                // Move cursor back to X position again to be ready for new text
-                this.del = 2;
-                // remove from buffer
+                // remove chr from buffer
                 var newBuffer:string = this.buffer.substring(0, this.buffer.length - 1);
                 this.buffer = newBuffer;
             }

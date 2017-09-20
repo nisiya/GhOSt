@@ -184,7 +184,7 @@ module TSOS {
         }
 
         public static enable(ctx) {
-            ctx.drawText = function(font,size,x,y,text, del) { return CanvasTextFunctions.draw( ctx, font,size,x,y,text); };
+            ctx.drawText = function(font,size,x,y,text) { return CanvasTextFunctions.draw( ctx, font,size,x,y,text); };
             ctx.measureText = function(font,size,text) { return CanvasTextFunctions.measure( font,size,text); };
             ctx.fontAscent = function(font,size) { return CanvasTextFunctions.ascent(font,size); };
             ctx.fontDescent = function(font,size) { return CanvasTextFunctions.descent(font,size); };
