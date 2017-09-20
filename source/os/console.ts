@@ -18,8 +18,8 @@ module TSOS {
                     public currentXPosition = 0,
                     public currentYPosition = _DefaultFontSize,
                     public buffer = "",
-                    public prevCmd: string[] = [],
-                    public updown = 0) {
+                    public prevCmd: string[] = [], // store handled commands
+                    public updown = 0) { // counter to index through previous commands
         }
 
         public init(): void {
@@ -45,6 +45,8 @@ module TSOS {
                     // The enter key marks the end of a console command, so ...
                     // ... tell the shell ...
                     _OsShell.handleInput(this.buffer);
+                    // add command to previous command list
+                    this.prevCmd.push(this.buffer);
                     // ... and reset our buffer.
                     this.buffer = "";
                 } else if (chr === String.fromCharCode(8)) { //   Backspace key
@@ -52,22 +54,10 @@ module TSOS {
                     chr = this.buffer[this.buffer.length-1];
                     this.removeChr(chr);
                 } else if (chr === String.fromCharCode(38)) { //   Up key
-                    this.updown ++;
-                    // go back a command
-                    // remove current command
-                    if(this.buffer !== ""){
-                        var i = this.buffer.length - 1;
-                        while (this.buffer.length > 0){
-                            this.removeChr(this.buffer[i]);
-                            i--;
-                        }
-                    }
-                    this.putText(this.prevCmd[this.prevCmd.length-1]);                    
-                } else if (chr === String.fromCharCode(40)) { //   Down key
-                    if(this.updown !== 0){
-                        this.updown --;
-                    // go down a command
-                    // remove current command
+                    // counter is within length of previous command list
+                    if (this.updown < this.prevCmd.length){
+                        this.updown ++;
+                        // remove current text
                         if(this.buffer !== ""){
                             var i = this.buffer.length - 1;
                             while (this.buffer.length > 0){
@@ -75,8 +65,27 @@ module TSOS {
                                 i--;
                             }
                         }
-                    } else{
-
+                        // put previous command
+                        this.putText(this.prevCmd[this.prevCmd.length-this.updown]);
+                        // current text is now previous command so add to buffer
+                        this.buffer = this.prevCmd[this.prevCmd.length-this.updown];
+                    }              
+                } else if (chr === String.fromCharCode(40)) { //   Down key
+                    // only if up key was used before
+                    if(this.updown > 1){
+                        this.updown--;
+                         // remove current text
+                        if(this.buffer !== ""){
+                            var i = this.buffer.length - 1;
+                            while (this.buffer.length > 0){
+                                this.removeChr(this.buffer[i]);
+                                i--;
+                            }
+                        }
+                        // put next command in previous command list
+                        this.putText(this.prevCmd[this.prevCmd.length-this.updown]);
+                        // current text is now that command so add to buffer
+                        this.buffer = this.prevCmd[this.prevCmd.length-this.updown];                        
                     }
                 } 
                 else {
@@ -106,7 +115,7 @@ module TSOS {
                 var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, text);
                 this.currentXPosition = this.currentXPosition + offset;
             }
-            console.log(this.currentXPosition);
+            // console.log(this.currentXPosition);
         }
 
         public removeChr(chr): void {
@@ -124,7 +133,7 @@ module TSOS {
                                 _DrawingContext.fontDescent(this.currentFont, this.currentFontSize));    
                 // offset is the width of the rectangle
                 _DrawingContext.clearRect(this.currentXPosition, chrTop , offset, chrHeight); 
-                console.log(this.currentXPosition);
+                // console.log(this.currentXPosition);
                 
                 // save for future debugging
                 // console.log(chrHeight + "," + chrTop)
@@ -139,8 +148,6 @@ module TSOS {
         }
 
         public advanceLine(): void {
-            //add command to previous command list
-            this.prevCmd.push(this.buffer);
             this.currentXPosition = 0;
             /*
              * Font size measures from the baseline to the highest point in the font.
@@ -158,7 +165,7 @@ module TSOS {
                 var saveYPosition = this.currentYPosition;
                 var copyYPostion = this.currentYPosition - _Canvas.height;
                 var imgData = _DrawingContext.getImageData(0, copyYPostion, _Canvas.width, _Canvas.height);
-                console.log(imgData);
+                // console.log(imgData);
                 this.init();
                 _DrawingContext.putImageData(imgData, 0, 0);
                 this.currentYPosition = saveYPosition - copyYPostion - _FontHeightMargin;
