@@ -9,18 +9,29 @@
      ------------ */
 var TSOS;
 (function (TSOS) {
-    var Console = (function () {
-        function Console(currentFont, currentFontSize, currentXPosition, currentYPosition, buffer) {
+    var Console = /** @class */ (function () {
+        function Console(currentFont, currentFontSize, currentXPosition, currentYPosition, buffer, prevCmd, // store handled commands
+            updown, // counter to index through previous commands
+            matchCmd, // store all matching commands
+            matchIndex) {
             if (currentFont === void 0) { currentFont = _DefaultFontFamily; }
             if (currentFontSize === void 0) { currentFontSize = _DefaultFontSize; }
             if (currentXPosition === void 0) { currentXPosition = 0; }
             if (currentYPosition === void 0) { currentYPosition = _DefaultFontSize; }
             if (buffer === void 0) { buffer = ""; }
+            if (prevCmd === void 0) { prevCmd = []; }
+            if (updown === void 0) { updown = 0; }
+            if (matchCmd === void 0) { matchCmd = []; }
+            if (matchIndex === void 0) { matchIndex = 0; }
             this.currentFont = currentFont;
             this.currentFontSize = currentFontSize;
             this.currentXPosition = currentXPosition;
             this.currentYPosition = currentYPosition;
             this.buffer = buffer;
+            this.prevCmd = prevCmd;
+            this.updown = updown;
+            this.matchCmd = matchCmd;
+            this.matchIndex = matchIndex;
         }
         Console.prototype.init = function () {
             this.clearScreen();
@@ -42,8 +53,62 @@ var TSOS;
                     // The enter key marks the end of a console command, so ...
                     // ... tell the shell ...
                     _OsShell.handleInput(this.buffer);
+                    // add command to previous command list
+                    this.prevCmd.push(this.buffer);
                     // ... and reset our buffer.
                     this.buffer = "";
+                }
+                else if (chr === String.fromCharCode(8)) {
+                    // delete a character
+                    chr = this.buffer[this.buffer.length - 1];
+                    this.removeChr(chr);
+                }
+                else if (chr === '38') {
+                    // counter is within length of previous command list
+                    if (this.updown < this.prevCmd.length) {
+                        this.updown++;
+                        // remove current text
+                        this.removeLine();
+                        // put previous command
+                        this.putText(this.prevCmd[this.prevCmd.length - this.updown]);
+                        // current text is now previous command so add to buffer
+                        this.buffer = this.prevCmd[this.prevCmd.length - this.updown];
+                    }
+                }
+                else if (chr === '40') {
+                    // only if up key was used before
+                    if (this.updown > 1) {
+                        this.updown--;
+                        this.removeLine();
+                        this.putText(this.prevCmd[this.prevCmd.length - this.updown]);
+                        this.buffer = this.prevCmd[this.prevCmd.length - this.updown];
+                    }
+                }
+                else if (chr === String.fromCharCode(9)) {
+                    if (this.matchCmd.length == 0) {
+                        // first tab on new line
+                        var re = new RegExp('^' + this.buffer + '', 'i');
+                        // find all commands that start with str in buffer               
+                        for (var i = 0; i < _OsShell.commandList.length; i++) {
+                            if (re.test(_OsShell.commandList[i].command)) {
+                                this.matchCmd.push(_OsShell.commandList[i].command);
+                            }
+                        }
+                        console.log(this.matchCmd.length);
+                        this.matchIndex = 0;
+                    }
+                    if (this.matchCmd.length > 0) {
+                        // replace current text with previous command
+                        this.removeLine();
+                        this.putText(this.matchCmd[this.matchIndex]);
+                        this.buffer = this.matchCmd[this.matchIndex];
+                        if (this.matchIndex == (this.matchCmd.length - 1)) {
+                            this.matchCmd = [];
+                        }
+                        else {
+                            this.matchIndex++;
+                        }
+                    }
                 }
                 else {
                     // This is a "normal" character, so ...
@@ -52,6 +117,7 @@ var TSOS;
                     // ... and add it to our buffer.
                     this.buffer += chr;
                 }
+                // TODO: Write a case for Ctrl-C.
             }
         };
         Console.prototype.putText = function (text) {
@@ -70,6 +136,49 @@ var TSOS;
                 var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, text);
                 this.currentXPosition = this.currentXPosition + offset;
             }
+            // console.log(this.currentXPosition);
+        };
+        Console.prototype.removeChr = function (chr) {
+            if (this.buffer !== "") {
+                // if beginning of line, move cursor back to previous line
+                if (this.currentXPosition <= 0) {
+                    this.currentYPosition -= _DefaultFontSize +
+                        _DrawingContext.fontDescent(this.currentFont, this.currentFontSize) +
+                        _FontHeightMargin;
+                    // get end of text position from that line
+                    this.currentXPosition = _SaveX;
+                }
+                // Move cursor back to X position before chr written.
+                var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, chr);
+                this.currentXPosition = this.currentXPosition - offset;
+                // clear chr with clearRect
+                var chrHeight = _DefaultFontSize +
+                    _DrawingContext.fontDescent(this.currentFont, this.currentFontSize) +
+                    _FontHeightMargin;
+                // highest point of chr
+                var chrTop = this.currentYPosition - (_DefaultFontSize +
+                    _DrawingContext.fontDescent(this.currentFont, this.currentFontSize));
+                // offset is the width of the rectangle
+                _DrawingContext.clearRect(this.currentXPosition, chrTop, offset, chrHeight);
+                // console.log(this.currentXPosition);
+                // save for future debugging
+                // console.log(chrHeight + "," + chrTop)
+                // _DrawingContext.beginPath();
+                // _DrawingContext.rect(this.currentXPosition, chrTop , offset, chrHeight);
+                // _DrawingContext.stroke();
+                // remove chr from buffer
+                var newBuffer = this.buffer.substring(0, this.buffer.length - 1);
+                this.buffer = newBuffer;
+            }
+        };
+        Console.prototype.removeLine = function () {
+            if (this.buffer !== "") {
+                var i = this.buffer.length - 1;
+                while (this.buffer.length > 0) {
+                    this.removeChr(this.buffer[i]);
+                    i--;
+                }
+            }
         };
         Console.prototype.advanceLine = function () {
             this.currentXPosition = 0;
@@ -82,8 +191,24 @@ var TSOS;
                 _DrawingContext.fontDescent(this.currentFont, this.currentFontSize) +
                 _FontHeightMargin;
             // TODO: Handle scrolling. (iProject 1)
+            if (this.currentYPosition > _Canvas.height) {
+                // keep track of position of last line
+                var saveYPosition = this.currentYPosition;
+                // start copying after first line which will "scroll up"
+                var copyYPostion = this.currentYPosition - _Canvas.height;
+                // save screenshot
+                var imgData = _DrawingContext.getImageData(0, copyYPostion, _Canvas.width, _Canvas.height);
+                // use below for debugging
+                // console.log(imgData);
+                // clear screen
+                this.init();
+                // put screenshot to top of screen
+                _DrawingContext.putImageData(imgData, 0, 0);
+                // put cursor back to correct
+                this.currentYPosition = saveYPosition - copyYPostion - _FontHeightMargin;
+            }
         };
         return Console;
-    })();
+    }());
     TSOS.Console = Console;
 })(TSOS || (TSOS = {}));

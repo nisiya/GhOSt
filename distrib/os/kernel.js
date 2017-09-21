@@ -13,7 +13,7 @@
      ------------ */
 var TSOS;
 (function (TSOS) {
-    var Kernel = (function () {
+    var Kernel = /** @class */ (function () {
         function Kernel() {
         }
         //
@@ -155,9 +155,12 @@ var TSOS;
         Kernel.prototype.krnTrapError = function (msg) {
             TSOS.Control.hostLog("OS ERROR - TRAP: " + msg);
             // TODO: Display error on console, perhaps in some sort of colored screen. (Maybe blue?)
+            _StdOut.putText("BSOD. You know what it means. Buy Some Organic ");
+            _StdOut.advanceLine();
+            _StdOut.putText("Donuts. Well you can, I prefer matcha ones.");
             this.krnShutdown();
         };
         return Kernel;
-    })();
+    }());
     TSOS.Kernel = Kernel;
 })(TSOS || (TSOS = {}));

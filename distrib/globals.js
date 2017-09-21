@@ -10,8 +10,8 @@
 //
 // Global CONSTANTS (TypeScript 1.5 introduced const. Very cool.)
 //
-var APP_NAME = "TSOS"; // 'cause Bob and I were at a loss for a better name.
-var APP_VERSION = "0.07"; // What did you expect?
+var APP_NAME = "GhOSt"; // Cause I'm craving thoses now
+var APP_VERSION = "7"; // The amount that I want to eat
 var CPU_CLOCK_INTERVAL = 100; // This is in ms (milliseconds) so 1000 = 1 second.
 var TIMER_IRQ = 0; // Pages 23 (timer), 9 (interrupts), and 561 (interrupt priority).
 // NOTE: The timer is different from hardware/host clock pulses. Don't confuse these.
@@ -48,6 +48,37 @@ var _hardwareClockID = null;
 // For testing (and enrichment)...
 var Glados = null; // This is the function Glados() in glados.js on Labouseur.com.
 var _GLaDOS = null; // If the above is linked in, this is the instantiated instance of Glados.
+// current time and date
+var _DateTime = new Date();
+var _Date = _DateTime.toDateString();
+var _Time = _DateTime.toLocaleTimeString();
+var _KeyToChr = {
+    "48": { "noShChr": 48, "shChr": 41 },
+    "49": { "noShChr": 49, "shChr": 33 },
+    "50": { "noShChr": 50, "shChr": 64 },
+    "51": { "noShChr": 51, "shChr": 35 },
+    "52": { "noShChr": 52, "shChr": 36 },
+    "53": { "noShChr": 53, "shChr": 37 },
+    "54": { "noShChr": 54, "shChr": 94 },
+    "55": { "noShChr": 55, "shChr": 38 },
+    "56": { "noShChr": 56, "shChr": 42 },
+    "57": { "noShChr": 57, "shChr": 40 },
+    // others
+    "186": { "noShChr": 59, "shChr": 58 },
+    "187": { "noShChr": 61, "shChr": 43 },
+    "188": { "noShChr": 44, "shChr": 60 },
+    "189": { "noShChr": 45, "shChr": 95 },
+    "190": { "noShChr": 46, "shChr": 62 },
+    "191": { "noShChr": 47, "shChr": 63 },
+    "192": { "noShChr": 96, "shChr": 126 },
+    "219": { "noShChr": 91, "shChr": 123 },
+    "220": { "noShChr": 92, "shChr": 124 },
+    "221": { "noShChr": 93, "shChr": 125 },
+    "222": { "noShChr": 39, "shChr": 34 }
+};
+var _SaveX = 0; // use for backspace and line wrapping for now, will improve
 var onDocumentLoad = function () {
     TSOS.Control.hostInit();
+    var clock = document.getElementById("clock");
+    clock.innerHTML = _Date + " " + _Time;
 };

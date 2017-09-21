@@ -11,8 +11,8 @@
 //
 // Global CONSTANTS (TypeScript 1.5 introduced const. Very cool.)
 //
-const APP_NAME: string    = "TSOS";   // 'cause Bob and I were at a loss for a better name.
-const APP_VERSION: string = "0.07";   // What did you expect?
+const APP_NAME: string    = "GhOSt";   // Cause I'm craving thoses now
+const APP_VERSION: string = "7";   // The amount that I want to eat
 
 const CPU_CLOCK_INTERVAL: number = 100;   // This is in ms (milliseconds) so 1000 = 1 second.
 
@@ -65,6 +65,41 @@ var _hardwareClockID: number = null;
 var Glados: any = null;  // This is the function Glados() in glados.js on Labouseur.com.
 var _GLaDOS: any = null; // If the above is linked in, this is the instantiated instance of Glados.
 
+// current time and date
+var _DateTime = new Date();
+var _Date = _DateTime.toDateString();
+var _Time = _DateTime.toLocaleTimeString()
+
+var _KeyToChr = {
+    "48" : {"noShChr": 48, "shChr": 41},
+    "49" : {"noShChr": 49, "shChr": 33 },
+    "50" : {"noShChr": 50, "shChr": 64 },
+    "51" : {"noShChr": 51, "shChr": 35 },
+    "52" : {"noShChr": 52, "shChr": 36 },
+    "53" : {"noShChr": 53, "shChr": 37 },
+    "54" : {"noShChr": 54, "shChr": 94 },
+    "55" : {"noShChr": 55, "shChr": 38 },
+    "56" : {"noShChr": 56, "shChr": 42 },
+    "57" : {"noShChr": 57, "shChr": 40 },
+
+    // others
+    "186" : {"noShChr": 59, "shChr": 58 },
+    "187" : {"noShChr": 61, "shChr": 43 },
+    "188" : {"noShChr": 44, "shChr": 60 },
+    "189" : {"noShChr": 45, "shChr": 95 },
+    "190" : {"noShChr": 46, "shChr": 62 },
+    "191" : {"noShChr": 47, "shChr": 63 },
+    "192" : {"noShChr": 96, "shChr": 126 },
+    "219" : {"noShChr": 91, "shChr": 123 },
+    "220" : {"noShChr": 92, "shChr": 124 },
+    "221" : {"noShChr": 93, "shChr": 125 },
+    "222" : {"noShChr": 39, "shChr": 34 }
+}
+
+var _SaveX = 0; // use for backspace and line wrapping for now, will improve
+
 var onDocumentLoad = function() {
-	TSOS.Control.hostInit();
+    TSOS.Control.hostInit();
+    var clock = document.getElementById("clock");
+    clock.innerHTML = _Date + " " + _Time;
 };

@@ -1,15 +1,17 @@
 /* TSOS.css */
 
 body {
-  background: #909193 url(distrib/images/linen.png) repeat;
+  background: #909193 url(distrib/images/grey.jpg);
   font-family: Helvetica, Verdana, Arial, sans-serif;
   font-size: 12pt;
   font-weight: normal;
   font-style: normal;
+  text-align: center;
+  position: relative;
 }
 
 h1 {
-  color: black;
+  color: white;
   font-size: 24pt;
   font-weight: normal;
   font-style: normal;
@@ -17,13 +19,14 @@ h1 {
 }
 
 h2 {
-  color: black;
+  color: white;
   font-size: 20pt;
   font-weight: normal;
   font-style: normal;
 }
 
 h3 {
+  color: white;
   font-family: Helvetica, Verdana, Arial, sans-serif;
   font-size: 16pt;
   font-weight: normal;
@@ -31,17 +34,63 @@ h3 {
 }
 
 #display {
-  background-color:#DFDBC3;
-  border: 2px solid red;
+  background-color:#FFFFFF;
+  border: 2px solid #000000;
   cursor: default;
 }
 
+textarea{
+  border: 2px solid #000000;
+}
+
 .normal_button {
-  width: 100px;
+  width: 40px;
+  height: 40px;
+  background-color: transparent;
+  background-size: 40px;
+  border: none;
+}
+
+.stop_button {
+  background-image: url(distrib/images/ghostVul.png);  
+}
+
+#btnStartOS {
+  background-image: url(distrib/images/pac_man.png);
+}
+
+#btnStartOS:disabled {
+  background-image: url(distrib/images/pacman.png);
+}
+
+#btnHaltOS:disabled {
+  background-image: url(distrib/images/ghostGreen.png);
+}
+
+#btnReset:disabled {
+  background-image: url(distrib/images/ghostRed.png);
+}
+
+text{
+  color: #FFFFFF;
+  font-weight: normal;
+}
+
+label {
+  color: #FEF200;
+}
+
+table {
+  display: inline-table;
+}
+
+#mainContent {
+  border-spacing: 10px;
+  border-collapse: separate;
 }
 
 .footerText {
-  color: black;
+  color: #FEF200;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 8pt;
   text-align: center;

@@ -33,7 +33,7 @@ module TSOS {
 
         public krnKbdDispatchKeyPress(params) {
             // Parse the params.    TODO: Check that the params are valid and osTrapError if not.
-            var keyCode = params[0];
+            var keyCode: number = params[0];
             var isShifted = params[1];
             _Kernel.krnTrace("Key code:" + keyCode + " shifted:" + isShifted);
             var chr = "";
@@ -51,9 +51,39 @@ module TSOS {
                 _KernelInputQueue.enqueue(chr);
             } else if (((keyCode >= 48) && (keyCode <= 57)) ||   // digits
                         (keyCode == 32)                     ||   // space
-                        (keyCode == 13)) {                       // enter
-                chr = String.fromCharCode(keyCode);
+                        (keyCode == 13)                     ||   // enter
+                        (keyCode == 8)                      ||   // backspace
+                        (keyCode == 9)                      ||   // tab
+                        (keyCode == 38)                     ||   // up
+                        (keyCode == 40)) {                       // down
+                // for symbol above digits
+                if (isShifted) {
+                    chr = String.fromCharCode(_KeyToChr[keyCode].shChr);
+                } else {
+                    // .. special case so two characters
+                    if (keyCode === 38){
+                        chr = '38'; // up arrow same as &
+                    } else if (keyCode === 40){
+                        chr = '40'; // down arrow same as (
+                    } else {
+                    chr = String.fromCharCode(keyCode);                    
+                    }
+                }
                 _KernelInputQueue.enqueue(chr);
+            }
+            else if (((keyCode >= 186) && (keyCode <= 192)) ||
+                     ((keyCode >= 219) && (keyCode <= 222))) // punctuations
+            {
+                // bottom of key
+                chr = String.fromCharCode(_KeyToChr[keyCode].noShChr);
+                console.log(chr);
+                if (isShifted) {
+                    // top of key
+                    console.log(_KeyToChr[keyCode].shChr);
+                    chr = String.fromCharCode(_KeyToChr[keyCode].shChr);
+                    console.log(chr);                    
+                }
+                _KernelInputQueue.enqueue(chr);                
             }
         }
     }

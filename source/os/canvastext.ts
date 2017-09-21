@@ -153,12 +153,28 @@ module TSOS {
             ctx.save();
             ctx.lineCap = "round";
             ctx.lineWidth = 2.0 * mag;
-            ctx.strokeStyle = "black";
+                ctx.strokeStyle = "black";                
 
             for (var i = 0; i < len; i++) {
                 var c = CanvasTextFunctions.letter(str.charAt(i));
                 if (!c) {
                     continue;
+                }
+                // estimate if go over
+                var estX = x + c.width*mag;
+                if ( estX >= 500){
+                    // if new letter will go out of canvas, advance line
+                    if(len == 1){
+                        _SaveX = x; // for backspace, will improve later
+                        console.log(_SaveX + " h");
+                        _StdOut.advanceLine();
+                        x = 0;
+                        y += _DefaultFontSize +  _DrawingContext.fontDescent(font, size) + _FontHeightMargin;
+                    } else{
+                        _StdOut.advanceLine();
+                        x = 0;
+                        y += _DefaultFontSize +  _DrawingContext.fontDescent(font, size) + _FontHeightMargin;
+                    }
                 }
                 ctx.beginPath();
                 var penUp = true;

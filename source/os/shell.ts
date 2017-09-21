@@ -80,7 +80,58 @@ module TSOS {
             this.commandList[this.commandList.length] = sc;
 
             // ps  - list the running processes and their IDs
+            /*sc = new ShellCommand(this.shellPs,
+                                  "ps",
+                                  "- List the running processes and their IDs.");
+            this.commandList[this.commandList.length] = sc;
+
             // kill <id> - kills the specified process id.
+            sc = new ShellCommand(this.shellKill,
+                                  "kill",
+                                  "<id> - Kills the specified process id.");
+            this.commandList[this.commandList.length] = sc; */
+
+            // date
+            sc = new ShellCommand(this.shellDate,
+                                  "date",
+                                  "- Displays the current date and time.");
+            this.commandList[this.commandList.length] = sc;
+
+            // whereami
+            sc = new ShellCommand(this.shellWhereami,
+                                  "whereami",
+                                  "- Displays the users current location.");
+            this.commandList[this.commandList.length] = sc;
+
+            // whomai
+            sc = new ShellCommand(this.shellWhoami,
+                                  "whoami",
+                                  "- Displays the users identity.");
+            this.commandList[this.commandList.length] = sc;
+
+            // meow
+            sc = new ShellCommand(this.shellMeow,
+                                  "meow",
+                                  "- Flushes the toilet. [audio warning]");
+            this.commandList[this.commandList.length] = sc;
+
+            // load
+            sc = new ShellCommand(this.shellLoad,
+                "load",
+                "- Validates the user code in user program input.");
+            this.commandList[this.commandList.length] = sc;
+
+            // welp
+            sc = new ShellCommand(this.shellWelp,
+                "welp",
+                "- Displays BSOD when the kernel traps an OS error.");
+            this.commandList[this.commandList.length] = sc;
+
+            // prompt <string>
+            sc = new ShellCommand(this.shellStatus,
+                "status",
+                "<string> - Sets the user status.");
+            this.commandList[this.commandList.length] = sc;
 
             //
             // Display the initial prompt.
@@ -177,6 +228,8 @@ module TSOS {
         // Shell Command Functions.  Kinda not part of Shell() class exactly, but
         // called from here, so kept here to avoid violating the law of least astonishment.
         //
+
+        // Invalid commands
         public shellInvalidCommand() {
             _StdOut.putText("Invalid Command. ");
             if (_SarcasticMode) {
@@ -188,6 +241,7 @@ module TSOS {
             }
         }
 
+        // Curse
         public shellCurse() {
             _StdOut.putText("Oh, so that's how it's going to be, eh? Fine.");
             _StdOut.advanceLine();
@@ -195,6 +249,7 @@ module TSOS {
             _SarcasticMode = true;
         }
 
+        // apology
         public shellApology() {
            if (_SarcasticMode) {
               _StdOut.putText("I think we can put our differences behind us.");
@@ -206,10 +261,12 @@ module TSOS {
            }
         }
 
+        // ver
         public shellVer(args) {
-            _StdOut.putText(APP_NAME + " version " + APP_VERSION);
+            _StdOut.putText(APP_NAME + " version " + APP_VERSION + " or so I thought");
         }
 
+        // help
         public shellHelp(args) {
             _StdOut.putText("Commands:");
             for (var i in _OsShell.commandList) {
@@ -218,6 +275,7 @@ module TSOS {
             }
         }
 
+        // shutdown
         public shellShutdown(args) {
              _StdOut.putText("Shutting down...");
              // Call Kernel shutdown routine.
@@ -225,21 +283,112 @@ module TSOS {
             // TODO: Stop the final prompt from being displayed.  If possible.  Not a high priority.  (Damn OCD!)
         }
 
+        // cls
         public shellCls(args) {
             _StdOut.clearScreen();
             _StdOut.resetXY();
         }
 
+        // man
         public shellMan(args) {
             if (args.length > 0) {
+                // explains what each topic does
+
                 var topic = args[0];
                 switch (topic) {
+
+                    // help
                     case "help":
                         _StdOut.putText("Help displays a list of (hopefully) valid commands.");
                         break;
-                    // TODO: Make descriptive MANual page entries for the the rest of the shell commands here.
+                    // Descriptive MANual page entries for the the rest of the shell commands here.
+
+                    // ver
+                    case "ver":
+                        _StdOut.putText("Ver displays the version of the OS");
+                        break;
+
+                    // shutdown
+                    case "shutdown":
+                        _StdOut.putText("Shuts down the OS.");
+                        break;
+
+                    // cls
+                    case "cls":
+                        _StdOut.putText("Cls clears the CLI");
+                        break;
+
+                    // trace
+                    case "trace":
+                        _StdOut.putText("Trace followed by on would turn on the OS trace on and ");
+                        _StdOut.advanceLine();
+                        _StdOut.putText("followed by off would turn it off.");
+                        break;
+
+                    // rot13
+                    case "rot13":
+                        _StdOut.putText("Rot13 followed by a string would rotate each letter of the ");
+                        _StdOut.advanceLine();
+                        _StdOut.putText("string by 13 places. E.g. 'ace' would be 'npr'.");
+                        break;
+
+                    // prompt
+                    case "prompt":
+                        _StdOut.putText("Prompt followed by a string would set the prompt as the ");
+                        _StdOut.advanceLine();
+                        _StdOut.putText("string instead of the default >.");
+                        break;
+
+                    // ps
+                    case "ps":
+                        _StdOut.putText("Ps displays a list of current processes and their IDs.");
+                        break;
+
+                    // kill <id>
+                    case "kill":
+                        _StdOut.putText("Kill followed by the process ID would kill that process.");
+                        break;
+
+                    // date
+                    case "date":
+                        _StdOut.putText("Date displays the current date and time in EST.");
+                        break;
+
+                    // whereami
+                    case "whereami":
+                        _StdOut.putText("Whereami displays the users current location.");
+                        break;
+
+                    // whoami
+                    case "whoami":
+                        _StdOut.putText("Whoami displays the users identity.");
+                        break;
+
+                    // meow
+                    case "meow":
+                        _StdOut.putText("Meow flushes the toilet.");
+                        break;
+
+                    // load
+                    case "load":
+                        _StdOut.putText("Load validates the user input in the User Program Input ");
+                        _StdOut.advanceLine();
+                        _StdOut.putText("box.");
+                        break;
+
+                    // welp
+                    case "welp":
+                        _StdOut.putText("Welp triggers the BSOD, when the kernel traps an OS error.");
+                        break;
+
+                    // prompt
+                    case "status":
+                    _StdOut.putText("Status followed by a string would set the user status as the string.");
+                    break;
+
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
+
                 }
             } else {
                 _StdOut.putText("Usage: man <topic>  Please supply a topic.");
@@ -287,5 +436,62 @@ module TSOS {
             }
         }
 
+        // date
+        public shellDate(args) {
+            var currDate: string = _Date + " " + _Time;
+            _StdOut.putText(currDate);
+        }
+
+        // whereami
+        public shellWhereami(args) {
+            _StdOut.putText("Definitely not here.");
+        }
+
+        // whoami
+        public shellWhoami(args) {
+            _StdOut.putText("Nope. Wrong. Not my father.");
+        }
+
+        // meow
+        public shellMeow(args) {
+            var audio = new Audio('distrib/audio/meow.mp3');
+            audio.play();
+            _StdOut.putText("He's a cat~ Meow~ Flushing the toliet~");
+        }
+
+        //load
+        public shellLoad(args) {
+            // gets text of textarea
+            var userIn: string = (<HTMLInputElement> document.getElementById("taProgramInput")).value;
+
+            // checks if text only contains hex decimals and spaces
+            var valText = /^[a-f\d\s]+$/i;
+            if (valText.test(userIn)) {
+                _StdOut.putText("Your input is valid.");
+            }
+            else {
+                _StdOut.putText("Only hex digits and spaces are allowed. Please enter a new");
+                _StdOut.advanceLine();
+                _StdOut.putText("code.");
+            }
+        }
+
+        // welp aka BSOD
+        public shellWelp(args) {
+            // adds element that Interrupt Handler does not know how to handle
+            _KernelInterruptQueue.enqueue(777);
+        }
+
+        // status
+        public shellStatus(args) {
+            if (args.length > 0) {
+                var status = document.getElementById("usrStatus");
+                // change user status
+                status.innerHTML = args.join(" ");
+                _StdOut.putText("Your status has changed.");
+            } else {
+                _StdOut.putText("Usage: status <string>  Please supply a string.");
+            }
+        }
     }
 }
