@@ -128,10 +128,17 @@ module TSOS {
 
         public removeChr(chr): void {
             if (this.buffer !== "") {
+                // if beginning of line, move cursor back to previous line
+                if(this.currentXPosition <= 0){
+                    this.currentYPosition -= _DefaultFontSize + 
+                                            _DrawingContext.fontDescent(this.currentFont, this.currentFontSize) +
+                                            _FontHeightMargin;
+                    // get end of text position from that line
+                    this.currentXPosition = _SaveX;
+                }
                 // Move cursor back to X position before chr written.
                 var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, chr);
                 this.currentXPosition = this.currentXPosition - offset;
-                
                 // clear chr with clearRect
                 var chrHeight = _DefaultFontSize + 
                             _DrawingContext.fontDescent(this.currentFont, this.currentFontSize) +

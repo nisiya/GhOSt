@@ -59,6 +59,8 @@ var TSOS;
                 if (estX >= 500) {
                     // if new letter will go out of canvas, advance line
                     if (len == 1) {
+                        _SaveX = x; // for backspace, will improve later
+                        console.log(_SaveX + " h");
                         _StdOut.advanceLine();
                         x = 0;
                         y += _DefaultFontSize + _DrawingContext.fontDescent(font, size) + _FontHeightMargin;
@@ -88,7 +90,6 @@ var TSOS;
                 }
                 ctx.stroke();
                 x += c.width * mag;
-                console.log("x " + x);
             }
             ctx.restore();
             return total;
