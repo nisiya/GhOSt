@@ -19,7 +19,9 @@ module TSOS {
                     public currentYPosition = _DefaultFontSize,
                     public buffer = "",
                     public prevCmd: string[] = [], // store handled commands
-                    public updown = 0) { // counter to index through previous commands
+                    public updown = 0, // counter to index through previous commands
+                    public matchCmd: string[] = [], // store all matching commands
+                    public matchIndex = 0) { // index of current command tab key is showing from matching list
         }
 
         public init(): void {
@@ -53,42 +55,52 @@ module TSOS {
                     // delete a character
                     chr = this.buffer[this.buffer.length-1];
                     this.removeChr(chr);
-                } else if (chr === '38') { //   Up key
+                } else if (chr === '38') { //   Up key .. special case so two characters
                     // counter is within length of previous command list
                     if (this.updown < this.prevCmd.length){
                         this.updown ++;
                         // remove current text
-                        if(this.buffer !== ""){
-                            var i = this.buffer.length - 1;
-                            while (this.buffer.length > 0){
-                                this.removeChr(this.buffer[i]);
-                                i--;
-                            }
-                        }
+                        this.removeLine();                        
                         // put previous command
                         this.putText(this.prevCmd[this.prevCmd.length-this.updown]);
                         // current text is now previous command so add to buffer
                         this.buffer = this.prevCmd[this.prevCmd.length-this.updown];
                     }              
-                } else if (chr === '40') { //   Down key
+                } else if (chr === '40') { //   Down key .. special case so two characters
                     // only if up key was used before
                     if(this.updown > 1){
                         this.updown--;
                          // remove current text
-                        if(this.buffer !== ""){
-                            var i = this.buffer.length - 1;
-                            while (this.buffer.length > 0){
-                                this.removeChr(this.buffer[i]);
-                                i--;
-                            }
-                        }
+                        this.removeLine();
                         // put next command in previous command list
                         this.putText(this.prevCmd[this.prevCmd.length-this.updown]);
                         // current text is now that command so add to buffer
                         this.buffer = this.prevCmd[this.prevCmd.length-this.updown];                        
                     }
-                }
-                else {
+                } else if (chr === String.fromCharCode(9)) { //  Tab key
+                    if (this.matchCmd.length == 0){
+                        var re = new RegExp('^' + this.buffer + '', 'i');                    
+                        for (var i=0; i<_OsShell.commandList.length; i++){
+                            if(re.test(_OsShell.commandList[i].command)){
+                                this.matchCmd.push(_OsShell.commandList[i].command);
+                            }
+                        }
+                        console.log(this.matchCmd.toString());
+                        this.matchIndex = 0;                 
+                    } 
+                    this.removeLine();
+                    console.log(this.matchIndex + " p");
+                    this.putText(this.matchCmd[this.matchIndex]);
+                    this.buffer = this.matchCmd[this.matchIndex];
+                    console.log(this.matchIndex);
+                    if (this.matchIndex == (this.matchCmd.length - 1)){
+                        this.matchCmd = [];
+                        console.log(this.matchCmd.length + " why");
+                    } else {
+                        this.matchIndex++;
+                    }
+                    console.log(this.matchIndex + " a");
+                } else {
                     // This is a "normal" character, so ...
                     // ... draw it on the screen...
                     this.putText(chr);
@@ -144,6 +156,16 @@ module TSOS {
                 // remove chr from buffer
                 var newBuffer:string = this.buffer.substring(0, this.buffer.length - 1);
                 this.buffer = newBuffer;
+            }
+        }
+
+        public removeLine(): void {
+            if(this.buffer !== ""){
+                var i = this.buffer.length - 1;
+                while (this.buffer.length > 0){
+                    this.removeChr(this.buffer[i]);
+                    i--;
+                }
             }
         }
 

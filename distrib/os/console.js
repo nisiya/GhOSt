@@ -11,7 +11,9 @@ var TSOS;
 (function (TSOS) {
     var Console = /** @class */ (function () {
         function Console(currentFont, currentFontSize, currentXPosition, currentYPosition, buffer, prevCmd, // store handled commands
-            updown) {
+            updown, // counter to index through previous commands
+            matchCmd, // store all matching commands
+            matchIndex) {
             if (currentFont === void 0) { currentFont = _DefaultFontFamily; }
             if (currentFontSize === void 0) { currentFontSize = _DefaultFontSize; }
             if (currentXPosition === void 0) { currentXPosition = 0; }
@@ -19,6 +21,8 @@ var TSOS;
             if (buffer === void 0) { buffer = ""; }
             if (prevCmd === void 0) { prevCmd = []; }
             if (updown === void 0) { updown = 0; }
+            if (matchCmd === void 0) { matchCmd = []; }
+            if (matchIndex === void 0) { matchIndex = 0; }
             this.currentFont = currentFont;
             this.currentFontSize = currentFontSize;
             this.currentXPosition = currentXPosition;
@@ -26,6 +30,8 @@ var TSOS;
             this.buffer = buffer;
             this.prevCmd = prevCmd;
             this.updown = updown;
+            this.matchCmd = matchCmd;
+            this.matchIndex = matchIndex;
         }
         Console.prototype.init = function () {
             this.clearScreen();
@@ -62,13 +68,7 @@ var TSOS;
                     if (this.updown < this.prevCmd.length) {
                         this.updown++;
                         // remove current text
-                        if (this.buffer !== "") {
-                            var i = this.buffer.length - 1;
-                            while (this.buffer.length > 0) {
-                                this.removeChr(this.buffer[i]);
-                                i--;
-                            }
-                        }
+                        this.removeLine();
                         // put previous command
                         this.putText(this.prevCmd[this.prevCmd.length - this.updown]);
                         // current text is now previous command so add to buffer
@@ -80,18 +80,37 @@ var TSOS;
                     if (this.updown > 1) {
                         this.updown--;
                         // remove current text
-                        if (this.buffer !== "") {
-                            var i = this.buffer.length - 1;
-                            while (this.buffer.length > 0) {
-                                this.removeChr(this.buffer[i]);
-                                i--;
-                            }
-                        }
+                        this.removeLine();
                         // put next command in previous command list
                         this.putText(this.prevCmd[this.prevCmd.length - this.updown]);
                         // current text is now that command so add to buffer
                         this.buffer = this.prevCmd[this.prevCmd.length - this.updown];
                     }
+                }
+                else if (chr === String.fromCharCode(9)) {
+                    if (this.matchCmd.length == 0) {
+                        var re = new RegExp('^' + this.buffer + '', 'i');
+                        for (var i = 0; i < _OsShell.commandList.length; i++) {
+                            if (re.test(_OsShell.commandList[i].command)) {
+                                this.matchCmd.push(_OsShell.commandList[i].command);
+                            }
+                        }
+                        console.log(this.matchCmd.toString());
+                        this.matchIndex = 0;
+                    }
+                    this.removeLine();
+                    console.log(this.matchIndex + " p");
+                    this.putText(this.matchCmd[this.matchIndex]);
+                    this.buffer = this.matchCmd[this.matchIndex];
+                    console.log(this.matchIndex);
+                    if (this.matchIndex == (this.matchCmd.length - 1)) {
+                        this.matchCmd = [];
+                        console.log(this.matchCmd.length + " why");
+                    }
+                    else {
+                        this.matchIndex++;
+                    }
+                    console.log(this.matchIndex + " a");
                 }
                 else {
                     // This is a "normal" character, so ...
@@ -144,6 +163,15 @@ var TSOS;
                 // remove chr from buffer
                 var newBuffer = this.buffer.substring(0, this.buffer.length - 1);
                 this.buffer = newBuffer;
+            }
+        };
+        Console.prototype.removeLine = function () {
+            if (this.buffer !== "") {
+                var i = this.buffer.length - 1;
+                while (this.buffer.length > 0) {
+                    this.removeChr(this.buffer[i]);
+                    i--;
+                }
             }
         };
         Console.prototype.advanceLine = function () {
