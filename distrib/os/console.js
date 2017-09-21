@@ -94,18 +94,20 @@ var TSOS;
                                 this.matchCmd.push(_OsShell.commandList[i].command);
                             }
                         }
-                        console.log(this.matchCmd.toString());
+                        console.log(this.matchCmd.length);
                         this.matchIndex = 0;
                     }
-                    // replace current text with previous command
-                    this.removeLine();
-                    this.putText(this.matchCmd[this.matchIndex]);
-                    this.buffer = this.matchCmd[this.matchIndex];
-                    if (this.matchIndex == (this.matchCmd.length - 1)) {
-                        this.matchCmd = [];
-                    }
-                    else {
-                        this.matchIndex++;
+                    if (this.matchCmd.length > 0) {
+                        // replace current text with previous command
+                        this.removeLine();
+                        this.putText(this.matchCmd[this.matchIndex]);
+                        this.buffer = this.matchCmd[this.matchIndex];
+                        if (this.matchIndex == (this.matchCmd.length - 1)) {
+                            this.matchCmd = [];
+                        }
+                        else {
+                            this.matchIndex++;
+                        }
                     }
                 }
                 else {
