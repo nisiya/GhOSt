@@ -1,6 +1,6 @@
-Wendy Ni's OS Repo
+Wendy Ni's OS Repo 
 ============================================
-Please grade the branches.
+Please grade the master for iProject and the branches for labs.
 
 Browser-based Operating System in TypeScript
 ============================================
