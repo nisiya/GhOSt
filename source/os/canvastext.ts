@@ -160,8 +160,20 @@ module TSOS {
                 if (!c) {
                     continue;
                 }
-                console.log(x);
-                console.log(y + " y");
+                // estimate if go over
+                var estX = x + c.width*mag;
+                if ( estX >= 500){
+                    // if new letter will go out of canvas, advance line
+                    if(len == 1){
+                        _StdOut.advanceLine();
+                        x = 0;
+                        y += _DefaultFontSize +  _DrawingContext.fontDescent(font, size) + _FontHeightMargin;
+                    } else{
+                        _StdOut.advanceLine();
+                        x = 0;
+                        y += _DefaultFontSize +  _DrawingContext.fontDescent(font, size) + _FontHeightMargin;
+                    }
+                }
                 ctx.beginPath();
                 var penUp = true;
                 var needStroke = 0;
@@ -179,13 +191,8 @@ module TSOS {
                     }
                 }
                 ctx.stroke();
-                if(x < 490){
-                    x += c.width*mag;
-                } else{
-                    alert(x + "," + y);
-                    _StdOut.advanceLine();
-                    y = 0;
-                }
+                x += c.width*mag;
+                console.log("x " +x);
             }
             ctx.restore();
             return total;
