@@ -70,16 +70,15 @@ module TSOS {
                     // only if up key was used before
                     if(this.updown > 1){
                         this.updown--;
-                         // remove current text
                         this.removeLine();
-                        // put next command in previous command list
                         this.putText(this.prevCmd[this.prevCmd.length-this.updown]);
-                        // current text is now that command so add to buffer
                         this.buffer = this.prevCmd[this.prevCmd.length-this.updown];                        
                     }
                 } else if (chr === String.fromCharCode(9)) { //  Tab key
                     if (this.matchCmd.length == 0){
-                        var re = new RegExp('^' + this.buffer + '', 'i');                    
+                        // first tab on new line
+                        var re = new RegExp('^' + this.buffer + '', 'i');     
+                        // find all commands that start with str in buffer               
                         for (var i=0; i<_OsShell.commandList.length; i++){
                             if(re.test(_OsShell.commandList[i].command)){
                                 this.matchCmd.push(_OsShell.commandList[i].command);
@@ -88,18 +87,15 @@ module TSOS {
                         console.log(this.matchCmd.toString());
                         this.matchIndex = 0;                 
                     } 
+                    // replace current text with previous command
                     this.removeLine();
-                    console.log(this.matchIndex + " p");
                     this.putText(this.matchCmd[this.matchIndex]);
                     this.buffer = this.matchCmd[this.matchIndex];
-                    console.log(this.matchIndex);
                     if (this.matchIndex == (this.matchCmd.length - 1)){
                         this.matchCmd = [];
-                        console.log(this.matchCmd.length + " why");
                     } else {
                         this.matchIndex++;
                     }
-                    console.log(this.matchIndex + " a");
                 } else {
                     // This is a "normal" character, so ...
                     // ... draw it on the screen...

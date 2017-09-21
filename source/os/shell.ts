@@ -383,9 +383,7 @@ module TSOS {
 
                     // prompt
                     case "status":
-                    _StdOut.putText("Status followed by a string would set the user status as");
-                    _StdOut.advanceLine();
-                    _StdOut.putText("the string.");
+                    _StdOut.putText("Status followed by a string would set the user status as the string.");
                     break;
 
                     default:

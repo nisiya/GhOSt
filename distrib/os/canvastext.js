@@ -54,6 +54,8 @@ var TSOS;
                 if (!c) {
                     continue;
                 }
+                console.log(x);
+                console.log(y + " y");
                 ctx.beginPath();
                 var penUp = true;
                 var needStroke = 0;
@@ -72,7 +74,14 @@ var TSOS;
                     }
                 }
                 ctx.stroke();
-                x += c.width * mag;
+                if (x < 490) {
+                    x += c.width * mag;
+                }
+                else {
+                    alert(x + "," + y);
+                    _StdOut.advanceLine();
+                    y = 0;
+                }
             }
             ctx.restore();
             return total;

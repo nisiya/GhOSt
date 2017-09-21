@@ -80,6 +80,15 @@ label {
   color: #FEF200;
 }
 
+table {
+  display: inline-table;
+}
+
+#mainContent {
+  border-spacing: 10px;
+  border-collapse: separate;
+}
+
 .footerText {
   color: #FEF200;
   font-family: Arial, Helvetica, sans-serif;
