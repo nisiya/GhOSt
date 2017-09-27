@@ -15,6 +15,7 @@
    <script type="text/javascript" src="distrib/host/control.js"></script>
    <script type="text/javascript" src="distrib/host/devices.js"></script>
    <script type="text/javascript" src="distrib/host/cpu.js"></script>
+   <script type="text/javascript" src="distrib/host/memory.js"></script>
 
    <!-- Virtual OS Routines: Make sure Kernel code is last, since it needs those above it. -->
    <script type="text/javascript" src="distrib/os/interrupt.js"></script>
@@ -27,6 +28,8 @@
    <script type="text/javascript" src="distrib/os/shellCommand.js"></script>
    <script type="text/javascript" src="distrib/os/userCommand.js"></script>
    <script type="text/javascript" src="distrib/os/kernel.js"></script>
+   <script type="text/javascript" src="distrib/os/pcb.js"></script>
+   <script type="text/javascript" src="distrib/os/memoryManager.js"></script>
 
    <!-- Other Routines -->
    <script type="text/javascript" src="distrib/utils.js"></script>
@@ -96,44 +99,38 @@
         </div>
       </th>
       <th>
-        <div id="divLog" style="margin-left:0px;">
+        <div id="divLog">
           <label>
               Host Log
               <br>
               <textarea name="taHostLog"
                         id  ="taHostLog"
-                        rows="5"
-                        cols="48"
+                        rows="10"
+                        cols="38"
               ></textarea>
           </label>
         </div>
-        <div id="divMemory" style="margin-left:0px;">
+        <div id="divMemory">
           <label>
               Memory
               <br>
-              <textarea name="taMemory"
-                        id  ="taMemory"
-                        rows="10"
-                        cols="48"
-              ></textarea>
+              <div class="tableContainer" id="memoryContainer">
+              </div>
           </label>
         </div>
-        <div id="divPcb" style="margin-left:0px;">
+        <div id="divPCB">
             <label>
                 Process Control Box
                 <br>
-                <textarea name="taPcb"
-                          id  ="taPcb"
-                          rows="5"
-                          cols="48"
-                ></textarea>
+                <div class="tableContainer" id="pcbContainer">
+                </div>
             </label>
           </div>
       </th>
     </tr> 
     <tr>
       <th>
-        <div id="divUserProgramInput" style="margin-top:14px; margin-left:0px;">
+        <div id="divUserProgramInput">
           <label>
               User Program Input
               <br>
@@ -146,7 +143,37 @@
         </div>
       </th>
       <th>
-
+        <div id="divCPU">
+          <label>
+            CPU 
+            <br>
+            <div id="cpuContainer">
+              <table name = "taCPU"
+                     id   = "taCPU">
+                <thead>
+                  <tr style="border-bottom: 1px solid #666666;">
+                    <th> PC </th>
+                    <th> IR </th>
+                    <th> ACC </th>
+                    <th> X </th>
+                    <th> Y </th>
+                    <th> Z </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td> 0 </td>
+                    <td> 0 </td>
+                    <td> 0 </td>
+                    <td> 0 </td>
+                    <td> 0 </td>
+                    <td> 0 </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>                
+          </label>
+        </div>
       </th>
     </tr>
   </table>

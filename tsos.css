@@ -71,7 +71,7 @@ textarea{
   background-image: url(distrib/images/ghostRed.png);
 }
 
-text{
+text {
   color: #FFFFFF;
   font-weight: normal;
 }
@@ -92,6 +92,39 @@ table {
 
 #mainContent th {
   vertical-align: top;
+}
+
+.tableContainer {
+  width: 287px;
+  height: 149px;
+  border: 2px solid black;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  white-space: nowrap;
+  background-color: white;
+}
+
+#cpuContainer {
+  width: 287px;  
+  height: 50px;
+  border: 2px solid black;
+  background-color: white;  
+}
+
+#taMemory{
+  color: black;
+  font-weight: normal;
+  width: 100%;
+  text-align: center;  
+  /* border-bottom: 1px solid #666666;   */
+}
+
+#taCPU{
+  color: black;
+  font-weight: normal;
+  width: 100%;
+  text-align: center;  
+  border-collapse: collapse;
 }
 
 .footerText {
