@@ -31,7 +31,7 @@
    <!-- Other Routines -->
    <script type="text/javascript" src="distrib/utils.js"></script>
    <!-- Uncomment the line below to enable GLaDOS testing. -->
-   <script type="text/javascript" src="http://alanclasses.github.io/TSOS/test/glados-ip0.js"></script>
+   <!-- <script type="text/javascript" src="http://alanclasses.github.io/TSOS/test/glados-ip0.js"></script> -->
    
 </head>
 
@@ -83,7 +83,7 @@
   <table id="mainContent">    
     <tr>
       <th>
-        <div id="divConsole" style="margin:4px; width:500px; height:500px; float:left;">
+        <div id="divConsole" style="width:500px; height:500px;">
           <label>
             Console
             <canvas id="display"
@@ -102,25 +102,53 @@
               <br>
               <textarea name="taHostLog"
                         id  ="taHostLog"
-                        rows="26"
+                        rows="5"
                         cols="48"
               ></textarea>
           </label>
         </div>
-
-        <div id="divUserProgramInput" style="margin-left:0px;">
+        <div id="divMemory" style="margin-left:0px;">
+          <label>
+              Memory
+              <br>
+              <textarea name="taMemory"
+                        id  ="taMemory"
+                        rows="10"
+                        cols="48"
+              ></textarea>
+          </label>
+        </div>
+        <div id="divPcb" style="margin-left:0px;">
+            <label>
+                Process Control Box
+                <br>
+                <textarea name="taPcb"
+                          id  ="taPcb"
+                          rows="5"
+                          cols="48"
+                ></textarea>
+            </label>
+          </div>
+      </th>
+    </tr> 
+    <tr>
+      <th>
+        <div id="divUserProgramInput" style="margin-top:14px; margin-left:0px;">
           <label>
               User Program Input
               <br>
               <textarea name="taProgramInput"
                         id  ="taProgramInput"
                         rows="8"
-                        cols="48"
+                        cols="68"
               >A9 A9 A2 01 EC 13 00 AC 0B 00 8D 14 00 EE 0B 00 D0 F5 00 00</textarea>
           </label>
         </div>
       </th>
-    </tr> 
+      <th>
+
+      </th>
+    </tr>
   </table>
 </div>
 

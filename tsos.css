@@ -87,6 +87,11 @@ table {
 #mainContent {
   border-spacing: 10px;
   border-collapse: separate;
+  border: 1px solid #FEF200;
+}
+
+#mainContent th {
+  vertical-align: top;
 }
 
 .footerText {
