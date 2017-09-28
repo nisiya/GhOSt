@@ -77,47 +77,14 @@ module TSOS {
 
         //
         // Host Events
-        //
-        // public static createTable(): void {
-        //     var memoryContainer = document.getElementById("memoryContainer");
-        //     var memoryTable = document.createElement("table");
-        //     memoryTable.className = "taMemory";
-        //     memoryTable.id = "taMemory";
-        //     var memoryTableBody = document.createElement("tbody");
-            
-        //     // creating cells
-        //     for (var i = 0; i < 32; i++){
-        //         // create rows
-        //         var row = document.createElement("tr");
-        //         row.id = "memoryRow-" + (8*i);
-        //         var cell = document.createElement("td");
-        //         var cellText = document.createTextNode("0x" + (8*i));
-        //         cell.appendChild(cellText);
-        //         row.appendChild(cell);                        
-        //         for (var j = 0; j < 8; j++) {
-        //             var cell = document.createElement("td");
-        //             // var str :string = TSOS.Memory.memoryBox[j];
-        //             console.log(TSOS.Memory.memoryBox[0]);
-        //             var cellText = document.createTextNode("00");
-        //             cell.appendChild(cellText);
-        //             row.appendChild(cell);
-        //         }
-            
-        //         memoryTableBody.appendChild(row);
-        //     }
-            
-        //     memoryTable.appendChild(memoryTableBody);
-        //     memoryContainer.appendChild(memoryTable);
-        // }
-
         public static hostBtnStartOS_click(btn): void {
             document.body.style.backgroundImage = "url(distrib/images/pacBack.png)";
             document.getElementById("display").style.border = "5px solid #0101FF";
             document.getElementById("taHostLog").style.border = "5px solid #0101FF";
             document.getElementById("taProgramInput").style.border = "5px solid #0101FF";            
-            document.getElementById("taPCB").style.border = "5px solid #0101FF";
-            // this.createTable();     
+            document.getElementById("pcbContainer").style.border = "5px solid #0101FF";
             document.getElementById("memoryContainer").style.border = "5px solid #0101FF";                        
+            document.getElementById("cpuContainer").style.border = "5px solid #0101FF";                        
             
             // Disable the (passed-in) start button...
             btn.disabled = true;
@@ -136,7 +103,7 @@ module TSOS {
             // ... Create and initialize the Memory
             _Memory = new Memory();  // Note: We could simulate multi-core systems by instantiating more than one instance of the CPU here.
             _Memory.init();  
-            
+
             // ... then set the host clock pulse ...
             _hardwareClockID = setInterval(Devices.hostClockPulse, CPU_CLOCK_INTERVAL);
             // .. and call the OS Kernel Bootstrap routine.

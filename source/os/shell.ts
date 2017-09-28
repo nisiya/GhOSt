@@ -118,7 +118,7 @@ module TSOS {
             // load
             sc = new ShellCommand(this.shellLoad,
                 "load",
-                "- Validates the user code in user program input.");
+                "- Validates and loads user program input into memory.");
             this.commandList[this.commandList.length] = sc;
 
             // welp
@@ -371,9 +371,7 @@ module TSOS {
 
                     // load
                     case "load":
-                        _StdOut.putText("Load validates the user input in the User Program Input ");
-                        _StdOut.advanceLine();
-                        _StdOut.putText("box.");
+                        _StdOut.putText("Validates and loads the 6502a op codes in User Program Input.");
                         break;
 
                     // welp
@@ -467,7 +465,14 @@ module TSOS {
             // checks if text only contains hex decimals and spaces
             var valText = /^[a-f\d\s]+$/i;
             if (valText.test(userIn)) {
-                _StdOut.putText("Your input is valid.");
+                var loadText: string[] = userIn.split(" ");
+                console.log(loadText);
+                for (var i = 0; i <loadText.length; i++){
+                    _Memory.memoryBox[i] = loadText[i];
+                    console.log("i = " + i);
+                }
+                console.log(_Memory.memoryBox);
+                _Memory.createTable(_Memory.memoryBox);                
             }
             else {
                 _StdOut.putText("Only hex digits and spaces are allowed. Please enter a new");

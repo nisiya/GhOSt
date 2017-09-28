@@ -15,14 +15,16 @@
                 }
                 
                 public init(): void {
-                    this.createTable();
-                }
-
-                public createTable(): void {
                     for (var i = 0; i<256; i++){
                         this.memoryBox.push("00");
                     }
+                    this.createTable(this.memoryBox);
+                }
+
+                public createTable(memoryBox): void {
+                    var memBox = memoryBox;
                     var memoryContainer = document.getElementById("memoryContainer");
+                    memoryContainer.innerHTML = " ";
                     var memoryTable = document.createElement("table");
                     memoryTable.className = "taMemory";
                     memoryTable.id = "taMemory";
@@ -39,7 +41,9 @@
                         row.appendChild(cell);                        
                         for (var j = 0; j < 8; j++) {
                             var cell = document.createElement("td");
-                            var str = this.memoryBox[j];
+                            var index = j + (8 * i);
+                            var str = memBox[index];
+                            console.log(str);
                             var cellText = document.createTextNode(str);
                             cell.appendChild(cellText);
                             row.appendChild(cell);

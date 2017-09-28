@@ -73,7 +73,7 @@ var TSOS;
             sc = new TSOS.ShellCommand(this.shellMeow, "meow", "- Flushes the toilet. [audio warning]");
             this.commandList[this.commandList.length] = sc;
             // load
-            sc = new TSOS.ShellCommand(this.shellLoad, "load", "- Validates the user code in user program input.");
+            sc = new TSOS.ShellCommand(this.shellLoad, "load", "- Validates and loads user program input into memory.");
             this.commandList[this.commandList.length] = sc;
             // welp
             sc = new TSOS.ShellCommand(this.shellWelp, "welp", "- Displays BSOD when the kernel traps an OS error.");
@@ -292,9 +292,7 @@ var TSOS;
                         break;
                     // load
                     case "load":
-                        _StdOut.putText("Load validates the user input in the User Program Input ");
-                        _StdOut.advanceLine();
-                        _StdOut.putText("box.");
+                        _StdOut.putText("Validates and loads the 6502a op codes in User Program Input.");
                         break;
                     // welp
                     case "welp":
@@ -380,7 +378,14 @@ var TSOS;
             // checks if text only contains hex decimals and spaces
             var valText = /^[a-f\d\s]+$/i;
             if (valText.test(userIn)) {
-                _StdOut.putText("Your input is valid.");
+                var loadText = userIn.split(" ");
+                console.log(loadText);
+                for (var i = 0; i < loadText.length; i++) {
+                    _Memory.memoryBox[i] = loadText[i];
+                    console.log("i = " + i);
+                }
+                console.log(_Memory.memoryBox);
+                _Memory.createTable(_Memory.memoryBox);
             }
             else {
                 _StdOut.putText("Only hex digits and spaces are allowed. Please enter a new");

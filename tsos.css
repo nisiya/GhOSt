@@ -87,7 +87,7 @@ table {
 #mainContent {
   border-spacing: 10px;
   border-collapse: separate;
-  border: 1px solid #FEF200;
+  /* border: 1px solid #FEF200; */
 }
 
 #mainContent th {
@@ -115,8 +115,14 @@ table {
   color: black;
   font-weight: normal;
   width: 100%;
-  text-align: center;  
+  text-align: center; 
+  border-collapse: collapse;
+  padding: 5px; 
   /* border-bottom: 1px solid #666666;   */
+}
+
+table#taMemory tr:nth-child(even) {
+  background-color: #f2f2f2;
 }
 
 #taCPU{
