@@ -100,8 +100,8 @@ module TSOS {
             _CPU = new Cpu();  // Note: We could simulate multi-core systems by instantiating more than one instance of the CPU here.
             _CPU.init();       //       There's more to do, like dealing with scheduling and such, but this would be a start. Pretty cool.
 
-            // ... Create and initialize the Memory
-            _Memory = new Memory();  // Note: We could simulate multi-core systems by instantiating more than one instance of the CPU here.
+            // ... Create and initialize the Memory (yup part of hardware too)
+            _Memory = new Memory();  // one memory for now
             _Memory.init();  
 
             // ... then set the host clock pulse ...

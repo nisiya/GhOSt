@@ -465,14 +465,7 @@ module TSOS {
             // checks if text only contains hex decimals and spaces
             var valText = /^[a-f\d\s]+$/i;
             if (valText.test(userIn)) {
-                var loadText: string[] = userIn.split(" ");
-                console.log(loadText);
-                for (var i = 0; i <loadText.length; i++){
-                    _Memory.memoryBox[i] = loadText[i];
-                    console.log("i = " + i);
-                }
-                console.log(_Memory.memoryBox);
-                _Memory.createTable(_Memory.memoryBox);                
+          
             }
             else {
                 _StdOut.putText("Only hex digits and spaces are allowed. Please enter a new");
