@@ -374,15 +374,19 @@ var TSOS;
         //load
         Shell.prototype.shellLoad = function (args) {
             // gets text of textarea
-            var userIn = document.getElementById("taProgramInput").value;
+            var userProgram = document.getElementById("taProgramInput").value;
             // checks if text only contains hex decimals and spaces
             var valText = /^[a-f\d\s]+$/i;
-            if (valText.test(userIn)) {
+            if (valText.test(userProgram)) {
+                var pBase = _MemoryManager.loadOpCodes(userProgram);
+                console.log(pBase);
+                // _Kernel.krnCreateProcess(pBase);
+            }
+            else if (userProgram == "") {
+                _StdOut.putText("Please enter 6502a op codes in the input area below.");
             }
             else {
-                _StdOut.putText("Only hex digits and spaces are allowed. Please enter a new");
-                _StdOut.advanceLine();
-                _StdOut.putText("code.");
+                _StdOut.putText("Only hex digits and spaces are allowed. Please enter a new set of codes.");
             }
         };
         // welp aka BSOD

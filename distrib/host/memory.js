@@ -7,18 +7,23 @@
 var TSOS;
 (function (TSOS) {
     var Memory = /** @class */ (function () {
-        function Memory(memoryBox) {
-            if (memoryBox === void 0) { memoryBox = []; }
-            this.memoryBox = memoryBox;
+        function Memory() {
+            this.memoryP1 = false;
+            this.memoryP2 = false;
+            this.memoryP3 = false;
         }
         Memory.prototype.init = function () {
-            for (var i = 0; i < 256; i++) {
-                this.memoryBox.push("00");
+            console.log("pop");
+            this.memory = new Array();
+            for (var i = 0; i < 768; i++) {
+                this.memory.push("00");
             }
-            this.createTable(this.memoryBox);
+            this.memoryP1 = false;
+            this.memoryP2 = false;
+            this.memoryP3 = false;
+            this.loadTable();
         };
-        Memory.prototype.createTable = function (memoryBox) {
-            var memBox = memoryBox;
+        Memory.prototype.loadTable = function () {
             var memoryContainer = document.getElementById("memoryContainer");
             memoryContainer.innerHTML = " ";
             var memoryTable = document.createElement("table");
@@ -26,20 +31,22 @@ var TSOS;
             memoryTable.id = "taMemory";
             var memoryTableBody = document.createElement("tbody");
             // creating cells
-            for (var i = 0; i < 32; i++) {
+            for (var i = 0; i < 96; i++) {
                 // create rows
                 var row = document.createElement("tr");
                 row.id = "memoryRow-" + (8 * i);
                 var cell = document.createElement("td");
                 var cellText = document.createTextNode("0x" + (8 * i));
+                cell.id = "byte" + (8 * i);
                 cell.appendChild(cellText);
                 row.appendChild(cell);
                 for (var j = 0; j < 8; j++) {
                     var cell = document.createElement("td");
                     var index = j + (8 * i);
-                    var str = memBox[index];
-                    console.log(str);
-                    var cellText = document.createTextNode(str);
+                    var memoryValue = this.memory[index];
+                    console.log(memoryValue);
+                    var cellText = document.createTextNode(memoryValue);
+                    cell.id = index.toString();
                     cell.appendChild(cellText);
                     row.appendChild(cell);
                 }

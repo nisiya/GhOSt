@@ -114,6 +114,7 @@ table {
 #taMemory{
   color: black;
   font-weight: normal;
+  font-family: Courier New, Courier, monospace;  
   width: 100%;
   text-align: center; 
   border-collapse: collapse;
@@ -125,8 +126,13 @@ table#taMemory tr:nth-child(even) {
   background-color: #f2f2f2;
 }
 
-#taCPU{
+table#taProcess tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+#taCPU, #taProcess{
   color: black;
+  font-family: Courier New, Courier, monospace;
   font-weight: normal;
   width: 100%;
   text-align: center;  

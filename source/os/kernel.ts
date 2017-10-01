@@ -1,5 +1,6 @@
 ///<reference path="../globals.ts" />
 ///<reference path="queue.ts" />
+///<reference path="pcb.ts" />
 
 /* ------------
      Kernel.ts
@@ -26,6 +27,8 @@ module TSOS {
             _KernelInterruptQueue = new Queue();  // A (currently) non-priority queue for interrupt requests (IRQs).
             _KernelBuffers = new Array();         // Buffers... for the kernel.
             _KernelInputQueue = new Queue();      // Where device input lands before being processed out somewhere.
+            _ResidentQueue = new Queue();
+            _ReadyQueue = new Queue();
 
             // Initialize the console.
             _Console = new Console();          // The command line interface / console I/O device.
@@ -44,6 +47,7 @@ module TSOS {
             //
             // ... more?
             //
+            _MemoryManager = new MemoryManager();
 
             // Enable the OS Interrupts.  (Not the CPU clock interrupt, as that is done in the hardware sim.)
             this.krnTrace("Enabling the interrupts.");
@@ -143,6 +147,13 @@ module TSOS {
         // - ReadConsole
         // - WriteConsole
         // - CreateProcess
+        public krnCreateProcess(pBase) {
+            var pid = _ResidentQueue.getSize();
+            var process = new Process(pid, pBase);
+            console.log(process);
+            _ResidentQueue.enqueue(process);
+        }
+
         // - ExitProcess
         // - WaitForProcessToExit
         // - CreateFile

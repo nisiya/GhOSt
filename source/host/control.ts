@@ -84,7 +84,7 @@ module TSOS {
             document.getElementById("taProgramInput").style.border = "5px solid #0101FF";            
             document.getElementById("pcbContainer").style.border = "5px solid #0101FF";
             document.getElementById("memoryContainer").style.border = "5px solid #0101FF";                        
-            document.getElementById("cpuContainer").style.border = "5px solid #0101FF";                        
+            document.getElementById("cpuContainer").style.border = "5px solid #0101FF";                       
             
             // Disable the (passed-in) start button...
             btn.disabled = true;

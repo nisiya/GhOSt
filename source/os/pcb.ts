@@ -5,7 +5,6 @@
    *process ID
    process state
    privileges
-   pointer to parent process
    program counter: pointer to address of next instruction
    location
    CPU registers, ACC, X, Y
@@ -17,10 +16,25 @@
 
    module TSOS {
     export class Process {
-        constructor(public id, ) {
-        }
-        public init(): void{
 
+        public pid: number;
+        public pCounter: number = 0;
+        public pAcc: number = 0;
+        public pXreg: number = 0;
+        public pYreg: number = 0;
+        public pZflag: number = 0; 
+        public pPriority: number = 0;
+        public pState: string = "Not running";
+        public pLocation: string = "Memory";
+        public pBase: number;
+        public pLimit: number = this.pBase + 255;
+
+        constructor(pid, pBase) {
         }
+
+        public getPid() {
+            return this.pid;
+        }
+        
     }
 }

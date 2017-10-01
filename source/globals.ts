@@ -27,6 +27,7 @@ const KEYBOARD_IRQ: number = 1;
 //
 var _CPU: TSOS.Cpu;  // Utilize TypeScript's type annotation system to ensure that _CPU is an instance of the Cpu class.
 var _Memory: TSOS.Memory;
+var _MemoryManager: TSOS.MemoryManager;
 
 var _OSclock: number = 0;  // Page 23.
 
@@ -45,6 +46,8 @@ var _Kernel: TSOS.Kernel;
 var _KernelInterruptQueue;          // Initializing this to null (which I would normally do) would then require us to specify the 'any' type, as below.
 var _KernelInputQueue: any = null;  // Is this better? I don't like uninitialized variables. But I also don't like using the type specifier 'any'
 var _KernelBuffers: any[] = null;   // when clearly 'any' is not what we want. There is likely a better way, but what is it?
+var _ResidentQueue;
+var _ReadyQueue;
 
 // Standard input and output
 var _StdIn;    // Same "to null or not to null" issue as above.
