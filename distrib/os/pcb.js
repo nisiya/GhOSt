@@ -25,7 +25,9 @@ var TSOS;
             this.pPriority = 0;
             this.pState = "Not running";
             this.pLocation = "Memory";
-            this.pLimit = this.pBase + 255;
+            this.pid = pid;
+            this.pBase = pBase;
+            this.pLimit = pBase + 255;
         }
         Process.prototype.getPid = function () {
             return this.pid;

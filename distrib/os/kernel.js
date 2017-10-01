@@ -135,6 +135,7 @@ var TSOS;
             var process = new TSOS.Process(pid, pBase);
             console.log(process);
             _ResidentQueue.enqueue(process);
+            return pid;
         };
         // - ExitProcess
         // - WaitForProcessToExit

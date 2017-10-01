@@ -380,7 +380,8 @@ var TSOS;
             if (valText.test(userProgram)) {
                 var pBase = _MemoryManager.loadOpCodes(userProgram);
                 console.log(pBase);
-                // _Kernel.krnCreateProcess(pBase);
+                var pid = _Kernel.krnCreateProcess(pBase);
+                _StdOut.putText("Process id: " + pid + " is in Resident Queue");
             }
             else if (userProgram == "") {
                 _StdOut.putText("Please enter 6502a op codes in the input area below.");

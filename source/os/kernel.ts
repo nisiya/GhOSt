@@ -152,6 +152,7 @@ module TSOS {
             var process = new Process(pid, pBase);
             console.log(process);
             _ResidentQueue.enqueue(process);
+            return pid;
         }
 
         // - ExitProcess

@@ -27,9 +27,12 @@
         public pState: string = "Not running";
         public pLocation: string = "Memory";
         public pBase: number;
-        public pLimit: number = this.pBase + 255;
+        public pLimit: number;
 
         constructor(pid, pBase) {
+            this.pid = pid;
+            this.pBase = pBase;
+            this.pLimit = pBase + 255;
         }
 
         public getPid() {
