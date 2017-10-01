@@ -121,6 +121,12 @@ module TSOS {
                 "- Validates and loads user program input into memory.");
             this.commandList[this.commandList.length] = sc;
 
+            // run
+            sc = new ShellCommand(this.shellRun,
+                "run",
+                "- <pid> - Runs the process with the id.");
+            this.commandList[this.commandList.length] = sc;
+
             // welp
             sc = new ShellCommand(this.shellWelp,
                 "welp",
@@ -374,6 +380,11 @@ module TSOS {
                         _StdOut.putText("Validates and loads the 6502a op codes in User Program Input.");
                         break;
 
+                    // run <pid>
+                    case "run":
+                    _StdOut.putText("Runs the process with id <pid>.");
+                    break;
+
                     // welp
                     case "welp":
                         _StdOut.putText("Welp triggers the BSOD, when the kernel traps an OS error.");
@@ -457,7 +468,7 @@ module TSOS {
             _StdOut.putText("He's a cat~ Meow~ Flushing the toliet~");
         }
 
-        //load
+        // load
         public shellLoad(args) {
             // gets text of textarea
             var userProgram: string = (<HTMLInputElement> document.getElementById("taProgramInput")).value;
@@ -469,13 +480,26 @@ module TSOS {
                 var pid: number = _Kernel.krnCreateProcess(pBase);
                 _StdOut.putText("Process id: " + pid + " is in Resident Queue");
 
-            }
-            else if(userProgram == ""){
+            } else if(userProgram == ""){
                 _StdOut.putText("Please enter 6502a op codes in the input area below.");
-            }
-            else {
+            } else {
                 _StdOut.putText("Only hex digits and spaces are allowed. Please enter a new set of codes.");
             }
+        }
+
+        // run <pid>
+        public shellRun(args) {
+            var valText = /^\d*$/;
+            if (valText.test(args) && args != ""){
+                if (_ResidentQueue.isEmpty()){
+                    _StdOut.putText("No process is loaded in memory.");
+                } else {
+                    _ReadyQueue.enqueue(_ResidentQueue.dequeue());
+                    console.log(_ReadyQueue);
+                }
+            } else {
+                _StdOut.putText("Please enter an integer for process id after run command.");
+            }  
         }
 
         // welp aka BSOD

@@ -75,6 +75,9 @@ var TSOS;
             // load
             sc = new TSOS.ShellCommand(this.shellLoad, "load", "- Validates and loads user program input into memory.");
             this.commandList[this.commandList.length] = sc;
+            // run
+            sc = new TSOS.ShellCommand(this.shellRun, "run", "- <pid> - Runs the process with the id.");
+            this.commandList[this.commandList.length] = sc;
             // welp
             sc = new TSOS.ShellCommand(this.shellWelp, "welp", "- Displays BSOD when the kernel traps an OS error.");
             this.commandList[this.commandList.length] = sc;
@@ -294,6 +297,10 @@ var TSOS;
                     case "load":
                         _StdOut.putText("Validates and loads the 6502a op codes in User Program Input.");
                         break;
+                    // run <pid>
+                    case "run":
+                        _StdOut.putText("Runs the process with id <pid>.");
+                        break;
                     // welp
                     case "welp":
                         _StdOut.putText("Welp triggers the BSOD, when the kernel traps an OS error.");
@@ -371,7 +378,7 @@ var TSOS;
             audio.play();
             _StdOut.putText("He's a cat~ Meow~ Flushing the toliet~");
         };
-        //load
+        // load
         Shell.prototype.shellLoad = function (args) {
             // gets text of textarea
             var userProgram = document.getElementById("taProgramInput").value;
@@ -388,6 +395,17 @@ var TSOS;
             }
             else {
                 _StdOut.putText("Only hex digits and spaces are allowed. Please enter a new set of codes.");
+            }
+        };
+        // run <pid>
+        Shell.prototype.shellRun = function (args) {
+            var valText = /^\d*$/;
+            if (valText.test(args) && args != "") {
+                _ReadyQueue.enqueue(_ResidentQueue.dequeue());
+                console.log(_ReadyQueue);
+            }
+            else {
+                _StdOut.putText("Please enter an integer for process id after run command.");
             }
         };
         // welp aka BSOD
