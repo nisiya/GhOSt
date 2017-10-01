@@ -7,6 +7,7 @@
 
      Requires globals.ts
               queue.ts
+              pcb.ts
 
      Routines for the Operating System, NOT the host.
 
@@ -146,11 +147,17 @@ module TSOS {
         // Some ideas:
         // - ReadConsole
         // - WriteConsole
+
         // - CreateProcess
         public krnCreateProcess(pBase) {
+            
             var pid = _ResidentQueue.getSize();
+
+            // base register value retrieved from loading process into memory
             var process = new Process(pid, pBase);
             console.log(process);
+
+            // put pcb on ready queue
             _ResidentQueue.enqueue(process);
             return pid;
         }

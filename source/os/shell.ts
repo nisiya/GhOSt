@@ -461,11 +461,11 @@ module TSOS {
         public shellLoad(args) {
             // gets text of textarea
             var userProgram: string = (<HTMLInputElement> document.getElementById("taProgramInput")).value;
-            // checks if text only contains hex decimals and spaces
+            // checks if text only contains hex decimals and spaces and is not empty
             var valText = /^[a-f\d\s]+$/i;
             if (valText.test(userProgram)) {
+                // base register value from when memory was loaded
                 var pBase: number = _MemoryManager.loadOpCodes(userProgram);
-                console.log(pBase);
                 var pid: number = _Kernel.krnCreateProcess(pBase);
                 _StdOut.putText("Process id: " + pid + " is in Resident Queue");
 
@@ -487,7 +487,7 @@ module TSOS {
         // status
         public shellStatus(args) {
             if (args.length > 0) {
-                var status = document.getElementById("usrStatus");
+                var status: HTMLTextAreaElement = <HTMLTextAreaElement> document.getElementById("usrStatus");
                 // change user status
                 status.innerHTML = args.join(" ");
                 _StdOut.putText("Your status has changed.");

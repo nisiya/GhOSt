@@ -375,11 +375,11 @@ var TSOS;
         Shell.prototype.shellLoad = function (args) {
             // gets text of textarea
             var userProgram = document.getElementById("taProgramInput").value;
-            // checks if text only contains hex decimals and spaces
+            // checks if text only contains hex decimals and spaces and is not empty
             var valText = /^[a-f\d\s]+$/i;
             if (valText.test(userProgram)) {
+                // base register value from when memory was loaded
                 var pBase = _MemoryManager.loadOpCodes(userProgram);
-                console.log(pBase);
                 var pid = _Kernel.krnCreateProcess(pBase);
                 _StdOut.putText("Process id: " + pid + " is in Resident Queue");
             }
