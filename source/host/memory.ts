@@ -51,16 +51,33 @@
                             var memoryValue = this.memory[index];
                             console.log(memoryValue);
                             var cellText = document.createTextNode(memoryValue);
-                            cell.id = index.toString();
+                            cell.id = "memoryCell-" + index;
                             cell.appendChild(cellText);
                             row.appendChild(cell);
                         }
-                    
                         memoryTableBody.appendChild(row);
+                        console.log(memoryTable);
                     }
                     
                     memoryTable.appendChild(memoryTableBody);
                     memoryContainer.appendChild(memoryTable);
+                }
+
+                public updateTable(baseReg): void {
+                    var memoryTable = <HTMLTableElement> document.getElementById("taMemory");
+                    var rowId: string;
+                    var index: number;                    
+                    var cellId: string;
+                    var limitReg: number = baseReg + 256;
+                    for (var i = baseReg; i < limitReg/8 ; i++){
+                        rowId = "memoryRow-" + (8*i);
+                        for (var j = 0; j < 8; j ++){
+                            index = j + (8 * i);
+                            cellId = "memoryCell-" + index;
+// =                            console.log(memoryTable.rows.namedItem(rowId).cells.namedItem(cellId).innerHTML);
+                            memoryTable.rows.namedItem(rowId).cells.namedItem(cellId).innerHTML = this.memory[index];
+                        }
+                    }
                 }
 
             }

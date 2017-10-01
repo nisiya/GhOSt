@@ -34,7 +34,7 @@
                     console.log("i = " + i);
                 }
                 console.log(_Memory.memory);
-                _Memory.loadTable();
+                _Memory.updateTable(baseReg);
                 return baseReg;
             }   
         }
