@@ -9,11 +9,8 @@ var TSOS;
     var MemoryManager = /** @class */ (function () {
         function MemoryManager() {
         }
-        MemoryManager.prototype.loadOpCodes = function (userProgram) {
-            var inputOpCodes = userProgram.split(" ");
-            console.log(inputOpCodes);
+        MemoryManager.prototype.loadMemory = function (inputOpCodes) {
             var baseReg;
-            var limitReg;
             if (_Memory.memoryP1) {
                 if (_Memory.memoryP2) {
                     if (_Memory.memoryP3) {
@@ -40,6 +37,13 @@ var TSOS;
             console.log(_Memory.memory);
             _Memory.updateTable(baseReg);
             return baseReg;
+        };
+        MemoryManager.prototype.readMemory = function (pBase, pLimit) {
+            var opCode = [];
+            for (var i = pBase; i <= pLimit; i++) {
+                opCode.push(_Memory.memory[i]);
+            }
+            return opCode;
         };
         return MemoryManager;
     }());

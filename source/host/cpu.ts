@@ -37,10 +37,64 @@ module TSOS {
             this.isExecuting = false;
         }
 
+        public updateCPUTable(): void {
+            var cpuTable: HTMLTableElement = <HTMLTableElement> document.getElementById("taCPU");
+            cpuTable.rows[1].cells.namedItem("cPC").innerHTML = this.PC.toString();
+            cpuTable.rows[1].cells.namedItem("cIR").innerHTML = this.PC.toString();            
+            cpuTable.rows[1].cells.namedItem("cACC").innerHTML = this.Acc.toString();            
+            cpuTable.rows[1].cells.namedItem("cX").innerHTML = this.Xreg.toString();            
+            cpuTable.rows[1].cells.namedItem("cY").innerHTML = this.Yreg.toString();            
+            cpuTable.rows[1].cells.namedItem("cZ").innerHTML = this.Zflag.toString();                        
+        } 
+
         public cycle(): void {
             _Kernel.krnTrace('CPU cycle');
             // TODO: Accumulate CPU usage and profiling statistics here.
             // Do the real work here. Be sure to set this.isExecuting appropriately.
+            if (_ReadyQueue.isEmpty()){
+                this.isExecuting = false;
+            }
+            else{
+                // move pcb from ready queue to running
+                var process = _ReadyQueue.dequeue();
+                var pBase = process.pBase;
+                var pLimit = process.pLimit;
+                console.log(pLimit+"p");
+
+                // retreive op codes from memory
+                var opCodes = _MemoryManager.readMemory(pBase, pLimit);
+                console.log(opCodes);
+
+                // decode the op codes
+                this.decodeOp(opCodes, pLimit);   
+                console.log(this.Acc);                 
+            }
+
+        }
+
+        public decodeOp(opCodes, pLimit) {
+            if (opCodes.length > 0) {
+                // take action according to op code ..
+                var data: number;
+                while (this.PC < pLimit){
+                    switch (opCodes[this.PC]) {
+                        
+                        // load accumulator with value in next byte
+                        case "A9":
+                            this.PC++;
+                            data = parseInt(opCodes[this.PC], 16);
+                            this.Acc = data;
+                            this.PC++;
+                            break;
+
+                        default:
+                            _StdOut.putText("Error. Op code " + opCodes[this.PC] + " does not exist.");
+                            break;
+                    }
+                    this.updateCPUTable();                    
+                }
+                console.log("finish process");
+            }
         }
 
     }

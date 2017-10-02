@@ -385,9 +385,11 @@ var TSOS;
             // checks if text only contains hex decimals and spaces and is not empty
             var valText = /^[a-f\d\s]+$/i;
             if (valText.test(userProgram)) {
+                var inputOpCodes = userProgram.split(" ");
                 // base register value from when memory was loaded
-                var pBase = _MemoryManager.loadOpCodes(userProgram);
-                var pid = _Kernel.krnCreateProcess(pBase);
+                var pBase = _MemoryManager.loadMemory(inputOpCodes);
+                var pLimit = pBase + inputOpCodes.length - 1;
+                var pid = _Kernel.krnCreateProcess(pBase, pLimit);
                 _StdOut.putText("Process id: " + pid + " is in Resident Queue");
             }
             else if (userProgram == "") {
@@ -400,9 +402,19 @@ var TSOS;
         // run <pid>
         Shell.prototype.shellRun = function (args) {
             var valText = /^\d*$/;
+            // validate input
             if (valText.test(args) && args != "") {
-                _ReadyQueue.enqueue(_ResidentQueue.dequeue());
-                console.log(_ReadyQueue);
+                // check if there are processes to be run
+                if (_ResidentQueue.isEmpty()) {
+                    _StdOut.putText("No process is loaded in memory.");
+                }
+                else {
+                    console.log(_CPU.isExecuting);
+                    _ReadyQueue.enqueue(_ResidentQueue.dequeue());
+                    console.log(_ReadyQueue);
+                    _CPU.isExecuting = true;
+                    console.log(_CPU.isExecuting);
+                }
             }
             else {
                 _StdOut.putText("Please enter an integer for process id after run command.");

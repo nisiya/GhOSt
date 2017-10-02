@@ -8,11 +8,8 @@
     module TSOS {
         export class MemoryManager {
 
-            public loadOpCodes(userProgram){
-                var inputOpCodes: string[] = userProgram.split(" ");
-                console.log(inputOpCodes);                
+            public loadMemory(inputOpCodes){               
                 var baseReg: number;
-                var limitReg: number;
                 if (_Memory.memoryP1){
                     if(_Memory.memoryP2){
                         if(_Memory.memoryP3){
@@ -36,6 +33,14 @@
                 console.log(_Memory.memory);
                 _Memory.updateTable(baseReg);
                 return baseReg;
-            }   
+            }
+            
+            public readMemory(pBase, pLimit){
+                var opCode: string[] = [];
+                for (var i = pBase; i <= pLimit; i ++){
+                    opCode.push(_Memory.memory[i]);
+                }
+                return opCode;
+            }
         }
     }

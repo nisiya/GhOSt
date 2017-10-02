@@ -131,11 +131,11 @@ var TSOS;
         // - ReadConsole
         // - WriteConsole
         // - CreateProcess
-        Kernel.prototype.krnCreateProcess = function (pBase) {
+        Kernel.prototype.krnCreateProcess = function (pBase, pLimit) {
             var pid = _ResidentQueue.getSize();
             // base register value retrieved from loading process into memory
-            var process = new TSOS.Process(pid, pBase);
-            console.log(process);
+            var process = new TSOS.Process(pid, pBase, pLimit);
+            // console.log(process);
             // put pcb on ready queue
             _ResidentQueue.enqueue(process);
             return pid;

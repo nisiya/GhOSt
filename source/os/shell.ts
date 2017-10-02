@@ -475,9 +475,11 @@ module TSOS {
             // checks if text only contains hex decimals and spaces and is not empty
             var valText = /^[a-f\d\s]+$/i;
             if (valText.test(userProgram)) {
+                var inputOpCodes: string[] = userProgram.split(" ");                
                 // base register value from when memory was loaded
-                var pBase: number = _MemoryManager.loadOpCodes(userProgram);
-                var pid: number = _Kernel.krnCreateProcess(pBase);
+                var pBase: number = _MemoryManager.loadMemory(inputOpCodes);
+                var pLimit: number = pBase + inputOpCodes.length - 1;
+                var pid: number = _Kernel.krnCreateProcess(pBase, pLimit);
                 _StdOut.putText("Process id: " + pid + " is in Resident Queue");
 
             } else if(userProgram == ""){
@@ -490,12 +492,17 @@ module TSOS {
         // run <pid>
         public shellRun(args) {
             var valText = /^\d*$/;
+            // validate input
             if (valText.test(args) && args != ""){
+                // check if there are processes to be run
                 if (_ResidentQueue.isEmpty()){
                     _StdOut.putText("No process is loaded in memory.");
                 } else {
+                    console.log(_CPU.isExecuting);
                     _ReadyQueue.enqueue(_ResidentQueue.dequeue());
                     console.log(_ReadyQueue);
+                    _CPU.isExecuting = true;
+                    console.log(_CPU.isExecuting);                    
                 }
             } else {
                 _StdOut.putText("Please enter an integer for process id after run command.");

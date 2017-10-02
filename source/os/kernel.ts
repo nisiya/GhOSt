@@ -149,13 +149,13 @@ module TSOS {
         // - WriteConsole
 
         // - CreateProcess
-        public krnCreateProcess(pBase) {
+        public krnCreateProcess(pBase, pLimit) {
             
-            var pid = _ResidentQueue.getSize();
+            var pid: number = _ResidentQueue.getSize();
 
             // base register value retrieved from loading process into memory
-            var process = new Process(pid, pBase);
-            console.log(process);
+            var process = new Process(pid, pBase, pLimit);
+            // console.log(process);
 
             // put pcb on ready queue
             _ResidentQueue.enqueue(process);
