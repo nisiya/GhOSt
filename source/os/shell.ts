@@ -478,10 +478,13 @@ module TSOS {
                 var inputOpCodes: string[] = userProgram.split(" ");                
                 // base register value from when memory was loaded
                 var pBase: number = _MemoryManager.loadMemory(inputOpCodes);
-                var pLimit: number = pBase + inputOpCodes.length - 1;
-                var pid: number = _Kernel.krnCreateProcess(pBase, pLimit);
-                _StdOut.putText("Process id: " + pid + " is in Resident Queue");
-
+                if (pBase == 999){
+                    _StdOut.putText("Memory is full. Please wait to load");                    
+                } else {
+                    var pLimit: number = pBase + inputOpCodes.length - 1;
+                    var pid: number = _Kernel.krnCreateProcess(pBase, pLimit);
+                    _StdOut.putText("Process id: " + pid + " is in Resident Queue");
+                }
             } else if(userProgram == ""){
                 _StdOut.putText("Please enter 6502a op codes in the input area below.");
             } else {

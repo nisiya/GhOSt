@@ -12,19 +12,19 @@ var TSOS;
         MemoryManager.prototype.loadMemory = function (inputOpCodes) {
             var baseReg;
             if (_Memory.memoryP1) {
-                if (_Memory.memoryP2) {
-                    if (_Memory.memoryP3) {
-                        _StdOut.putText("Memory is full. Please wait to load");
-                    }
-                    else {
-                        _Memory.memoryP3 = true;
-                        baseReg = 512;
-                    }
-                }
-                else {
-                    _Memory.memoryP2 = true;
-                    baseReg = 256;
-                }
+                // memory is full
+                baseReg = 999;
+                // if(_Memory.memoryP2){
+                //     if(_Memory.memoryP3){
+                //         _StdOut.putText("Memory is full. Please wait to load");
+                //     } else{
+                //         _Memory.memoryP3 = true;
+                //         baseReg = 512;
+                //     }
+                // } else{
+                //     _Memory.memoryP2 = true; 
+                //     baseReg = 256;
+                // }
             }
             else {
                 _Memory.memoryP1 = true;
@@ -32,7 +32,6 @@ var TSOS;
             }
             for (var i = baseReg; i < inputOpCodes.length; i++) {
                 _Memory.memory[i] = inputOpCodes[i];
-                console.log("i = " + i);
             }
             console.log(_Memory.memory);
             _Memory.updateTable(baseReg);
@@ -45,6 +44,13 @@ var TSOS;
             }
             return opCode;
         };
+        MemoryManager.prototype.updateMemory = function (addr, data) {
+            var index = parseInt(addr, 16);
+            console.log(_Memory.memory[index] + "whe1");
+            _Memory.memory[index] = data.toString();
+            console.log(_Memory.memory[index] + "whe");
+            _Memory.updateTable(0);
+        };
         MemoryManager.prototype.clearPartition = function (pBase, pLimit) {
             console.log("clearing");
             console.log(pBase);
@@ -52,6 +58,8 @@ var TSOS;
             for (var i = pBase; i <= pLimit; i++) {
                 _Memory.memory[i] = "00";
             }
+            console.log(_Memory.memory);
+            _Memory.memoryP1 = false;
             _Memory.updateTable(pBase);
         };
         return MemoryManager;

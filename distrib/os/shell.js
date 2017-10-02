@@ -388,9 +388,14 @@ var TSOS;
                 var inputOpCodes = userProgram.split(" ");
                 // base register value from when memory was loaded
                 var pBase = _MemoryManager.loadMemory(inputOpCodes);
-                var pLimit = pBase + inputOpCodes.length - 1;
-                var pid = _Kernel.krnCreateProcess(pBase, pLimit);
-                _StdOut.putText("Process id: " + pid + " is in Resident Queue");
+                if (pBase == 999) {
+                    _StdOut.putText("Memory is full. Please wait to load");
+                }
+                else {
+                    var pLimit = pBase + inputOpCodes.length - 1;
+                    var pid = _Kernel.krnCreateProcess(pBase, pLimit);
+                    _StdOut.putText("Process id: " + pid + " is in Resident Queue");
+                }
             }
             else if (userProgram == "") {
                 _StdOut.putText("Please enter 6502a op codes in the input area below.");
