@@ -45,6 +45,15 @@ var TSOS;
             }
             return opCode;
         };
+        MemoryManager.prototype.clearPartition = function (pBase, pLimit) {
+            console.log("clearing");
+            console.log(pBase);
+            console.log(pLimit);
+            for (var i = pBase; i <= pLimit; i++) {
+                _Memory.memory[i] = "00";
+            }
+            _Memory.updateTable(pBase);
+        };
         return MemoryManager;
     }());
     TSOS.MemoryManager = MemoryManager;

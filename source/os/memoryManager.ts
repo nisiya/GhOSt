@@ -42,5 +42,15 @@
                 }
                 return opCode;
             }
+
+            public clearPartition(pBase,pLimit) : void{
+                console.log("clearing");
+                console.log(pBase);
+                console.log(pLimit);
+                for (var i = pBase; i <= pLimit; i++){
+                    _Memory.memory[i] = "00";
+                } 
+                _Memory.updateTable(pBase);
+            }
         }
     }

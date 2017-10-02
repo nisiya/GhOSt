@@ -67,7 +67,8 @@ module TSOS {
 
                 // decode the op codes
                 this.decodeOp(opCodes, pLimit);   
-                console.log(this.Acc);                 
+                console.log(this.Acc);
+                _MemoryManager.clearPartition(pBase, pLimit);                 
             }
 
         }
@@ -91,7 +92,7 @@ module TSOS {
                             _StdOut.putText("Error. Op code " + opCodes[this.PC] + " does not exist.");
                             break;
                     }
-                    this.updateCPUTable();                    
+                    this.updateCPUTable();
                 }
                 console.log("finish process");
             }

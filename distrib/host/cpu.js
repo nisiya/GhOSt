@@ -66,6 +66,7 @@ var TSOS;
                 // decode the op codes
                 this.decodeOp(opCodes, pLimit);
                 console.log(this.Acc);
+                _MemoryManager.clearPartition(pBase, pLimit);
             }
         };
         Cpu.prototype.decodeOp = function (opCodes, pLimit) {
