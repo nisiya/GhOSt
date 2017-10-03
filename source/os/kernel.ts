@@ -49,6 +49,7 @@ module TSOS {
             // ... more?
             //
             _MemoryManager = new MemoryManager();
+            _PCB = new PCB(0,0);
 
             // Enable the OS Interrupts.  (Not the CPU clock interrupt, as that is done in the hardware sim.)
             this.krnTrace("Enabling the interrupts.");
@@ -139,6 +140,7 @@ module TSOS {
         public krnTimerISR() {
             // The built-in TIMER (not clock) Interrupt Service Routine (as opposed to an ISR coming from a device driver). {
             // Check multiprogramming parameters and enforce quanta here. Call the scheduler / context switch here if necessary.
+
         }
 
         //
@@ -151,10 +153,10 @@ module TSOS {
         // - CreateProcess
         public krnCreateProcess(pBase, pLimit) {
             
-            var pid: number = _ResidentQueue.getSize();
-
             // base register value retrieved from loading process into memory
-            var process = new Process(pid, pBase, pLimit);
+            // pid incremented upon creation
+            var process = new PCB(pBase, pLimit);
+            var pid = process.getPid();
             // console.log(process);
 
             // put pcb on ready queue
@@ -163,6 +165,13 @@ module TSOS {
         }
 
         // - ExitProcess
+        public krnExitProcess(){
+            var pBase: number = _PCB.getPBase();
+            console.log(pBase);
+            var pLimit: number = _PCB.getPLimit();
+            console.log(pLimit);
+            _MemoryManager.clearPartition(pBase, pLimit);
+        }
         // - WaitForProcessToExit
         // - CreateFile
         // - OpenFile

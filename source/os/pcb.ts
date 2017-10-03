@@ -14,28 +14,37 @@
    ------------ */
 
    module TSOS {
-    export class Process {
+    export class PCB {
 
-        public pid: number;
+        public pid: number = -1;
         public pCounter: number = 0;
         public pAcc: number = 0;
         public pXreg: number = 0;
         public pYreg: number = 0;
         public pZflag: number = 0; 
         public pPriority: number = 0;
-        public pState: string = "Not running";
+        public pState: string = "New";
         public pLocation: string = "Memory";
         public pBase: number;
         public pLimit: number;
 
-        constructor(pid, pBase, pLimit) {
-            this.pid = pid;
+        constructor(pBase, pLimit) {
             this.pBase = pBase;
             this.pLimit = pLimit;
+            this.pid++;
+            this.pState = "Resident";
         }
 
         public getPid() {
             return this.pid;
+        }
+
+        public getPBase() {
+            return this.pBase;
+        }
+
+        public getPLimit() {
+            return this.pLimit;
         }
         
     }

@@ -481,7 +481,7 @@ module TSOS {
                 if (pBase == 999){
                     _StdOut.putText("Memory is full. Please wait to load");                    
                 } else {
-                    var pLimit: number = pBase + inputOpCodes.length - 1;
+                    var pLimit: number = pBase + inputOpCodes.length;
                     var pid: number = _Kernel.krnCreateProcess(pBase, pLimit);
                     _StdOut.putText("Process id: " + pid + " is in Resident Queue");
                 }

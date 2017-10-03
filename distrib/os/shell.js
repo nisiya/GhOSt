@@ -392,7 +392,7 @@ var TSOS;
                     _StdOut.putText("Memory is full. Please wait to load");
                 }
                 else {
-                    var pLimit = pBase + inputOpCodes.length - 1;
+                    var pLimit = pBase + inputOpCodes.length;
                     var pid = _Kernel.krnCreateProcess(pBase, pLimit);
                     _StdOut.putText("Process id: " + pid + " is in Resident Queue");
                 }

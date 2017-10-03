@@ -14,24 +14,32 @@
    ------------ */
 var TSOS;
 (function (TSOS) {
-    var Process = /** @class */ (function () {
-        function Process(pid, pBase, pLimit) {
+    var PCB = /** @class */ (function () {
+        function PCB(pBase, pLimit) {
+            this.pid = -1;
             this.pCounter = 0;
             this.pAcc = 0;
             this.pXreg = 0;
             this.pYreg = 0;
             this.pZflag = 0;
             this.pPriority = 0;
-            this.pState = "Not running";
+            this.pState = "New";
             this.pLocation = "Memory";
-            this.pid = pid;
             this.pBase = pBase;
             this.pLimit = pLimit;
+            this.pid++;
+            this.pState = "Resident";
         }
-        Process.prototype.getPid = function () {
+        PCB.prototype.getPid = function () {
             return this.pid;
         };
-        return Process;
+        PCB.prototype.getPBase = function () {
+            return this.pBase;
+        };
+        PCB.prototype.getPLimit = function () {
+            return this.pLimit;
+        };
+        return PCB;
     }());
-    TSOS.Process = Process;
+    TSOS.PCB = PCB;
 })(TSOS || (TSOS = {}));
