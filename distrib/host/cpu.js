@@ -100,7 +100,7 @@ var TSOS;
                         this.PC++;
                         addr = this.fetch(this.PC) + addr;
                         var index = parseInt(addr, 16);
-                        data = parseInt(this.fetch(index));
+                        data = parseInt(this.fetch(index), 16);
                         this.Acc = data;
                         this.PC++;
                     // store accumulator in memory
@@ -117,6 +117,14 @@ var TSOS;
                     /* add content of an address to content of accumulator
                         and keeps resut in the accumulator*/
                     case "6D":
+                        this.PC++;
+                        addr = this.fetch(this.PC);
+                        this.PC++;
+                        addr = this.fetch(this.PC) + addr;
+                        var index = parseInt(addr, 16);
+                        data = parseInt(this.fetch(index), 16);
+                        this.Acc = data + this.Acc;
+                        this.PC++;
                     // load the x register with a constant
                     case "A2":
                         this.PC++;

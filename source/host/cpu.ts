@@ -108,7 +108,7 @@ module TSOS {
                         this.PC++;
                         addr = this.fetch(this.PC) + addr;
                         var index: number = parseInt(addr, 16);  
-                        data = parseInt(this.fetch(index));
+                        data = parseInt(this.fetch(index), 16);
                         this.Acc = data;
                         this.PC++;
 
@@ -127,7 +127,14 @@ module TSOS {
                     /* add content of an address to content of accumulator
                         and keeps resut in the accumulator*/
                     case "6D":
-
+                        this.PC++;
+                        addr = this.fetch(this.PC);
+                        this.PC++;
+                        addr = this.fetch(this.PC) + addr;
+                        var index: number = parseInt(addr, 16);  
+                        data = parseInt(this.fetch(index), 16);
+                        this.Acc = data + this.Acc;
+                        this.PC++;
                     // load the x register with a constant
                     case "A2":
                         this.PC++;
@@ -188,7 +195,7 @@ module TSOS {
 
                     // increment the value of a byte
                     case "EE":
-                    
+
                     // system call
                     /* #$01 in x reg = print integer stored in Y reg
                         #$02 in x reg = print 00-terminated string stored at

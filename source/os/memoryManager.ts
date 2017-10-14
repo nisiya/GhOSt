@@ -47,7 +47,7 @@
             public updateMemory(addr, data) : void{
                 var index: number = parseInt(addr, 16);  
                 console.log(_Memory.memory[index] + "whe1");                
-                _Memory.memory[index] = data.toString();
+                _Memory.memory[index] = data.toString(16);
                 console.log(_Memory.memory[index] + "whe");
                 _Memory.updateTable(0);
             }
