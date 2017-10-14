@@ -62,29 +62,23 @@ module TSOS {
             // TODO: Accumulate CPU usage and profiling statistics here.
             // Do the real work here. Be sure to set this.isExecuting appropriately.
 
-            if(this.PC==_PCB.pLimit){
-                // stop
-                _Kernel.krnExitProcess();
-                this.clearCPU();
-                this.updateCPUTable();
+            if(this.PC==0){
+                // move pcb from ready queue to running
+                _PCB = _ReadyQueue.dequeue();
+                _PCB.pState = "Running";
+                this.PC = _PCB.pBase;
+                // var pLimit = process.pLimit;
+                // console.log(pLimit+"p");
             }
-            else {
-                if(this.PC==0){
-                    // move pcb from ready queue to running
-                    _PCB = _ReadyQueue.dequeue();
-                    _PCB.pState = "Running";
-                    this.PC = _PCB.pBase;
-                    // var pLimit = process.pLimit;
-                    // console.log(pLimit+"p");
-                }
-                // fetch instruction from memory
-                var opCode = this.fetch(this.PC);
-                console.log(opCode);
+            // fetch instruction from memory
+            var opCode = this.fetch(this.PC);
+            console.log(opCode);
 
-                // decode then execute the op codes
-                this.decodeExecute(opCode);   
-                console.log(this.Acc + "a");
-            }
+            // decode then execute the op codes
+            this.decodeExecute(opCode);   
+            console.log(this.Acc + "a");
+
+            this.updateCPUTable();
         }
 
         public fetch(PC) {
@@ -109,6 +103,17 @@ module TSOS {
 
                     // load accumulator from memory
                     case "AD":
+                        this.PC++;
+                        addr = this.fetch(this.PC);
+                        this.PC++;
+                        addr = this.fetch(this.PC) + addr;
+                        var index: number = parseInt(addr, 16);  
+                        data = parseInt(this.fetch(index));
+                        this.Acc = data;
+                        this.PC++;
+
+                    // store accumulator in memory
+                    case "8D":
                         data = this.Acc;
                         this.PC++;
                         addr = this.fetch(this.PC);
@@ -117,32 +122,73 @@ module TSOS {
                         _MemoryManager.updateMemory(addr, data);
                         this.PC++;
                         break;
-                    // store accumulator in memory
-                    case "8D":
+
                     // add with carry
                     /* add content of an address to content of accumulator
                         and keeps resut in the accumulator*/
                     case "6D":
+
                     // load the x register with a constant
                     case "A2":
+                        this.PC++;
+                        data = parseInt(this.fetch(this.PC), 16);
+                        this.Xreg = data;
+                        this.PC++;
+                        break;
+
                     // load the x register from memory
                     case "AE":
+                        this.PC++;
+                        addr = this.fetch(this.PC);
+                        this.PC++;
+                        addr = this.fetch(this.PC) + addr;
+                        var index: number = parseInt(addr, 16);  
+                        data = parseInt(this.fetch(index));
+                        this.Xreg = data;
+                        this.PC++;
+
                     // load the y register with a constant
                     case "A0":
+                        this.PC++
+                        data = parseInt(this.fetch(this.PC), 16);
+                        this.Yreg = data;
+                        this.PC++;
+                        break;
+
                     // load the y register from memory
                     case "AC":
+                        this.PC++;
+                        addr = this.fetch(this.PC);
+                        this.PC++;
+                        addr = this.fetch(this.PC) + addr;
+                        var index: number = parseInt(addr, 16);  
+                        data = parseInt(this.fetch(index));
+                        this.Yreg = data;
+                        this.PC++;
+
                     // no operation
                     case "EA":
+                        this.PC++;
+
                     // break
                     case "00":
+                        // stop
+                        console.log("finish process");      
                         _Kernel.krnExitProcess();
+                        this.clearCPU();
+                        this.updateCPUTable();
+                        break;
+
                     // compare a byte in memory to the X reg
                     // if equal, set z flag 
                     case "EC":
+
                     // branch n bytes if z flag = 0
                     case "D0":
+
                     // increment the value of a byte
                     case "EE":
+                    
                     // system call
                     /* #$01 in x reg = print integer stored in Y reg
                         #$02 in x reg = print 00-terminated string stored at
@@ -154,8 +200,6 @@ module TSOS {
                         _StdOut.putText("Error. Op code " + opCode + " does not exist.");
                         break;
                 }
-                this.updateCPUTable();
-                console.log("finish process");
             }
         }
 

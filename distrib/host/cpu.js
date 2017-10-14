@@ -60,28 +60,21 @@ var TSOS;
             console.log("CPU cycle");
             // TODO: Accumulate CPU usage and profiling statistics here.
             // Do the real work here. Be sure to set this.isExecuting appropriately.
-            if (this.PC == _PCB.pLimit) {
-                // stop
-                _Kernel.krnExitProcess();
-                this.clearCPU();
-                this.updateCPUTable();
+            if (this.PC == 0) {
+                // move pcb from ready queue to running
+                _PCB = _ReadyQueue.dequeue();
+                _PCB.pState = "Running";
+                this.PC = _PCB.pBase;
+                // var pLimit = process.pLimit;
+                // console.log(pLimit+"p");
             }
-            else {
-                if (this.PC == 0) {
-                    // move pcb from ready queue to running
-                    _PCB = _ReadyQueue.dequeue();
-                    _PCB.pState = "Running";
-                    this.PC = _PCB.pBase;
-                    // var pLimit = process.pLimit;
-                    // console.log(pLimit+"p");
-                }
-                // fetch instruction from memory
-                var opCode = this.fetch(this.PC);
-                console.log(opCode);
-                // decode then execute the op codes
-                this.decodeExecute(opCode);
-                console.log(this.Acc + "a");
-            }
+            // fetch instruction from memory
+            var opCode = this.fetch(this.PC);
+            console.log(opCode);
+            // decode then execute the op codes
+            this.decodeExecute(opCode);
+            console.log(this.Acc + "a");
+            this.updateCPUTable();
         };
         Cpu.prototype.fetch = function (PC) {
             return _Memory.memory[PC];
@@ -102,6 +95,16 @@ var TSOS;
                         break;
                     // load accumulator from memory
                     case "AD":
+                        this.PC++;
+                        addr = this.fetch(this.PC);
+                        this.PC++;
+                        addr = this.fetch(this.PC) + addr;
+                        var index = parseInt(addr, 16);
+                        data = parseInt(this.fetch(index));
+                        this.Acc = data;
+                        this.PC++;
+                    // store accumulator in memory
+                    case "8D":
                         data = this.Acc;
                         this.PC++;
                         addr = this.fetch(this.PC);
@@ -110,25 +113,55 @@ var TSOS;
                         _MemoryManager.updateMemory(addr, data);
                         this.PC++;
                         break;
-                    // store accumulator in memory
-                    case "8D":
                     // add with carry
                     /* add content of an address to content of accumulator
                         and keeps resut in the accumulator*/
                     case "6D":
                     // load the x register with a constant
                     case "A2":
+                        this.PC++;
+                        data = parseInt(this.fetch(this.PC), 16);
+                        this.Xreg = data;
+                        this.PC++;
+                        break;
                     // load the x register from memory
                     case "AE":
+                        this.PC++;
+                        addr = this.fetch(this.PC);
+                        this.PC++;
+                        addr = this.fetch(this.PC) + addr;
+                        var index = parseInt(addr, 16);
+                        data = parseInt(this.fetch(index));
+                        this.Xreg = data;
+                        this.PC++;
                     // load the y register with a constant
                     case "A0":
+                        this.PC++;
+                        data = parseInt(this.fetch(this.PC), 16);
+                        this.Yreg = data;
+                        this.PC++;
+                        break;
                     // load the y register from memory
                     case "AC":
+                        this.PC++;
+                        addr = this.fetch(this.PC);
+                        this.PC++;
+                        addr = this.fetch(this.PC) + addr;
+                        var index = parseInt(addr, 16);
+                        data = parseInt(this.fetch(index));
+                        this.Yreg = data;
+                        this.PC++;
                     // no operation
                     case "EA":
+                        this.PC++;
                     // break
                     case "00":
+                        // stop
+                        console.log("finish process");
                         _Kernel.krnExitProcess();
+                        this.clearCPU();
+                        this.updateCPUTable();
+                        break;
                     // compare a byte in memory to the X reg
                     // if equal, set z flag 
                     case "EC":
@@ -145,8 +178,6 @@ var TSOS;
                         _StdOut.putText("Error. Op code " + opCode + " does not exist.");
                         break;
                 }
-                this.updateCPUTable();
-                console.log("finish process");
             }
         };
         return Cpu;
