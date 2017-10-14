@@ -51,11 +51,9 @@ var TSOS;
             console.log(_Memory.memory[index] + "whe");
             _Memory.updateTable(0);
         };
-        MemoryManager.prototype.clearPartition = function (pBase, pLimit) {
+        MemoryManager.prototype.clearPartition = function (pBase) {
             console.log("clearing");
-            console.log(pBase);
-            console.log(pLimit);
-            for (var i = pBase; i <= pLimit; i++) {
+            for (var i = pBase; i <= pBase + 255; i++) {
                 _Memory.memory[i] = "00";
             }
             console.log(_Memory.memory);

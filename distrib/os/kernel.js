@@ -135,20 +135,18 @@ var TSOS;
         Kernel.prototype.krnCreateProcess = function (pBase, pLimit) {
             // base register value retrieved from loading process into memory
             // pid incremented upon creation
-            var process = new TSOS.PCB(pBase, pLimit);
-            var pid = process.getPid();
+            _PCB = new TSOS.PCB(pBase, pLimit);
+            var pid = _PCB.getPid();
             // console.log(process);
             // put pcb on ready queue
-            _ResidentQueue.enqueue(process);
+            _ResidentQueue.enqueue(_PCB);
             return pid;
         };
         // - ExitProcess
         Kernel.prototype.krnExitProcess = function () {
             var pBase = _PCB.getPBase();
-            console.log(pBase);
-            var pLimit = _PCB.getPLimit();
-            console.log(pLimit);
-            _MemoryManager.clearPartition(pBase, pLimit);
+            console.log(pBase + "W");
+            _MemoryManager.clearPartition(pBase);
         };
         // - WaitForProcessToExit
         // - CreateFile

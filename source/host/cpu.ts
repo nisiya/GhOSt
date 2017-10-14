@@ -37,6 +37,15 @@ module TSOS {
             this.isExecuting = false;
         }
 
+        public clearCPU(): void {
+            this.PC = 0;
+            this.Acc = 0;
+            this.Xreg = 0;
+            this.Yreg = 0;
+            this.Zflag = 0;
+            this.isExecuting = false;
+        }
+
         public updateCPUTable(): void {
             var cpuTable: HTMLTableElement = <HTMLTableElement> document.getElementById("taCPU");
             cpuTable.rows[1].cells.namedItem("cPC").innerHTML = this.PC.toString();
@@ -53,24 +62,29 @@ module TSOS {
             // TODO: Accumulate CPU usage and profiling statistics here.
             // Do the real work here. Be sure to set this.isExecuting appropriately.
 
-            // move pcb from ready queue to running
-            var process = _ReadyQueue.dequeue();
-            process.pState = "Running";
-            this.PC = process.pBase;
-            // var pLimit = process.pLimit;
-            // console.log(pLimit+"p");
+            if(this.PC==_PCB.pLimit){
+                // stop
+                _Kernel.krnExitProcess();
+                this.clearCPU();
+                this.updateCPUTable();
+            }
+            else {
+                if(this.PC==0){
+                    // move pcb from ready queue to running
+                    _PCB = _ReadyQueue.dequeue();
+                    _PCB.pState = "Running";
+                    this.PC = _PCB.pBase;
+                    // var pLimit = process.pLimit;
+                    // console.log(pLimit+"p");
+                }
+                // fetch instruction from memory
+                var opCode = this.fetch(this.PC);
+                console.log(opCode);
 
-            // fetch instruction from memory
-            var opCode = this.fetch(this.PC);
-            console.log(opCode);
-
-            // decode then execute the op codes
-            this.decodeExecute(opCode);   
-            console.log(this.Acc);
-
-            // stop
-            this.isExecuting = false;
-            _Kernel.krnExitProcess();
+                // decode then execute the op codes
+                this.decodeExecute(opCode);   
+                console.log(this.Acc + "a");
+            }
         }
 
         public fetch(PC) {

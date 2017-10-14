@@ -475,7 +475,7 @@ module TSOS {
             // checks if text only contains hex decimals and spaces and is not empty
             var valText = /^[a-f\d\s]+$/i;
             if (valText.test(userProgram)) {
-                var inputOpCodes: string[] = userProgram.split(" ");                
+                var inputOpCodes: string[] = userProgram.split(" "); 
                 // base register value from when memory was loaded
                 var pBase: number = _MemoryManager.loadMemory(inputOpCodes);
                 if (pBase == 999){

@@ -155,22 +155,19 @@ module TSOS {
             
             // base register value retrieved from loading process into memory
             // pid incremented upon creation
-            var process = new PCB(pBase, pLimit);
-            var pid = process.getPid();
+            _PCB = new PCB(pBase, pLimit);
+            var pid = _PCB.getPid();
             // console.log(process);
-
             // put pcb on ready queue
-            _ResidentQueue.enqueue(process);
+            _ResidentQueue.enqueue(_PCB);
             return pid;
         }
 
         // - ExitProcess
         public krnExitProcess(){
             var pBase: number = _PCB.getPBase();
-            console.log(pBase);
-            var pLimit: number = _PCB.getPLimit();
-            console.log(pLimit);
-            _MemoryManager.clearPartition(pBase, pLimit);
+            console.log(pBase+"W");
+            _MemoryManager.clearPartition(pBase);
         }
         // - WaitForProcessToExit
         // - CreateFile

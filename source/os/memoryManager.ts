@@ -52,11 +52,9 @@
                 _Memory.updateTable(0);
             }
 
-            public clearPartition(pBase,pLimit) : void{
+            public clearPartition(pBase) : void{
                 console.log("clearing");
-                console.log(pBase);
-                console.log(pLimit);
-                for (var i = pBase; i <= pLimit; i++){
+                for (var i = pBase; i <= pBase+255; i++){
                     _Memory.memory[i] = "00";
                 } 
                 console.log(_Memory.memory);
