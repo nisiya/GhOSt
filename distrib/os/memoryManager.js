@@ -33,7 +33,6 @@ var TSOS;
             for (var i = baseReg; i < inputOpCodes.length; i++) {
                 _Memory.memory[i] = inputOpCodes[i];
             }
-            console.log(_Memory.memory);
             _Memory.updateTable(baseReg);
             return baseReg;
         };
@@ -46,9 +45,7 @@ var TSOS;
         };
         MemoryManager.prototype.updateMemory = function (addr, data) {
             var index = parseInt(addr, 16);
-            console.log(_Memory.memory[index] + "whe1");
             _Memory.memory[index] = data.toString(16);
-            console.log(_Memory.memory[index] + "whe");
             _Memory.updateTable(0);
         };
         MemoryManager.prototype.clearPartition = function (pBase) {
@@ -56,7 +53,6 @@ var TSOS;
             for (var i = pBase; i <= pBase + 255; i++) {
                 _Memory.memory[i] = "00";
             }
-            console.log(_Memory.memory);
             _Memory.memoryP1 = false;
             _Memory.updateTable(pBase);
         };

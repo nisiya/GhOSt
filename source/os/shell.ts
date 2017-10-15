@@ -481,8 +481,7 @@ module TSOS {
                 if (pBase == 999){
                     _StdOut.putText("Memory is full. Please wait to load");                    
                 } else {
-                    var pLimit: number = pBase + inputOpCodes.length;
-                    var pid: number = _Kernel.krnCreateProcess(pBase, pLimit);
+                    var pid: number = _Kernel.krnCreateProcess(pBase);
                     _StdOut.putText("Process id: " + pid + " is in Resident Queue");
                 }
             } else if(userProgram == ""){
@@ -501,11 +500,8 @@ module TSOS {
                 if (_ResidentQueue.isEmpty()){
                     _StdOut.putText("No process is loaded in memory.");
                 } else {
-                    console.log(_CPU.isExecuting);
                     _ReadyQueue.enqueue(_ResidentQueue.dequeue());
-                    console.log(_ReadyQueue);
                     _CPU.isExecuting = true;
-                    console.log(_CPU.isExecuting);                    
                 }
             } else {
                 _StdOut.putText("Please enter an integer for process id after run command.");

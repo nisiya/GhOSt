@@ -31,7 +31,6 @@
                 for (var i = baseReg; i <inputOpCodes.length; i++){
                     _Memory.memory[i] = inputOpCodes[i];
                 }
-                console.log(_Memory.memory);
                 _Memory.updateTable(baseReg);
                 return baseReg;
             }
@@ -46,9 +45,7 @@
 
             public updateMemory(addr, data) : void{
                 var index: number = parseInt(addr, 16);  
-                console.log(_Memory.memory[index] + "whe1");                
                 _Memory.memory[index] = data.toString(16);
-                console.log(_Memory.memory[index] + "whe");
                 _Memory.updateTable(0);
             }
 
@@ -57,7 +54,6 @@
                 for (var i = pBase; i <= pBase+255; i++){
                     _Memory.memory[i] = "00";
                 } 
-                console.log(_Memory.memory);
                 _Memory.memoryP1 = false;
                 _Memory.updateTable(pBase);
             }

@@ -49,7 +49,7 @@ module TSOS {
             // ... more?
             //
             _MemoryManager = new MemoryManager();
-            _PCB = new PCB(0,0);
+            _PCB = new PCB(0);
 
             // Enable the OS Interrupts.  (Not the CPU clock interrupt, as that is done in the hardware sim.)
             this.krnTrace("Enabling the interrupts.");
@@ -132,6 +132,9 @@ module TSOS {
                     _krnKeyboardDriver.isr(params);   // Kernel mode device driver
                     _StdIn.handleInput();
                     break;
+                case USRPRGERROR_IRQ:
+                    this.userPrgError(params);
+                    break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
             }
@@ -143,6 +146,14 @@ module TSOS {
 
         }
 
+        public userPrgError(opCode){
+            // When user program entry is not a valid op ocde
+            console.log("yes");
+            _StdOut.putText("Error. Op code " + opCode + " does not exist.");
+            _StdOut.advanceLine();
+            _OsShell.putPrompt();
+        }
+
         //
         // System Calls... that generate software interrupts via tha Application Programming Interface library routines.
         //
@@ -151,13 +162,12 @@ module TSOS {
         // - WriteConsole
 
         // - CreateProcess
-        public krnCreateProcess(pBase, pLimit) {
+        public krnCreateProcess(pBase) {
             
             // base register value retrieved from loading process into memory
             // pid incremented upon creation
-            _PCB = new PCB(pBase, pLimit);
+            _PCB = new PCB(pBase);
             var pid = _PCB.getPid();
-            // console.log(process);
             // put pcb on ready queue
             _ResidentQueue.enqueue(_PCB);
             return pid;
@@ -166,7 +176,6 @@ module TSOS {
         // - ExitProcess
         public krnExitProcess(){
             var pBase: number = _PCB.getPBase();
-            console.log(pBase+"W");
             _MemoryManager.clearPartition(pBase);
         }
         // - WaitForProcessToExit
@@ -199,9 +208,7 @@ module TSOS {
         public krnTrapError(msg) {
             Control.hostLog("OS ERROR - TRAP: " + msg);
             // TODO: Display error on console, perhaps in some sort of colored screen. (Maybe blue?)
-            _StdOut.putText("BSOD. You know what it means. Buy Some Organic ");
-            _StdOut.advanceLine();
-            _StdOut.putText("Donuts. Well you can, I prefer matcha ones.");
+            _StdOut.putText("BSOD. You know what it means. Buy Some Organic Donut Well you can, I prefer matcha ones.");
             this.krnShutdown();
         }
     }

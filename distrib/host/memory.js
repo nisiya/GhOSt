@@ -62,7 +62,7 @@ var TSOS;
                 }
                 memoryTableBody.appendChild(row);
                 // for debugging
-                console.log(memoryTable);
+                // console.log(memoryTable);
             }
             memoryTable.appendChild(memoryTableBody);
             memoryContainer.appendChild(memoryTable);

@@ -392,8 +392,7 @@ var TSOS;
                     _StdOut.putText("Memory is full. Please wait to load");
                 }
                 else {
-                    var pLimit = pBase + inputOpCodes.length;
-                    var pid = _Kernel.krnCreateProcess(pBase, pLimit);
+                    var pid = _Kernel.krnCreateProcess(pBase);
                     _StdOut.putText("Process id: " + pid + " is in Resident Queue");
                 }
             }
@@ -414,11 +413,8 @@ var TSOS;
                     _StdOut.putText("No process is loaded in memory.");
                 }
                 else {
-                    console.log(_CPU.isExecuting);
                     _ReadyQueue.enqueue(_ResidentQueue.dequeue());
-                    console.log(_ReadyQueue);
                     _CPU.isExecuting = true;
-                    console.log(_CPU.isExecuting);
                 }
             }
             else {

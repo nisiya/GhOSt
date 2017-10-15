@@ -86,12 +86,9 @@ var TSOS;
                 ((keyCode >= 219) && (keyCode <= 222))) {
                 // bottom of key
                 chr = String.fromCharCode(_KeyToChr[keyCode].noShChr);
-                console.log(chr);
                 if (isShifted) {
                     // top of key
-                    console.log(_KeyToChr[keyCode].shChr);
                     chr = String.fromCharCode(_KeyToChr[keyCode].shChr);
-                    console.log(chr);
                 }
                 _KernelInputQueue.enqueue(chr);
             }

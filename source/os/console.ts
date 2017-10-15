@@ -84,7 +84,7 @@ module TSOS {
                                 this.matchCmd.push(_OsShell.commandList[i].command);
                             }
                         }
-                        console.log(this.matchCmd.length);
+                        // console.log(this.matchCmd.length);
                         this.matchIndex = 0;                 
                     }
                     if (this.matchCmd.length > 0){

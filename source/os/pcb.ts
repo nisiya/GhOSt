@@ -26,11 +26,10 @@
         public pState: string = "New";
         public pLocation: string = "Memory";
         public pBase: number;
-        public pLimit: number;
+        public pLimit: number = 256;
 
-        constructor(pBase, pLimit) {
+        constructor(pBase) {
             this.pBase = pBase;
-            this.pLimit = pLimit;
             this.pid++;
             this.pState = "Resident";
         }

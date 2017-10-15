@@ -44,7 +44,7 @@ var TSOS;
             // ... more?
             //
             _MemoryManager = new TSOS.MemoryManager();
-            _PCB = new TSOS.PCB(0, 0);
+            _PCB = new TSOS.PCB(0);
             // Enable the OS Interrupts.  (Not the CPU clock interrupt, as that is done in the hardware sim.)
             this.krnTrace("Enabling the interrupts.");
             this.krnEnableInterrupts();
@@ -117,6 +117,9 @@ var TSOS;
                     _krnKeyboardDriver.isr(params); // Kernel mode device driver
                     _StdIn.handleInput();
                     break;
+                case USRPRGERROR_IRQ:
+                    this.userPrgError(params);
+                    break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
             }
@@ -125,6 +128,13 @@ var TSOS;
             // The built-in TIMER (not clock) Interrupt Service Routine (as opposed to an ISR coming from a device driver). {
             // Check multiprogramming parameters and enforce quanta here. Call the scheduler / context switch here if necessary.
         };
+        Kernel.prototype.userPrgError = function (opCode) {
+            // When user program entry is not a valid op ocde
+            console.log("yes");
+            _StdOut.putText("Error. Op code " + opCode + " does not exist.");
+            _StdOut.advanceLine();
+            _OsShell.putPrompt();
+        };
         //
         // System Calls... that generate software interrupts via tha Application Programming Interface library routines.
         //
@@ -132,12 +142,11 @@ var TSOS;
         // - ReadConsole
         // - WriteConsole
         // - CreateProcess
-        Kernel.prototype.krnCreateProcess = function (pBase, pLimit) {
+        Kernel.prototype.krnCreateProcess = function (pBase) {
             // base register value retrieved from loading process into memory
             // pid incremented upon creation
-            _PCB = new TSOS.PCB(pBase, pLimit);
+            _PCB = new TSOS.PCB(pBase);
             var pid = _PCB.getPid();
-            // console.log(process);
             // put pcb on ready queue
             _ResidentQueue.enqueue(_PCB);
             return pid;
@@ -145,7 +154,6 @@ var TSOS;
         // - ExitProcess
         Kernel.prototype.krnExitProcess = function () {
             var pBase = _PCB.getPBase();
-            console.log(pBase + "W");
             _MemoryManager.clearPartition(pBase);
         };
         // - WaitForProcessToExit
@@ -176,9 +184,7 @@ var TSOS;
         Kernel.prototype.krnTrapError = function (msg) {
             TSOS.Control.hostLog("OS ERROR - TRAP: " + msg);
             // TODO: Display error on console, perhaps in some sort of colored screen. (Maybe blue?)
-            _StdOut.putText("BSOD. You know what it means. Buy Some Organic ");
-            _StdOut.advanceLine();
-            _StdOut.putText("Donuts. Well you can, I prefer matcha ones.");
+            _StdOut.putText("BSOD. You know what it means. Buy Some Organic Donut Well you can, I prefer matcha ones.");
             this.krnShutdown();
         };
         return Kernel;
