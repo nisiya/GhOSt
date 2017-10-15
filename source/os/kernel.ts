@@ -132,7 +132,7 @@ module TSOS {
                     _krnKeyboardDriver.isr(params);   // Kernel mode device driver
                     _StdIn.handleInput();
                     break;
-                case USRPRGERROR_IRQ:
+                case PROCESS_ERROR_IRQ:
                     this.userPrgError(params);
                     break;
                 default:

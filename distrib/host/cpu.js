@@ -183,18 +183,23 @@ var TSOS;
                         break;
                     // branch n bytes if z flag = 0
                     case "D0":
-                        var start = this.PC;
-                        this.PC++;
-                        var branch = parseInt(this.fetch(this.PC), 16) + start;
-                        console.log(branch + "Q");
-                        if (branch < _PCB.pLimit) {
-                            this.PC = branch;
+                        if (this.Zflag == 0) {
+                            this.PC++;
+                            var branch = parseInt(this.fetch(this.PC), 16) + this.PC;
+                            console.log(branch + "Q");
+                            if (branch < _PCB.pLimit) {
+                                this.PC = branch;
+                            }
+                            else {
+                                branch = branch % 256;
+                                this.PC = branch;
+                            }
+                            console.log(this.PC + "W");
+                            this.PC++;
                         }
                         else {
-                            branch = branch % 256;
-                            this.PC = branch;
+                            this.PC += 2;
                         }
-                        console.log(this.PC + "W");
                         break;
                     // increment the value of a byte
                     case "EE":
@@ -213,8 +218,16 @@ var TSOS;
                         #$02 in x reg = print 00-terminated string stored at
                                         address in y reg */
                     case "FF":
+                        if (this.Xreg == 1) {
+                            _StdOut.putText(this.Yreg + "");
+                        }
+                        else if (this.Xreg == 2) {
+                            _StdOut.putText("hello");
+                        }
+                        this.PC++;
+                        break;
                     default:
-                        _KernelInterruptQueue.enqueue(new TSOS.Interrupt(USRPRGERROR_IRQ, opCode));
+                        _KernelInterruptQueue.enqueue(new TSOS.Interrupt(PROCESS_ERROR_IRQ, opCode));
                         _Kernel.krnExitProcess();
                         this.init();
                         this.updateCPUTable();
