@@ -77,80 +77,67 @@ var TSOS;
                 switch (opCode) {
                     // load accumulator with value in next byte
                     case "A9":
-                        this.PC++;
-                        data = parseInt(this.fetch(this.PC), 16);
+                        data = parseInt(this.fetch(this.PC + 1), 16);
                         this.Acc = data;
-                        this.PC++;
+                        this.PC += 2;
                         break;
                     // load accumulator from memory
                     case "AD":
-                        this.PC++;
-                        addr = this.fetch(this.PC);
-                        this.PC++;
-                        addr = this.fetch(this.PC) + addr;
+                        addr = this.fetch(this.PC + 1);
+                        addr = this.fetch(this.PC + 2) + addr;
                         var index = parseInt(addr, 16);
                         data = parseInt(this.fetch(index), 16);
                         this.Acc = data;
-                        this.PC++;
+                        this.PC += 3;
                         break;
                     // store accumulator in memory
                     case "8D":
                         data = this.Acc;
-                        this.PC++;
-                        addr = this.fetch(this.PC);
-                        this.PC++;
-                        addr = this.fetch(this.PC) + addr;
+                        addr = this.fetch(this.PC + 1);
+                        addr = this.fetch(this.PC + 2) + addr;
                         _MemoryManager.updateMemory(addr, data);
-                        this.PC++;
+                        this.PC += 3;
                         break;
                     // add with carry
                     /* add content of an address to content of accumulator
                         and keeps resut in the accumulator*/
                     case "6D":
-                        this.PC++;
-                        addr = this.fetch(this.PC);
-                        this.PC++;
-                        addr = this.fetch(this.PC) + addr;
+                        addr = this.fetch(this.PC + 1);
+                        addr = this.fetch(this.PC + 2) + addr;
                         var index = parseInt(addr, 16);
                         data = parseInt(this.fetch(index), 16);
                         this.Acc = data + this.Acc;
-                        this.PC++;
+                        this.PC += 3;
                         break;
                     // load the x register with a constant
                     case "A2":
-                        this.PC++;
-                        data = parseInt(this.fetch(this.PC), 16);
+                        data = parseInt(this.fetch(this.PC + 1), 16);
                         this.Xreg = data;
-                        this.PC++;
+                        this.PC += 2;
                         break;
                     // load the x register from memory
                     case "AE":
-                        this.PC++;
-                        addr = this.fetch(this.PC);
-                        this.PC++;
-                        addr = this.fetch(this.PC) + addr;
+                        addr = this.fetch(this.PC + 1);
+                        addr = this.fetch(this.PC + 2) + addr;
                         var index = parseInt(addr, 16);
                         data = parseInt(this.fetch(index));
                         this.Xreg = data;
-                        this.PC++;
+                        this.PC += 3;
                         break;
                     // load the y register with a constant
                     case "A0":
-                        this.PC++;
-                        data = parseInt(this.fetch(this.PC), 16);
+                        data = parseInt(this.fetch(this.PC + 1), 16);
                         this.Yreg = data;
-                        this.PC++;
+                        this.PC += 2;
                         break;
                     // load the y register from memory
                     case "AC":
-                        this.PC++;
-                        addr = this.fetch(this.PC);
-                        this.PC++;
-                        addr = this.fetch(this.PC) + addr;
+                        addr = this.fetch(this.PC + 1);
+                        addr = this.fetch(this.PC + 2) + addr;
                         var index = parseInt(addr, 16);
                         data = parseInt(this.fetch(index));
                         this.Yreg = data;
-                        this.PC++;
+                        this.PC += 3;
                         break;
                     // no operation
                     case "EA":
@@ -167,10 +154,8 @@ var TSOS;
                     // compare a byte in memory to the X reg
                     // if equal, set z flag 
                     case "EC":
-                        this.PC++;
-                        addr = this.fetch(this.PC);
-                        this.PC++;
-                        addr = this.fetch(this.PC) + addr;
+                        addr = this.fetch(this.PC + 1);
+                        addr = this.fetch(this.PC + 2) + addr;
                         var index = parseInt(addr, 16);
                         data = parseInt(this.fetch(index), 16);
                         if (data == this.Xreg) {
@@ -179,13 +164,12 @@ var TSOS;
                         else {
                             this.Zflag = 0;
                         }
-                        this.PC++;
+                        this.PC += 3;
                         break;
                     // branch n bytes if z flag = 0
                     case "D0":
                         if (this.Zflag == 0) {
-                            this.PC++;
-                            var branch = parseInt(this.fetch(this.PC), 16) + this.PC;
+                            var branch = parseInt(this.fetch(this.PC + 1), 16) + this.PC;
                             console.log(branch + "Q");
                             if (branch < _PCB.pLimit) {
                                 this.PC = branch;
@@ -195,7 +179,7 @@ var TSOS;
                                 this.PC = branch;
                             }
                             console.log(this.PC + "W");
-                            this.PC++;
+                            this.PC += 2;
                         }
                         else {
                             this.PC += 2;
@@ -203,27 +187,36 @@ var TSOS;
                         break;
                     // increment the value of a byte
                     case "EE":
-                        this.PC++;
-                        addr = this.fetch(this.PC);
-                        this.PC++;
-                        addr = this.fetch(this.PC) + addr;
+                        addr = this.fetch(this.PC + 1);
+                        addr = this.fetch(this.PC + 2) + addr;
                         var index = parseInt(addr, 16);
                         data = parseInt(this.fetch(index), 16);
-                        data = data + 1;
+                        data++;
                         _MemoryManager.updateMemory(addr, data);
-                        this.PC++;
+                        this.PC += 3;
                         break;
                     // system call
                     /* #$01 in x reg = print integer stored in Y reg
                         #$02 in x reg = print 00-terminated string stored at
                                         address in y reg */
                     case "FF":
+                        var str = "";
                         if (this.Xreg == 1) {
-                            _StdOut.putText(this.Yreg + "");
+                            str = this.Yreg.toString();
                         }
                         else if (this.Xreg == 2) {
-                            _StdOut.putText("hello");
+                            addr = this.Yreg.toString(16);
+                            var index = parseInt(addr, 16);
+                            data = parseInt(this.fetch(index), 16);
+                            var chr = String.fromCharCode(data);
+                            while (data != 0) {
+                                str = str + chr;
+                                index++;
+                                data = parseInt(this.fetch(index), 16);
+                                chr = String.fromCharCode(data);
+                            }
                         }
+                        _KernelInterruptQueue.enqueue(new TSOS.Interrupt(PROCESS_PRINT_IRQ, str));
                         this.PC++;
                         break;
                     default:

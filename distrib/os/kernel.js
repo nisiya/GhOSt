@@ -120,6 +120,9 @@ var TSOS;
                 case PROCESS_ERROR_IRQ:
                     this.userPrgError(params);
                     break;
+                case PROCESS_PRINT_IRQ:
+                    this.processPrint(params);
+                    break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
             }
@@ -134,6 +137,11 @@ var TSOS;
             _StdOut.putText("Error. Op code " + opCode + " does not exist.");
             _StdOut.advanceLine();
             _OsShell.putPrompt();
+        };
+        Kernel.prototype.processPrint = function (chr) {
+            // When user program makes system call to print
+            console.log("yes");
+            _StdOut.putText(chr);
         };
         //
         // System Calls... that generate software interrupts via tha Application Programming Interface library routines.

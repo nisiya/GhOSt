@@ -135,6 +135,9 @@ module TSOS {
                 case PROCESS_ERROR_IRQ:
                     this.userPrgError(params);
                     break;
+                case PROCESS_PRINT_IRQ:
+                    this.processPrint(params);
+                    break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
             }
@@ -152,6 +155,12 @@ module TSOS {
             _StdOut.putText("Error. Op code " + opCode + " does not exist.");
             _StdOut.advanceLine();
             _OsShell.putPrompt();
+        }
+
+        public processPrint(chr){
+            // When user program makes system call to print
+            console.log("yes");
+            _StdOut.putText(chr);
         }
 
         //
