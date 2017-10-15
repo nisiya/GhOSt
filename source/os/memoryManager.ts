@@ -35,11 +35,8 @@
                 return baseReg;
             }
             
-            public readMemory(pBase, pLimit){
-                var opCode: string[] = [];
-                for (var i = pBase; i <= pLimit; i ++){
-                    opCode.push(_Memory.memory[i]);
-                }
+            public readMemory(index){
+                var opCode: string = _Memory.memory[index];
                 return opCode;
             }
 

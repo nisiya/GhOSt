@@ -15,7 +15,7 @@
 var TSOS;
 (function (TSOS) {
     var PCB = /** @class */ (function () {
-        function PCB(pBase) {
+        function PCB(pBase, pid) {
             this.pid = -1;
             this.pCounter = 0;
             this.pAcc = 0;
@@ -27,7 +27,7 @@ var TSOS;
             this.pLocation = "Memory";
             this.pLimit = 256;
             this.pBase = pBase;
-            this.pid++;
+            this.pid = pid;
             this.pState = "Resident";
         }
         PCB.prototype.getPid = function () {

@@ -44,7 +44,7 @@ var TSOS;
             // ... more?
             //
             _MemoryManager = new TSOS.MemoryManager();
-            _PCB = new TSOS.PCB(0);
+            _PCB = new TSOS.PCB(0, -1);
             // Enable the OS Interrupts.  (Not the CPU clock interrupt, as that is done in the hardware sim.)
             this.krnTrace("Enabling the interrupts.");
             this.krnEnableInterrupts();
@@ -153,7 +153,8 @@ var TSOS;
         Kernel.prototype.krnCreateProcess = function (pBase) {
             // base register value retrieved from loading process into memory
             // pid incremented upon creation
-            _PCB = new TSOS.PCB(pBase);
+            pid = _PCB.pid + 1;
+            _PCB = new TSOS.PCB(pBase, pid);
             var pid = _PCB.getPid();
             // put pcb on ready queue
             _ResidentQueue.enqueue(_PCB);

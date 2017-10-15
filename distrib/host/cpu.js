@@ -66,7 +66,7 @@ var TSOS;
             this.updateCPUTable();
         };
         Cpu.prototype.fetch = function (PC) {
-            return _Memory.memory[PC];
+            return _MemoryManager.readMemory(PC);
         };
         Cpu.prototype.decodeExecute = function (opCode) {
             if (opCode.length > 0) {

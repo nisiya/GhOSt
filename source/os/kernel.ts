@@ -49,7 +49,7 @@ module TSOS {
             // ... more?
             //
             _MemoryManager = new MemoryManager();
-            _PCB = new PCB(0);
+            _PCB = new PCB(0, -1);
 
             // Enable the OS Interrupts.  (Not the CPU clock interrupt, as that is done in the hardware sim.)
             this.krnTrace("Enabling the interrupts.");
@@ -175,7 +175,8 @@ module TSOS {
             
             // base register value retrieved from loading process into memory
             // pid incremented upon creation
-            _PCB = new PCB(pBase);
+            pid = _PCB.pid + 1;            
+            _PCB = new PCB(pBase, pid);
             var pid = _PCB.getPid();
             // put pcb on ready queue
             _ResidentQueue.enqueue(_PCB);

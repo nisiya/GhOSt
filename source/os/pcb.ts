@@ -28,9 +28,9 @@
         public pBase: number;
         public pLimit: number = 256;
 
-        constructor(pBase) {
+        constructor(pBase, pid) {
             this.pBase = pBase;
-            this.pid++;
+            this.pid = pid;
             this.pState = "Resident";
         }
 

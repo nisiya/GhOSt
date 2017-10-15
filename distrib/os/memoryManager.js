@@ -36,11 +36,8 @@ var TSOS;
             _Memory.updateTable(baseReg);
             return baseReg;
         };
-        MemoryManager.prototype.readMemory = function (pBase, pLimit) {
-            var opCode = [];
-            for (var i = pBase; i <= pLimit; i++) {
-                opCode.push(_Memory.memory[i]);
-            }
+        MemoryManager.prototype.readMemory = function (index) {
+            var opCode = _Memory.memory[index];
             return opCode;
         };
         MemoryManager.prototype.updateMemory = function (addr, data) {
