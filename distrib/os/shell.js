@@ -383,6 +383,9 @@ var TSOS;
             // gets text of textarea
             var userProgram = document.getElementById("taProgramInput").value;
             // checks if text only contains hex decimals and spaces and is not empty
+            console.log(userProgram);
+            userProgram = userProgram.replace(/(\r\n|\n|\r)/gm, "");
+            console.log(userProgram);
             var valText = /^[a-f\d\s]+$/i;
             if (valText.test(userProgram)) {
                 var inputOpCodes = userProgram.split(" ");

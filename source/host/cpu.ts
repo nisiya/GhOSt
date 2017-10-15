@@ -189,13 +189,13 @@ module TSOS {
                             var branch = parseInt(this.fetch(this.PC+1),16) + this.PC;
                             console.log(branch+"Q");         
                             if (branch < _PCB.pLimit){
-                                this.PC = branch;
+                                console.log("q");
+                                this.PC = branch + 2;
                             } else{
+                                console.log("w");
                                 branch = branch%256;
-                                this.PC = branch;
+                                this.PC = branch + 2;
                             }
-                            console.log(this.PC+"W");
-                            this.PC+=2;                            
                         } else{
                             this.PC+=2;  
                         }                      
