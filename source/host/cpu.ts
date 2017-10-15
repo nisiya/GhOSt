@@ -132,7 +132,7 @@ module TSOS {
                         addr = this.fetch(this.PC+1);
                         addr = this.fetch(this.PC+2) + addr;
                         var index: number = parseInt(addr, 16);  
-                        data = parseInt(this.fetch(index));
+                        data = parseInt(this.fetch(index), 16);
                         this.Xreg = data;
                         this.PC+=3;
                         break;
@@ -149,7 +149,7 @@ module TSOS {
                         addr = this.fetch(this.PC+1);
                         addr = this.fetch(this.PC+2) + addr;
                         var index: number = parseInt(addr, 16);  
-                        data = parseInt(this.fetch(index));
+                        data = parseInt(this.fetch(index), 16);
                         this.Yreg = data;
                         this.PC+=3;
                         break;
@@ -191,6 +191,7 @@ module TSOS {
                             if (branch < _PCB.pLimit){
                                 console.log("q");
                                 this.PC = branch + 2;
+                                console.log("PC" + this.PC);
                             } else{
                                 console.log("w");
                                 branch = branch%256;

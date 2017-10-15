@@ -192,7 +192,7 @@ var TSOS;
         Kernel.prototype.krnTrapError = function (msg) {
             TSOS.Control.hostLog("OS ERROR - TRAP: " + msg);
             // TODO: Display error on console, perhaps in some sort of colored screen. (Maybe blue?)
-            _StdOut.putText("BSOD. You know what it means. Buy Some Organic Donut Well you can, I prefer matcha ones.");
+            _StdOut.putText("BSOD. You know what it means. Buy Some Organic Donuts. Well you can, I prefer matcha ones.");
             this.krnShutdown();
         };
         return Kernel;
