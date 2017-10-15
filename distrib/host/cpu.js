@@ -183,6 +183,19 @@ var TSOS;
                         break;
                     // branch n bytes if z flag = 0
                     case "D0":
+                        var start = this.PC;
+                        this.PC++;
+                        var branch = parseInt(this.fetch(this.PC), 16) + start;
+                        console.log(branch + "Q");
+                        if (branch < _PCB.pLimit) {
+                            this.PC = branch;
+                        }
+                        else {
+                            branch = branch % 256;
+                            this.PC = branch;
+                        }
+                        console.log(this.PC + "W");
+                        break;
                     // increment the value of a byte
                     case "EE":
                         this.PC++;
