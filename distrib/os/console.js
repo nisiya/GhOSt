@@ -54,9 +54,12 @@ var TSOS;
                     // ... tell the shell ...
                     _OsShell.handleInput(this.buffer);
                     // add command to previous command list
+                    console.log(this.buffer + "we");
                     this.prevCmd.push(this.buffer);
+                    console.log(this.prevCmd);
                     // ... and reset our buffer.
                     this.buffer = "";
+                    this.updown = 0;
                 }
                 else if (chr === String.fromCharCode(8)) {
                     // delete a character
@@ -73,6 +76,7 @@ var TSOS;
                         this.putText(this.prevCmd[this.prevCmd.length - this.updown]);
                         // current text is now previous command so add to buffer
                         this.buffer = this.prevCmd[this.prevCmd.length - this.updown];
+                        console.log(this.updown);
                     }
                 }
                 else if (chr === '40') {
@@ -82,6 +86,7 @@ var TSOS;
                         this.removeLine();
                         this.putText(this.prevCmd[this.prevCmd.length - this.updown]);
                         this.buffer = this.prevCmd[this.prevCmd.length - this.updown];
+                        console.log(this.updown);
                     }
                 }
                 else if (chr === String.fromCharCode(9)) {
@@ -155,7 +160,8 @@ var TSOS;
                     _DrawingContext.fontDescent(this.currentFont, this.currentFontSize) +
                     _FontHeightMargin;
                 // highest point of chr
-                var chrTop = this.currentYPosition;
+                var chrTop = this.currentYPosition - (_DefaultFontSize +
+                    _DrawingContext.fontDescent(this.currentFont, this.currentFontSize));
                 // offset is the width of the rectangle
                 _DrawingContext.clearRect(this.currentXPosition, chrTop, offset, chrHeight);
                 // remove chr from buffer
@@ -199,7 +205,7 @@ var TSOS;
                 this.init();
                 // put screenshot to top of screen
                 _DrawingContext.putImageData(imgData, 0, 0);
-                // put cursor back to correct position
+                // put cursor back to correct
                 this.currentYPosition = saveYPosition;
             }
         };

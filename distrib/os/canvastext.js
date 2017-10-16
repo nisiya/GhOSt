@@ -62,13 +62,11 @@ var TSOS;
                         _SaveX = x; // for backspace, will improve later
                         _StdOut.advanceLine();
                         x = _StdOut.currentXPosition;
-                        // y += _DefaultFontSize +  _DrawingContext.fontDescent(font, size) + _FontHeightMargin;
                         y = _StdOut.currentYPosition;
                     }
                     else {
                         _StdOut.advanceLine();
                         x = _StdOut.currentXPosition;
-                        // y += _DefaultFontSize +  _DrawingContext.fontDescent(font, size) + _FontHeightMargin;
                         y = _StdOut.currentYPosition;
                     }
                 }

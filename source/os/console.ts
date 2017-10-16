@@ -48,9 +48,12 @@ module TSOS {
                     // ... tell the shell ...
                     _OsShell.handleInput(this.buffer);
                     // add command to previous command list
+                    console.log(this.buffer+"we");
                     this.prevCmd.push(this.buffer);
+                    console.log(this.prevCmd);
                     // ... and reset our buffer.
                     this.buffer = "";
+                    this.updown = 0;
                 } else if (chr === String.fromCharCode(8)) { //   Backspace key
                     // delete a character
                     chr = this.buffer[this.buffer.length-1];
@@ -65,6 +68,7 @@ module TSOS {
                         this.putText(this.prevCmd[this.prevCmd.length-this.updown]);
                         // current text is now previous command so add to buffer
                         this.buffer = this.prevCmd[this.prevCmd.length-this.updown];
+                        console.log(this.updown);
                     }              
                 } else if (chr === '40') { //   Down key .. special case so two characters
                     // only if up key was used before
@@ -73,6 +77,7 @@ module TSOS {
                         this.removeLine();
                         this.putText(this.prevCmd[this.prevCmd.length-this.updown]);
                         this.buffer = this.prevCmd[this.prevCmd.length-this.updown];                        
+                        console.log(this.updown);
                     }
                 } else if (chr === String.fromCharCode(9)) { //  Tab key
                     if (this.matchCmd.length == 0){
@@ -145,7 +150,8 @@ module TSOS {
                             _DrawingContext.fontDescent(this.currentFont, this.currentFontSize) +
                             _FontHeightMargin;
                 // highest point of chr
-                var chrTop = this.currentYPosition;    
+                var chrTop = this.currentYPosition - (_DefaultFontSize + 
+                                _DrawingContext.fontDescent(this.currentFont, this.currentFontSize));    
                 // offset is the width of the rectangle
                 _DrawingContext.clearRect(this.currentXPosition, chrTop , offset, chrHeight); 
 
@@ -193,7 +199,7 @@ module TSOS {
                 this.init();
                 // put screenshot to top of screen
                 _DrawingContext.putImageData(imgData, 0, 0);
-                // put cursor back to correct position
+                // put cursor back to correct
                 this.currentYPosition = saveYPosition;
             }
         }
