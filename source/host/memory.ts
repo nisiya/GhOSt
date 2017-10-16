@@ -42,8 +42,8 @@
                     // load Memory table at start up
                     var memoryContainer: HTMLDivElement = <HTMLDivElement> document.getElementById("memoryContainer");
                     var memoryTable: HTMLTableElement = <HTMLTableElement> document.createElement("table");
-                    memoryTable.className = "taMemory";
-                    memoryTable.id = "taMemory";
+                    memoryTable.className = "tbMemory";
+                    memoryTable.id = "tbMemory";
                     var memoryTableBody: HTMLTableSectionElement = <HTMLTableSectionElement> document.createElement("tbody");
                     
                     // creating cells for "bytes"
@@ -84,7 +84,7 @@
                 public updateTable(baseReg): void {
                    
                     // update Memory table after new process is loaded
-                    var memoryTable: HTMLTableElement = <HTMLTableElement> document.getElementById("taMemory");
+                    var memoryTable: HTMLTableElement = <HTMLTableElement> document.getElementById("tbMemory");
                     var rowId: string;
                     var index: number;                    
                     var cellId: string;

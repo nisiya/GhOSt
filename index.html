@@ -1,9 +1,21 @@
 <!DOCTYPE HTML>
 <html>
 <head>
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-   <meta name="author"             content="Alan G. Labouseur" />
+   <meta name="author"             content="Alan G. Labouseur and Wendy Ni" />
    <link rel="stylesheet" href="tsos.css" type="text/css" media="screen" />
+   <!-- Bootstrap core CSS -->
+   <link href="style/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  
+      <!-- Custom fonts for this template -->
+      <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
+      <link href="https://fonts.googleapis.com/css?family=Josefin+Slab:100,300,400,600,700,100italic,300italic,400italic,600italic,700italic" rel="stylesheet" type="text/css">
+  
+      <!-- Custom styles for this template -->
+      <link href="style/css/style.css" rel="stylesheet">
+
    <title>
       ghOSt - a browser-based virtual Operating System in TypeScript
    </title>
@@ -39,92 +51,98 @@
 </head>
 
 <body onload="onDocumentLoad()">
+  <!-- background video -->
+  <div class="fullscreen-bg">
+    <video loop muted poster="img/videoframe.jpg" class="fullscreen-bg__video">
+        <source src="distrib/video/pacmanGame.mp4" type="video/mp4">
+    </video>
+  </div>
 
-<div id="divMain" style="width:100%;">
-  <img src="distrib/images/title.png" alt="title" style="padding:10px;">
-  <div id="divButtonBar" style="margin:4px;">      
-    <table id="headContent">
+  <!-- time, time and status -->
+  <div class="tagline-upper text-center text-heading text-shadow text-white mt-5 d-none d-lg-block">  
+      <img src="distrib/images/title.png" alt="title" style="padding:10px;">
+  </div>
+  <div class="tagline-lower text-center text-expanded text-shadow text-uppercase text-white mb-5 d-none d-lg-block">
+      <text id="clock"> </text><br />
+      <text id="usrStatus"> <b>Status: </b> I Lurve Operating Systems </text>
+  </div>
+
+  <div id="divMain" style="width:100%;">
+      <div class="navbar-expand-lg navbar-light bg-faded">
+        <div id="divButtonBar" style="margin:4px;">      
+          <table id="headContent">
+            <tr>
+              <th>
+                  <input type="button"
+                        id = "btnStartOS"
+                        name="brnStartOS"
+                        class="normal_button"
+                        value=""
+                        title="Start"
+                        tabindex="0"
+                        onclick="TSOS.Control.hostBtnStartOS_click(this);">
+
+                  <input type="button"
+                        id = "btnHaltOS"
+                        name="brnHaltOS"
+                        class="normal_button stop_button"
+                        disabled="disabled"
+                        value=""
+                        title="Halt"
+                        tabindex="1"
+                        onclick="TSOS.Control.hostBtnHaltOS_click(this);">
+
+                  <input type="button"
+                        id = "btnReset"
+                        name="brnReset"
+                        class="normal_button stop_button"
+                        disabled="disabled"
+                        value=""
+                        title="Reset"
+                        tabindex="2"
+                        onclick="TSOS.Control.hostBtnReset_click(this);">
+              </th>
+            </tr>
+          </table>
+        </div>
+      </div>
+      
+    <table id="mainContent">    
       <tr>
         <th>
-            <input type="button"
-                  id = "btnStartOS"
-                  name="brnStartOS"
-                  class="normal_button"
-                  value=""
-                  title="Start"
-                  tabindex="0"
-                  onclick="TSOS.Control.hostBtnStartOS_click(this);">
-
-            <input type="button"
-                  id = "btnHaltOS"
-                  name="brnHaltOS"
-                  class="normal_button stop_button"
-                  disabled="disabled"
-                  value=""
-                  title="Halt"
-                  tabindex="1"
-                  onclick="TSOS.Control.hostBtnHaltOS_click(this);">
-
-            <input type="button"
-                  id = "btnReset"
-                  name="brnReset"
-                  class="normal_button stop_button"
-                  disabled="disabled"
-                  value=""
-                  title="Reset"
-                  tabindex="2"
-                  onclick="TSOS.Control.hostBtnReset_click(this);">
+            <div id="divConsole" class="bg-faded p-3 my-4">
+              <label>
+                Console
+                <br>
+                <canvas id="display"
+                      width="500px"
+                      height="500px"
+                      tabindex="3"
+                      style="margin-left:8px;"
+                        >
+                </canvas>
+              </label>
+            </div>                              
         </th>
         <th>
-          <text id="clock"> </text><br />
-          <text id="usrStatus"> <b>Status: </b> I Lurve Operating Systems </text>
-        </th>
-      </tr>
-    </table>
-  </div>
-      
-  <table id="mainContent">    
-    <tr>
-      <th>
-        <div id="divConsole" style="width:500px; height:500px;">
-          <label>
-            Console
-            <canvas id="display"
-                  width="500px"
-                  height="500px"
-                  tabindex="3"
-                    >
-            </canvas>
-          <label>
-        </div>
-      </th>
-      <th>
-        <div id="divLog">
-          <label>
-              Host Log
-              <br>
-              <textarea name="taHostLog"
-                        id  ="taHostLog"
-                        rows="10"
-                        cols="38"
-              ></textarea>
-          </label>
-        </div>
-        <div id="divMemory">
-          <label>
-              Memory
-              <br>
-              <div class="tableContainer" id="memoryContainer">
-              </div>
-          </label>
-        </div>
-        <div id="divPCB">
+          <div id="divLog" class="bg-faded p-3 my-4">
             <label>
-                Processes
+                Host Log
                 <br>
-                <div class="tableContainer" id="pcbContainer">
-                    <table name = "taProces"
-                           id   = "taProcess">
+                <textarea name="taHostLog"
+                          id  ="taHostLog"
+                          rows="6"
+                          cols="38"
+                ></textarea>
+            </label>
+          </div>
+          <div id="divCPU" class="bg-faded p-3 my-4">
+              <label>
+                CPU 
+                <br>
+                <div id="cpuContainer">
+                  <table name = "taCPU"
+                        id   = "taCPU">
                     <thead>
                       <tr style="border-bottom: 1px solid #666666;">
                         <th> PC </th>
@@ -137,78 +155,91 @@
                     </thead>
                     <tbody>
                       <tr>
-                        <td id="pPC"> 0 </td>
-                        <td id="pIR"> 0 </td>
-                        <td id="pACC"> 0 </td>
-                        <td id="pX"> 0 </td>
-                        <td id="pY"> 0 </td>
-                        <td id="pZ"> 0 </td>
+                        <td id="cPC"> 0 </td>
+                        <td id="cIR"> 0 </td>
+                        <td id="cACC"> 0 </td>
+                        <td id="cX"> 0 </td>
+                        <td id="cY"> 0 </td>
+                        <td id="cZ"> 0 </td>
                       </tr>
                     </tbody>
                   </table>
-                </div>
+                </div>                
+              </label>
+            </div>
+          <div id="divPCB" class="bg-faded p-3 my-4">
+              <label>
+                  Processes
+                  <br>
+                  <div class="tableContainer" id="pcbContainer">
+                      <table name = "taProces"
+                            id   = "taProcess">
+                      <thead>
+                        <tr style="border-bottom: 1px solid #666666;">
+                          <th> PC </th>
+                          <th> IR </th>
+                          <th> ACC </th>
+                          <th> X </th>
+                          <th> Y </th>
+                          <th> Z </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td id="pPC"> 0 </td>
+                          <td id="pIR"> 0 </td>
+                          <td id="pACC"> 0 </td>
+                          <td id="pX"> 0 </td>
+                          <td id="pY"> 0 </td>
+                          <td id="pZ"> 0 </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+              </label>
+            </div>
+        </th>
+        <th>
+          <div id="divUserProgramInput" class="bg-faded p-3 my-4">
+            <label>
+                User Program Input
+                <br>
+                <textarea name="taProgramInput"
+                          id  ="taProgramInput"
+                          rows="6"
+                          cols="38"
+                >A9 11</textarea>
             </label>
           </div>
-      </th>
-    </tr> 
-    <tr>
-      <th>
-        <div id="divUserProgramInput">
-          <label>
-              User Program Input
-              <br>
-              <textarea name="taProgramInput"
-                        id  ="taProgramInput"
-                        rows="8"
-                        cols="68"
-              >A9 11</textarea>
-          </label>
-        </div>
-      </th>
-      <th>
-        <div id="divCPU">
-          <label>
-            CPU 
-            <br>
-            <div id="cpuContainer">
-              <table name = "taCPU"
-                     id   = "taCPU">
-                <thead>
-                  <tr style="border-bottom: 1px solid #666666;">
-                    <th> PC </th>
-                    <th> IR </th>
-                    <th> ACC </th>
-                    <th> X </th>
-                    <th> Y </th>
-                    <th> Z </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td id="cPC"> 0 </td>
-                    <td id="cIR"> 0 </td>
-                    <td id="cACC"> 0 </td>
-                    <td id="cX"> 0 </td>
-                    <td id="cY"> 0 </td>
-                    <td id="cZ"> 0 </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>                
-          </label>
-        </div>
-      </th>
-    </tr>
-  </table>
-</div>
+          <div id="divMemory" class="bg-faded p-3 my-4">
+              <label>
+                  Memory
+                  <br>
+                  <div class="tableContainer" id="memoryContainer">
+                  </div>
+              </label>
+            </div>
+        </th>
+      </tr>
+    </table>
+  </div>
 
-<p class="footerText" style="clear:both;">
-   <br>
-   Copyright &copy; 2008 - 2016 No Rights Reserved.
-   <br>
-   Reproduction is inhibited without the express written consent of
-   Ted Codd, Stevie Ray Vaughan, and Ian Fleming.
-</p>
+<footer class="bg-faded text-center">
+    <div class="container">
+      <p class="m-0">
+          <br>
+          Copyright &copy; 2008 - 2016 No Rights Reserved.
+          <br>
+          Reproduction is inhibited without the express written consent of
+          Ted Codd, Stevie Ray Vaughan, and Ian Fleming.
+      </p>
+    </div>
+  </footer>
+
+<!-- Bootstrap core JavaScript -->
+<script src="style/vendor/jquery/jquery.min.js"></script>
+<script src="style/vendor/popper/popper.min.js"></script>
+<script src="style/vendor/bootstrap/js/bootstrap.min.js"></script>
 
 </body>
 </html>

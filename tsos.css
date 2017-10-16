@@ -1,7 +1,7 @@
 /* TSOS.css */
 
 body {
-  background: #909193 url(distrib/images/grey.jpg);
+  /* background: #909193 url(distrib/images/grey.jpg); */
   font-family: Helvetica, Verdana, Arial, sans-serif;
   font-size: 12pt;
   font-weight: normal;
@@ -76,10 +76,6 @@ text {
   font-weight: normal;
 }
 
-label {
-  color: #FEF200;
-}
-
 table {
   display: inline-table;
 }
@@ -95,8 +91,6 @@ table {
 }
 
 .tableContainer {
-  width: 287px;
-  height: 149px;
   border: 2px solid black;
   overflow-x: hidden;
   overflow-y: scroll;
@@ -105,13 +99,23 @@ table {
 }
 
 #cpuContainer {
-  width: 287px;  
-  height: 50px;
+  width: 327px;
+  height: 60px;
   border: 2px solid black;
   background-color: white;  
 }
 
-#taMemory{
+#memoryContainer {
+  width: 327px;
+  height: 140px;
+}
+
+#pcbContainer{
+  width: 327px;
+  height: 115px;
+}
+
+#tbMemory{
   color: black;
   font-weight: normal;
   font-family: Courier New, Courier, monospace;  
@@ -122,7 +126,7 @@ table {
   /* border-bottom: 1px solid #666666;   */
 }
 
-table#taMemory tr:nth-child(even) {
+table#tbMemory tr:nth-child(even) {
   background-color: #f2f2f2;
 }
 
@@ -144,4 +148,46 @@ table#taProcess tr:nth-child(even) {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 8pt;
   text-align: center;
+}
+
+.fullscreen-bg {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  overflow: hidden;
+  z-index: -100;
+}
+
+.fullscreen-bg__video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+@media (min-aspect-ratio: 16/9) {
+  .fullscreen-bg__video {
+    height: 300%;
+    top: -100%;
+  }
+}
+
+@media (max-aspect-ratio: 16/9) {
+  .fullscreen-bg__video {
+    width: 300%;
+    left: -100%;
+  }
+}
+
+@media (max-width: 767px) {
+  .fullscreen-bg {
+    background: url('../img/videoframe.jpg') center center / cover no-repeat;
+  }
+
+  .fullscreen-bg__video {
+    display: none;
+  }
 }

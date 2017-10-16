@@ -34,8 +34,8 @@ var TSOS;
             // load Memory table at start up
             var memoryContainer = document.getElementById("memoryContainer");
             var memoryTable = document.createElement("table");
-            memoryTable.className = "taMemory";
-            memoryTable.id = "taMemory";
+            memoryTable.className = "tbMemory";
+            memoryTable.id = "tbMemory";
             var memoryTableBody = document.createElement("tbody");
             // creating cells for "bytes"
             for (var i = 0; i < 96; i++) {
@@ -69,7 +69,7 @@ var TSOS;
         };
         Memory.prototype.updateTable = function (baseReg) {
             // update Memory table after new process is loaded
-            var memoryTable = document.getElementById("taMemory");
+            var memoryTable = document.getElementById("tbMemory");
             var rowId;
             var index;
             var cellId;
