@@ -53,9 +53,8 @@ var TSOS;
             // Do the real work here. Be sure to set this.isExecuting appropriately.
             if (this.PC == 0) {
                 // move pcb from ready queue to running
-                _PCB = _ReadyQueue.dequeue();
-                _PCB.pState = "Running";
-                this.PC = _PCB.pBase;
+                var process = _ReadyQueue.dequeue();
+                process.pState = "Running";
             }
             // fetch instruction from memory
             var opCode = this.fetch(this.PC);
@@ -73,6 +72,7 @@ var TSOS;
                 // take action according to op code ..
                 var data;
                 var addr;
+                var index;
                 // decode then execute
                 switch (opCode) {
                     // load accumulator with value in next byte
@@ -85,7 +85,7 @@ var TSOS;
                     case "AD":
                         addr = this.fetch(this.PC + 1);
                         addr = this.fetch(this.PC + 2) + addr;
-                        var index = parseInt(addr, 16);
+                        index = parseInt(addr, 16);
                         data = parseInt(this.fetch(index), 16);
                         this.Acc = data;
                         this.PC += 3;
@@ -104,7 +104,7 @@ var TSOS;
                     case "6D":
                         addr = this.fetch(this.PC + 1);
                         addr = this.fetch(this.PC + 2) + addr;
-                        var index = parseInt(addr, 16);
+                        index = parseInt(addr, 16);
                         data = parseInt(this.fetch(index), 16);
                         this.Acc = data + this.Acc;
                         this.PC += 3;
@@ -119,7 +119,7 @@ var TSOS;
                     case "AE":
                         addr = this.fetch(this.PC + 1);
                         addr = this.fetch(this.PC + 2) + addr;
-                        var index = parseInt(addr, 16);
+                        index = parseInt(addr, 16);
                         data = parseInt(this.fetch(index), 16);
                         this.Xreg = data;
                         this.PC += 3;
@@ -134,7 +134,7 @@ var TSOS;
                     case "AC":
                         addr = this.fetch(this.PC + 1);
                         addr = this.fetch(this.PC + 2) + addr;
-                        var index = parseInt(addr, 16);
+                        index = parseInt(addr, 16);
                         data = parseInt(this.fetch(index), 16);
                         this.Yreg = data;
                         this.PC += 3;
@@ -146,8 +146,8 @@ var TSOS;
                     // break
                     case "00":
                         // stop
-                        console.log("finish process");
                         _Kernel.krnExitProcess();
+                        // reset CPU
                         this.init();
                         this.updateCPUTable();
                         break;
@@ -156,7 +156,7 @@ var TSOS;
                     case "EC":
                         addr = this.fetch(this.PC + 1);
                         addr = this.fetch(this.PC + 2) + addr;
-                        var index = parseInt(addr, 16);
+                        index = parseInt(addr, 16);
                         data = parseInt(this.fetch(index), 16);
                         if (data == this.Xreg) {
                             this.Zflag = 1;
@@ -170,14 +170,10 @@ var TSOS;
                     case "D0":
                         if (this.Zflag == 0) {
                             var branch = parseInt(this.fetch(this.PC + 1), 16) + this.PC;
-                            console.log(branch + "Q");
-                            if (branch < _PCB.pLimit) {
-                                console.log("q");
+                            if (branch < 256) {
                                 this.PC = branch + 2;
-                                console.log("PC" + this.PC);
                             }
                             else {
-                                console.log("w");
                                 branch = branch % 256;
                                 this.PC = branch + 2;
                             }
@@ -190,7 +186,7 @@ var TSOS;
                     case "EE":
                         addr = this.fetch(this.PC + 1);
                         addr = this.fetch(this.PC + 2) + addr;
-                        var index = parseInt(addr, 16);
+                        index = parseInt(addr, 16);
                         data = parseInt(this.fetch(index), 16);
                         data++;
                         _MemoryManager.updateMemory(addr, data);
@@ -207,7 +203,7 @@ var TSOS;
                         }
                         else if (this.Xreg == 2) {
                             addr = this.Yreg.toString(16);
-                            var index = parseInt(addr, 16);
+                            index = parseInt(addr, 16);
                             data = parseInt(this.fetch(index), 16);
                             var chr = String.fromCharCode(data);
                             while (data != 0) {

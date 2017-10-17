@@ -478,11 +478,11 @@ module TSOS {
             if (valText.test(userProgram)) {
                 var inputOpCodes: string[] = userProgram.split(" "); 
                 // base register value from when memory was loaded
-                var pBase: number = _MemoryManager.loadMemory(inputOpCodes);
-                if (pBase == 999){
+                var baseReg: number = _MemoryManager.loadMemory(inputOpCodes);
+                if (baseReg == 999){
                     _StdOut.putText("Memory is full. Please wait to load");                    
                 } else {
-                    var pid: number = _Kernel.krnCreateProcess(pBase);
+                    var pid: number = _Kernel.krnCreateProcess(baseReg);
                     _StdOut.putText("Process id: " + pid + " is in Resident Queue");
                 }
             } else if(userProgram == ""){
@@ -500,7 +500,10 @@ module TSOS {
                 // check if there are processes to be run
                 if (_ResidentQueue.isEmpty()){
                     _StdOut.putText("No process is loaded in memory.");
-                } else {
+                } else if(args!=_PID) {
+                    _StdOut.putText("No process with id: " + args);                    
+                } else{
+                    // only one process in ready queue for now
                     _ReadyQueue.enqueue(_ResidentQueue.dequeue());
                     _CPU.isExecuting = true;
                 }

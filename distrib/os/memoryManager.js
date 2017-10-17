@@ -11,9 +11,11 @@ var TSOS;
         }
         MemoryManager.prototype.loadMemory = function (inputOpCodes) {
             var baseReg;
+            // check if memory is full and return the base of free partition
             if (_Memory.memoryP1) {
                 // memory is full
                 baseReg = 999;
+                // for iPj3
                 // if(_Memory.memoryP2){
                 //     if(_Memory.memoryP3){
                 //         _StdOut.putText("Memory is full. Please wait to load");
@@ -43,15 +45,18 @@ var TSOS;
         MemoryManager.prototype.updateMemory = function (addr, data) {
             var index = parseInt(addr, 16);
             _Memory.memory[index] = data.toString(16);
+            // 0 for now bc only one parition
             _Memory.updateTable(0);
         };
-        MemoryManager.prototype.clearPartition = function (pBase) {
-            console.log("clearing");
-            for (var i = pBase; i <= pBase + 255; i++) {
+        MemoryManager.prototype.clearPartition = function (baseReg) {
+            for (var i = baseReg; i <= baseReg + 255; i++) {
                 _Memory.memory[i] = "00";
             }
-            _Memory.memoryP1 = false;
-            _Memory.updateTable(pBase);
+            if (baseReg == 0) {
+                _Memory.memoryP1 = false;
+            }
+            // add other partitions later
+            _Memory.updateTable(baseReg);
         };
         return MemoryManager;
     }());

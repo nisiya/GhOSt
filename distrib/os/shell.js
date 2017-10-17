@@ -388,12 +388,12 @@ var TSOS;
             if (valText.test(userProgram)) {
                 var inputOpCodes = userProgram.split(" ");
                 // base register value from when memory was loaded
-                var pBase = _MemoryManager.loadMemory(inputOpCodes);
-                if (pBase == 999) {
+                var baseReg = _MemoryManager.loadMemory(inputOpCodes);
+                if (baseReg == 999) {
                     _StdOut.putText("Memory is full. Please wait to load");
                 }
                 else {
-                    var pid = _Kernel.krnCreateProcess(pBase);
+                    var pid = _Kernel.krnCreateProcess(baseReg);
                     _StdOut.putText("Process id: " + pid + " is in Resident Queue");
                 }
             }
@@ -413,7 +413,11 @@ var TSOS;
                 if (_ResidentQueue.isEmpty()) {
                     _StdOut.putText("No process is loaded in memory.");
                 }
+                else if (args != _PID) {
+                    _StdOut.putText("No process with id: " + args);
+                }
                 else {
+                    // only one process in ready queue for now
                     _ReadyQueue.enqueue(_ResidentQueue.dequeue());
                     _CPU.isExecuting = true;
                 }

@@ -82,7 +82,6 @@
                 }
 
                 public updateTable(baseReg): void {
-                   
                     // update Memory table after new process is loaded
                     var memoryTable: HTMLTableElement = <HTMLTableElement> document.getElementById("tbMemory");
                     var rowId: string;

@@ -16,7 +16,7 @@
    module TSOS {
     export class PCB {
 
-        public pid: number = -1;
+        public pid: number;
         public pCounter: number = 0;
         public pAcc: number = 0;
         public pXreg: number = 0;
@@ -26,25 +26,13 @@
         public pState: string = "New";
         public pLocation: string = "Memory";
         public pBase: number;
-        public pLimit: number = 256;
+        public pLimit: number;
 
         constructor(pBase, pid) {
-            this.pBase = pBase;
             this.pid = pid;
+            this.pBase = pBase;
+            this.pLimit = pBase + 255;
             this.pState = "Resident";
         }
-
-        public getPid() {
-            return this.pid;
-        }
-
-        public getPBase() {
-            return this.pBase;
-        }
-
-        public getPLimit() {
-            return this.pLimit;
-        }
-        
     }
 }
