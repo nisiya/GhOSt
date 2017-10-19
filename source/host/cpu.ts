@@ -20,7 +20,7 @@ module TSOS {
     export class Cpu {
 
         constructor(public PC: number = 0,
-                    public IR: string = "00",
+                    public IR: string = "00", //program instruction
                     public Acc: number = 0,
                     public Xreg: number = 0,
                     public Yreg: number = 0,
@@ -31,7 +31,7 @@ module TSOS {
 
         public init(): void {
             this.PC = 0;
-            this.IR = "00";
+            this.IR = "00"; 
             this.Acc = 0;
             this.Xreg = 0;
             this.Yreg = 0;
@@ -54,12 +54,10 @@ module TSOS {
             var opCode = this.fetch(this.PC);
             this.IR = opCode;
 
-            // process.pIR = opCode;        
-
             // decode then execute the op codes
             this.decodeExecute(opCode);   
 
-            // update display table
+            // update display tables
             Control.updateCPUTable(this);
             if(this.isExecuting){
                 Control.updateProcessTable(this.PC, this.IR, this.Acc, this.Xreg, this.Yreg, this.Zflag);
@@ -220,13 +218,16 @@ module TSOS {
                                 chr = String.fromCharCode(data);                              
                             }  
                         }
+                        // call Kernel to print to canvas
                         _KernelInterruptQueue.enqueue(new Interrupt(PROCESS_PRINT_IRQ, str));                        
                         this.PC++;
                         break;
 
                     default:
+                        // call Kernel to print error message if op code does not exist
                         _KernelInterruptQueue.enqueue(new Interrupt(PROCESS_ERROR_IRQ, opCode));
                         _Kernel.krnExitProcess();
+                        // reset CPU
                         this.init();
                         Control.updateCPUTable(this);
                         break;

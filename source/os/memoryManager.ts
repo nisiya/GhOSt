@@ -30,6 +30,8 @@
                     _Memory.memoryP1 = true;
                     baseReg = 0;
                 }
+                
+                // load user program into memory
                 for (var i = baseReg; i <inputOpCodes.length; i++){
                     _Memory.memory[i] = inputOpCodes[i];
                 }
@@ -38,6 +40,7 @@
             }
             
             public readMemory(index){
+                // retrieve from Memory
                 var opCode: string = _Memory.memory[index];
                 return opCode;
             }
@@ -45,18 +48,19 @@
             public updateMemory(addr, data) : void{
                 var index: number = parseInt(addr, 16);  
                 _Memory.memory[index] = data.toString(16);
+                
                 // 0 for now bc only one parition
                 Control.updateMemoryTable(0);
             }
 
             public clearPartition(baseReg) : void{
+                // free up memory when process completes
                 for (var i = baseReg; i <= baseReg+255; i++){
                     _Memory.memory[i] = "00";
                 } 
                 if(baseReg==0){
                     _Memory.memoryP1 = false;
-                }
-                // add other partitions later
+                } // add other partitions later
                 Control.updateMemoryTable(baseReg);
             }
         }

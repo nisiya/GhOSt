@@ -382,8 +382,9 @@ var TSOS;
         Shell.prototype.shellLoad = function (args) {
             // gets text of textarea
             var userProgram = document.getElementById("taProgramInput").value;
-            // checks if text only contains hex decimals and spaces and is not empty
+            // remove line breaks and extra spaces
             userProgram = userProgram.replace(/(\r\n|\n|\r)/gm, "");
+            // checks if text only contains hex decimals and spaces and is not empty
             var valText = /^[a-f\d\s]+$/i;
             if (valText.test(userProgram)) {
                 var inputOpCodes = userProgram.split(" ");
@@ -412,13 +413,14 @@ var TSOS;
         // run <pid>
         Shell.prototype.shellRun = function (args) {
             var valText = /^\d*$/;
-            // validate input
+            // validate input for integer
             if (valText.test(args) && args != "") {
                 // check if there are processes to be run
                 if (_ResidentQueue.isEmpty()) {
                     _StdOut.putText("No process is loaded in memory.");
                 }
                 else if (args != _PID) {
+                    // check if value matches current pid
                     _StdOut.putText("No process with id: " + args);
                 }
                 else {

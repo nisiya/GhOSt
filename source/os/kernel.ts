@@ -28,8 +28,8 @@ module TSOS {
             _KernelInterruptQueue = new Queue();  // A (currently) non-priority queue for interrupt requests (IRQs).
             _KernelBuffers = new Array();         // Buffers... for the kernel.
             _KernelInputQueue = new Queue();      // Where device input lands before being processed out somewhere.
-            _ResidentQueue = new Queue();
-            _ReadyQueue = new Queue();
+            _ResidentQueue = new Queue();         // Where loaded process reside
+            _ReadyQueue = new Queue();            // Where process are ready to run sit
 
             // Initialize the console.
             _Console = new Console();          // The command line interface / console I/O device.
@@ -47,7 +47,7 @@ module TSOS {
 
             //
             // ... more?
-            //
+            // Launch memory manager
             _MemoryManager = new MemoryManager();
 
             // Enable the OS Interrupts.  (Not the CPU clock interrupt, as that is done in the hardware sim.)
@@ -157,7 +157,7 @@ module TSOS {
         }
 
         public processPrint(chr){
-            // When user program makes system call to print
+            // When user program makes system call to print to canvas
             _StdOut.putText(chr);
         }
 
@@ -168,8 +168,8 @@ module TSOS {
         // - ReadConsole
         // - WriteConsole
 
-        // - CreateProcess
         public krnCreateProcess(pBase) {
+            // Creates process when it is loaded into memory
             // base register value retrieved from loading process into memory
             // pid incremented upon creation
             _PID++;
@@ -183,8 +183,8 @@ module TSOS {
             return pid;
         }
 
-        // - ExitProcess
         public krnExitProcess(){
+            // exit process upon completion
             // clear partion starting from base 0
             _MemoryManager.clearPartition(0);
             Control.removeProcessTable();

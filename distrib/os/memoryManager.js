@@ -32,6 +32,7 @@ var TSOS;
                 _Memory.memoryP1 = true;
                 baseReg = 0;
             }
+            // load user program into memory
             for (var i = baseReg; i < inputOpCodes.length; i++) {
                 _Memory.memory[i] = inputOpCodes[i];
             }
@@ -39,6 +40,7 @@ var TSOS;
             return baseReg;
         };
         MemoryManager.prototype.readMemory = function (index) {
+            // retrieve from Memory
             var opCode = _Memory.memory[index];
             return opCode;
         };
@@ -49,13 +51,13 @@ var TSOS;
             TSOS.Control.updateMemoryTable(0);
         };
         MemoryManager.prototype.clearPartition = function (baseReg) {
+            // free up memory when process completes
             for (var i = baseReg; i <= baseReg + 255; i++) {
                 _Memory.memory[i] = "00";
             }
             if (baseReg == 0) {
                 _Memory.memoryP1 = false;
-            }
-            // add other partitions later
+            } // add other partitions later
             TSOS.Control.updateMemoryTable(baseReg);
         };
         return MemoryManager;

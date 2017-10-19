@@ -472,8 +472,9 @@ module TSOS {
         public shellLoad(args) {
             // gets text of textarea
             var userProgram: string = (<HTMLInputElement> document.getElementById("taProgramInput")).value;
+            // remove line breaks and extra spaces
+            userProgram = userProgram.replace(/(\r\n|\n|\r)/gm,"");              
             // checks if text only contains hex decimals and spaces and is not empty
-            userProgram = userProgram.replace(/(\r\n|\n|\r)/gm,"");  
             var valText = /^[a-f\d\s]+$/i;
             if (valText.test(userProgram)) {
                 var inputOpCodes: string[] = userProgram.split(" ");
@@ -499,12 +500,13 @@ module TSOS {
         // run <pid>
         public shellRun(args) {
             var valText = /^\d*$/;
-            // validate input
+            // validate input for integer
             if (valText.test(args) && args != ""){
                 // check if there are processes to be run
                 if (_ResidentQueue.isEmpty()){
                     _StdOut.putText("No process is loaded in memory.");
                 } else if(args!=_PID) {
+                    // check if value matches current pid
                     _StdOut.putText("No process with id: " + args);                    
                 } else{
                     // only one process in ready queue for now

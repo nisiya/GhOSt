@@ -27,8 +27,8 @@ var TSOS;
             _KernelInterruptQueue = new TSOS.Queue(); // A (currently) non-priority queue for interrupt requests (IRQs).
             _KernelBuffers = new Array(); // Buffers... for the kernel.
             _KernelInputQueue = new TSOS.Queue(); // Where device input lands before being processed out somewhere.
-            _ResidentQueue = new TSOS.Queue();
-            _ReadyQueue = new TSOS.Queue();
+            _ResidentQueue = new TSOS.Queue(); // Where loaded process reside
+            _ReadyQueue = new TSOS.Queue(); // Where process are ready to run sit
             // Initialize the console.
             _Console = new TSOS.Console(); // The command line interface / console I/O device.
             _Console.init();
@@ -42,7 +42,7 @@ var TSOS;
             this.krnTrace(_krnKeyboardDriver.status);
             //
             // ... more?
-            //
+            // Launch memory manager
             _MemoryManager = new TSOS.MemoryManager();
             // Enable the OS Interrupts.  (Not the CPU clock interrupt, as that is done in the hardware sim.)
             this.krnTrace("Enabling the interrupts.");
@@ -138,7 +138,7 @@ var TSOS;
             _OsShell.putPrompt();
         };
         Kernel.prototype.processPrint = function (chr) {
-            // When user program makes system call to print
+            // When user program makes system call to print to canvas
             _StdOut.putText(chr);
         };
         //
@@ -147,8 +147,8 @@ var TSOS;
         // Some ideas:
         // - ReadConsole
         // - WriteConsole
-        // - CreateProcess
         Kernel.prototype.krnCreateProcess = function (pBase) {
+            // Creates process when it is loaded into memory
             // base register value retrieved from loading process into memory
             // pid incremented upon creation
             _PID++;
@@ -161,8 +161,8 @@ var TSOS;
             TSOS.Control.addProcessTable(process);
             return pid;
         };
-        // - ExitProcess
         Kernel.prototype.krnExitProcess = function () {
+            // exit process upon completion
             // clear partion starting from base 0
             _MemoryManager.clearPartition(0);
             TSOS.Control.removeProcessTable();

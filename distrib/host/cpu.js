@@ -16,7 +16,8 @@
 var TSOS;
 (function (TSOS) {
     var Cpu = /** @class */ (function () {
-        function Cpu(PC, IR, Acc, Xreg, Yreg, Zflag, isExecuting) {
+        function Cpu(PC, IR, //program instruction
+            Acc, Xreg, Yreg, Zflag, isExecuting) {
             if (PC === void 0) { PC = 0; }
             if (IR === void 0) { IR = "00"; }
             if (Acc === void 0) { Acc = 0; }
@@ -53,10 +54,9 @@ var TSOS;
             // fetch instruction from memory
             var opCode = this.fetch(this.PC);
             this.IR = opCode;
-            // process.pIR = opCode;        
             // decode then execute the op codes
             this.decodeExecute(opCode);
-            // update display table
+            // update display tables
             TSOS.Control.updateCPUTable(this);
             if (this.isExecuting) {
                 TSOS.Control.updateProcessTable(this.PC, this.IR, this.Acc, this.Xreg, this.Yreg, this.Zflag);
@@ -204,12 +204,15 @@ var TSOS;
                                 chr = String.fromCharCode(data);
                             }
                         }
+                        // call Kernel to print to canvas
                         _KernelInterruptQueue.enqueue(new TSOS.Interrupt(PROCESS_PRINT_IRQ, str));
                         this.PC++;
                         break;
                     default:
+                        // call Kernel to print error message if op code does not exist
                         _KernelInterruptQueue.enqueue(new TSOS.Interrupt(PROCESS_ERROR_IRQ, opCode));
                         _Kernel.krnExitProcess();
+                        // reset CPU
                         this.init();
                         TSOS.Control.updateCPUTable(this);
                         break;
