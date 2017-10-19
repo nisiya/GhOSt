@@ -16,14 +16,16 @@
 var TSOS;
 (function (TSOS) {
     var Cpu = /** @class */ (function () {
-        function Cpu(PC, Acc, Xreg, Yreg, Zflag, isExecuting) {
+        function Cpu(PC, IR, Acc, Xreg, Yreg, Zflag, isExecuting) {
             if (PC === void 0) { PC = 0; }
+            if (IR === void 0) { IR = "00"; }
             if (Acc === void 0) { Acc = 0; }
             if (Xreg === void 0) { Xreg = 0; }
             if (Yreg === void 0) { Yreg = 0; }
             if (Zflag === void 0) { Zflag = 0; }
             if (isExecuting === void 0) { isExecuting = false; }
             this.PC = PC;
+            this.IR = IR;
             this.Acc = Acc;
             this.Xreg = Xreg;
             this.Yreg = Yreg;
@@ -32,6 +34,7 @@ var TSOS;
         }
         Cpu.prototype.init = function () {
             this.PC = 0;
+            this.IR = "00";
             this.Acc = 0;
             this.Xreg = 0;
             this.Yreg = 0;
@@ -39,9 +42,9 @@ var TSOS;
             this.isExecuting = false;
         };
         Cpu.prototype.updateCPUTable = function () {
-            var cpuTable = document.getElementById("taCPU");
+            var cpuTable = document.getElementById("tbCPU");
             cpuTable.rows[1].cells.namedItem("cPC").innerHTML = this.PC.toString();
-            cpuTable.rows[1].cells.namedItem("cIR").innerHTML = this.PC.toString();
+            cpuTable.rows[1].cells.namedItem("cIR").innerHTML = this.IR.toString();
             cpuTable.rows[1].cells.namedItem("cACC").innerHTML = this.Acc.toString();
             cpuTable.rows[1].cells.namedItem("cX").innerHTML = this.Xreg.toString();
             cpuTable.rows[1].cells.namedItem("cY").innerHTML = this.Yreg.toString();
@@ -54,15 +57,19 @@ var TSOS;
             if (this.PC == 0) {
                 // move pcb from ready queue to running
                 var process = _ReadyQueue.dequeue();
-                process.pState = "Running";
+                TSOS.Control.updateProcessTable(this.PC, this.IR, this.Acc, this.Xreg, this.Yreg, this.Zflag);
             }
             // fetch instruction from memory
             var opCode = this.fetch(this.PC);
-            console.log(opCode);
+            this.IR = opCode;
+            // process.pIR = opCode;        
             // decode then execute the op codes
             this.decodeExecute(opCode);
             // update display table
             this.updateCPUTable();
+            if (this.isExecuting) {
+                TSOS.Control.updateProcessTable(this.PC, this.IR, this.Acc, this.Xreg, this.Yreg, this.Zflag);
+            }
         };
         Cpu.prototype.fetch = function (PC) {
             return _MemoryManager.readMemory(PC);
@@ -83,8 +90,7 @@ var TSOS;
                         break;
                     // load accumulator from memory
                     case "AD":
-                        addr = this.fetch(this.PC + 1);
-                        addr = this.fetch(this.PC + 2) + addr;
+                        addr = this.fetch(this.PC + 2) + this.fetch(this.PC + 1);
                         index = parseInt(addr, 16);
                         data = parseInt(this.fetch(index), 16);
                         this.Acc = data;
@@ -93,8 +99,7 @@ var TSOS;
                     // store accumulator in memory
                     case "8D":
                         data = this.Acc;
-                        addr = this.fetch(this.PC + 1);
-                        addr = this.fetch(this.PC + 2) + addr;
+                        addr = this.fetch(this.PC + 2) + this.fetch(this.PC + 1);
                         _MemoryManager.updateMemory(addr, data);
                         this.PC += 3;
                         break;
@@ -102,8 +107,7 @@ var TSOS;
                     /* add content of an address to content of accumulator
                         and keeps resut in the accumulator*/
                     case "6D":
-                        addr = this.fetch(this.PC + 1);
-                        addr = this.fetch(this.PC + 2) + addr;
+                        addr = this.fetch(this.PC + 2) + this.fetch(this.PC + 1);
                         index = parseInt(addr, 16);
                         data = parseInt(this.fetch(index), 16);
                         this.Acc = data + this.Acc;
@@ -117,8 +121,7 @@ var TSOS;
                         break;
                     // load the x register from memory
                     case "AE":
-                        addr = this.fetch(this.PC + 1);
-                        addr = this.fetch(this.PC + 2) + addr;
+                        addr = this.fetch(this.PC + 2) + this.fetch(this.PC + 1);
                         index = parseInt(addr, 16);
                         data = parseInt(this.fetch(index), 16);
                         this.Xreg = data;
@@ -132,8 +135,7 @@ var TSOS;
                         break;
                     // load the y register from memory
                     case "AC":
-                        addr = this.fetch(this.PC + 1);
-                        addr = this.fetch(this.PC + 2) + addr;
+                        addr = this.fetch(this.PC + 2) + this.fetch(this.PC + 1);
                         index = parseInt(addr, 16);
                         data = parseInt(this.fetch(index), 16);
                         this.Yreg = data;
@@ -154,8 +156,7 @@ var TSOS;
                     // compare a byte in memory to the X reg
                     // if equal, set z flag 
                     case "EC":
-                        addr = this.fetch(this.PC + 1);
-                        addr = this.fetch(this.PC + 2) + addr;
+                        addr = this.fetch(this.PC + 2) + this.fetch(this.PC + 1);
                         index = parseInt(addr, 16);
                         data = parseInt(this.fetch(index), 16);
                         if (data == this.Xreg) {
@@ -184,8 +185,7 @@ var TSOS;
                         break;
                     // increment the value of a byte
                     case "EE":
-                        addr = this.fetch(this.PC + 1);
-                        addr = this.fetch(this.PC + 2) + addr;
+                        addr = this.fetch(this.PC + 2) + this.fetch(this.PC + 1);
                         index = parseInt(addr, 16);
                         data = parseInt(this.fetch(index), 16);
                         data++;

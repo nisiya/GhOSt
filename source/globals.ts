@@ -72,9 +72,21 @@ var Glados: any = null;  // This is the function Glados() in glados.js on Labous
 var _GLaDOS: any = null; // If the above is linked in, this is the instantiated instance of Glados.
 
 // current time and date
-var _DateTime = new Date();
-var _Date = _DateTime.toDateString();
-var _Time = _DateTime.toLocaleTimeString()
+var _Datetime;
+function updateTime(){
+    var clock = document.getElementById("clock");
+    updateClock(clock);
+    setInterval(function () {
+        updateClock(clock);
+    }, 1000);
+}
+function updateClock(clock) {
+    var dateTime = new Date();
+    var date = dateTime.toDateString();
+    var time = dateTime.toLocaleTimeString();
+    _Datetime = date + " " + time;
+    clock.innerHTML = _Datetime;    
+}
 
 var _KeyToChr = {
     "48" : {"noShChr": 48, "shChr": 41},
@@ -106,6 +118,5 @@ var _SaveX = 0; // use for backspace and line wrapping for now, will improve
 
 var onDocumentLoad = function() {
     TSOS.Control.hostInit();
-    var clock = document.getElementById("clock");
-    clock.innerHTML = _Date + " " + _Time;
+    updateTime();
 };

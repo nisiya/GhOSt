@@ -361,7 +361,7 @@ var TSOS;
         };
         // date
         Shell.prototype.shellDate = function (args) {
-            var currDate = _Date + " " + _Time;
+            var currDate = _Datetime;
             _StdOut.putText(currDate);
         };
         // whereami
@@ -387,14 +387,19 @@ var TSOS;
             var valText = /^[a-f\d\s]+$/i;
             if (valText.test(userProgram)) {
                 var inputOpCodes = userProgram.split(" ");
-                // base register value from when memory was loaded
-                var baseReg = _MemoryManager.loadMemory(inputOpCodes);
-                if (baseReg == 999) {
-                    _StdOut.putText("Memory is full. Please wait to load");
+                if (inputOpCodes.length > 256) {
+                    _StdOut.putText("Process is too big for memory.");
                 }
                 else {
-                    var pid = _Kernel.krnCreateProcess(baseReg);
-                    _StdOut.putText("Process id: " + pid + " is in Resident Queue");
+                    // base register value from when memory was loaded
+                    var baseReg = _MemoryManager.loadMemory(inputOpCodes);
+                    if (baseReg == 999) {
+                        _StdOut.putText("Memory is full. Please run the current process then load more.");
+                    }
+                    else {
+                        var pid = _Kernel.krnCreateProcess(baseReg);
+                        _StdOut.putText("Process id: " + pid + " is in Resident Queue");
+                    }
                 }
             }
             else if (userProgram == "") {

@@ -157,12 +157,16 @@ var TSOS;
             var process = new TSOS.PCB(pBase, pid);
             // put pcb on ready queue
             _ResidentQueue.enqueue(process);
+            // update process table
+            // _PCB.addProcessTable(process);
+            TSOS.Control.addProcessTable(process);
             return pid;
         };
         // - ExitProcess
         Kernel.prototype.krnExitProcess = function () {
             // clear partion starting from base 0
             _MemoryManager.clearPartition(0);
+            TSOS.Control.removeProcessTable();
         };
         // - WaitForProcessToExit
         // - CreateFile

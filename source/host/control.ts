@@ -74,6 +74,78 @@ module TSOS {
             // TODO in the future: Optionally update a log database or some streaming service.
         }
 
+        public static addProcessTable(process): void {
+            var processTableBody: HTMLTableSectionElement = <HTMLTableSectionElement> document.getElementById("processTbody");         
+            var row: HTMLTableRowElement = <HTMLTableRowElement> document.createElement("tr");
+            row.id = "pid" + process.pid;
+            var cell: HTMLTableCellElement = <HTMLTableCellElement> document.createElement("td");
+            cell.id = process.id;
+            // PID
+            var cellText = document.createTextNode(process.pid);
+            cell.appendChild(cellText);
+            row.appendChild(cell);
+            // PC
+            cell = document.createElement("td");            
+            cellText = document.createTextNode(process.pCounter);
+            cell.appendChild(cellText);
+            row.appendChild(cell);
+            // IR
+            cell = document.createElement("td");            
+            cellText = document.createTextNode("0");
+            cell.appendChild(cellText);
+            row.appendChild(cell);
+            // Acc
+            cell = document.createElement("td");            
+            cellText = document.createTextNode(process.pAcc);
+            cell.appendChild(cellText);
+            row.appendChild(cell);
+            // X
+            cell = document.createElement("td");            
+            cellText = document.createTextNode(process.pXreg);
+            cell.appendChild(cellText);
+            row.appendChild(cell);
+            // Y
+            cell = document.createElement("td");            
+            cellText = document.createTextNode(process.pYreg);
+            cell.appendChild(cellText);
+            row.appendChild(cell);
+            // Z
+            cell = document.createElement("td");            
+            cellText = document.createTextNode(process.pZflag);
+            cell.appendChild(cellText);
+            row.appendChild(cell);
+            // State
+            cell = document.createElement("td");            
+            cellText = document.createTextNode(process.pState);
+            cell.appendChild(cellText);
+            row.appendChild(cell);
+            // Location
+            cell = document.createElement("td");            
+            cellText = document.createTextNode(process.pLocation);
+            cell.appendChild(cellText);
+            row.appendChild(cell);
+            processTableBody.appendChild(row);
+        } 
+
+        public static updateProcessTable(pCounter, pIR, pAcc, pXreg, pYreg, pZflag): void{
+            var processTableBody: HTMLTableSectionElement = <HTMLTableSectionElement> document.getElementById("processTbody");                
+            var row = processTableBody.rows.item(0);
+            row.cells.item(1).innerHTML = pCounter;
+            row.cells.item(2).innerHTML = pIR;
+            row.cells.item(3).innerHTML = pAcc;
+            row.cells.item(4).innerHTML = pXreg;
+            row.cells.item(5).innerHTML = pYreg;
+            row.cells.item(6).innerHTML = pZflag;
+            row.cells.item(7).innerHTML = "Running";
+        }
+
+        public static removeProcessTable(): void{
+            var processTableBody: HTMLTableSectionElement = <HTMLTableSectionElement> document.getElementById("processTbody");    
+            // var row: HTMLTableRowElement = <HTMLTableRowElement> document.getElementById("pid"+pid);     
+            processTableBody.deleteRow(0);
+            // row.parentNode.removeChild(row);      
+        }
+
 
         //
         // Host Events

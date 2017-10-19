@@ -18,6 +18,7 @@
 
         public pid: number;
         public pCounter: number = 0;
+        public pIR: string = "00";
         public pAcc: number = 0;
         public pXreg: number = 0;
         public pYreg: number = 0;

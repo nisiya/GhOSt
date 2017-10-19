@@ -106,12 +106,12 @@ table {
 }
 
 #memoryContainer {
-  width: 327px;
+  width: 330px;
   height: 140px;
 }
 
 #pcbContainer{
-  width: 327px;
+  width: 400px;
   height: 115px;
 }
 
@@ -130,17 +130,18 @@ table#tbMemory tr:nth-child(even) {
   background-color: #f2f2f2;
 }
 
-table#taProcess tr:nth-child(even) {
+table#tbProcess tr:nth-child(even) {
   background-color: #f2f2f2;
 }
 
-#taCPU, #taProcess{
+#tbCPU, #tbProcess{
   color: black;
   font-family: Courier New, Courier, monospace;
   font-weight: normal;
   width: 100%;
   text-align: center;  
   border-collapse: collapse;
+  table-layout: fixed;
 }
 
 .footerText {
@@ -184,7 +185,7 @@ table#taProcess tr:nth-child(even) {
 
 @media (max-width: 767px) {
   .fullscreen-bg {
-    background: url('../img/videoframe.jpg') center center / cover no-repeat;
+    background: url('distrib/images/grey.jpg') center center / cover no-repeat;
   }
 
   .fullscreen-bg__video {

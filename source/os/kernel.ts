@@ -178,6 +178,9 @@ module TSOS {
             var process = new PCB(pBase, pid);
             // put pcb on ready queue
             _ResidentQueue.enqueue(process);
+            // update process table
+            // _PCB.addProcessTable(process);
+            Control.addProcessTable(process);
             return pid;
         }
 
@@ -185,6 +188,7 @@ module TSOS {
         public krnExitProcess(){
             // clear partion starting from base 0
             _MemoryManager.clearPartition(0);
+            Control.removeProcessTable();
         }
         // - WaitForProcessToExit
         // - CreateFile

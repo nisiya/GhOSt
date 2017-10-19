@@ -48,9 +48,7 @@ module TSOS {
                     // ... tell the shell ...
                     _OsShell.handleInput(this.buffer);
                     // add command to previous command list
-                    console.log(this.buffer+"we");
                     this.prevCmd.push(this.buffer);
-                    console.log(this.prevCmd);
                     // ... and reset our buffer.
                     this.buffer = "";
                     this.updown = 0;
@@ -68,7 +66,6 @@ module TSOS {
                         this.putText(this.prevCmd[this.prevCmd.length-this.updown]);
                         // current text is now previous command so add to buffer
                         this.buffer = this.prevCmd[this.prevCmd.length-this.updown];
-                        console.log(this.updown);
                     }              
                 } else if (chr === '40') { //   Down key .. special case so two characters
                     // only if up key was used before
@@ -77,7 +74,6 @@ module TSOS {
                         this.removeLine();
                         this.putText(this.prevCmd[this.prevCmd.length-this.updown]);
                         this.buffer = this.prevCmd[this.prevCmd.length-this.updown];                        
-                        console.log(this.updown);
                     }
                 } else if (chr === String.fromCharCode(9)) { //  Tab key
                     if (this.matchCmd.length == 0){
@@ -129,7 +125,6 @@ module TSOS {
                 var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, text);
                 this.currentXPosition = this.currentXPosition + offset;
             }
-            // console.log(this.currentXPosition);
         }
 
         public removeChr(chr): void {
@@ -179,7 +174,6 @@ module TSOS {
              * Font height margin is extra spacing between the lines.
              */
             var saveYPosition = this.currentYPosition;      
-            console.log(saveYPosition+"A");      
             this.currentYPosition += _DefaultFontSize + 
                                      _DrawingContext.fontDescent(this.currentFont, this.currentFontSize) +
                                      _FontHeightMargin;
@@ -192,7 +186,6 @@ module TSOS {
                                    _DrawingContext.fontDescent(this.currentFont, this.currentFontSize) +
                                    _FontHeightMargin;
                 var copyHeight = _Canvas.height - startYPostion - _DrawingContext.fontDescent(this.currentFont, this.currentFontSize);
-                console.log(startYPostion+"Z");
                 // save screenshot
                 var imgData = _DrawingContext.getImageData(0, startYPostion, _Canvas.width, copyHeight);
                 // clear screen

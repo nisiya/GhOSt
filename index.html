@@ -51,9 +51,9 @@
 </head>
 
 <body onload="onDocumentLoad()">
-  <!-- background video -->
+  <!-- background video for future-->
   <div class="fullscreen-bg">
-    <video loop muted poster="img/videoframe.jpg" class="fullscreen-bg__video">
+    <video loop muted poster="distrib/images/grey.jpg" class="fullscreen-bg__video">
         <source src="distrib/video/pacmanGame.mp4" type="video/mp4">
     </video>
   </div>
@@ -131,8 +131,8 @@
                 <br>
                 <textarea name="taHostLog"
                           id  ="taHostLog"
-                          rows="6"
-                          cols="38"
+                          rows="5"
+                          cols="40"
                 ></textarea>
             </label>
           </div>
@@ -141,8 +141,8 @@
                 CPU 
                 <br>
                 <div id="cpuContainer">
-                  <table name = "taCPU"
-                        id   = "taCPU">
+                  <table name = "tbCPU"
+                        id   = "tbCPU">
                     <thead>
                       <tr style="border-bottom: 1px solid #666666;">
                         <th> PC </th>
@@ -167,34 +167,11 @@
                 </div>                
               </label>
             </div>
-          <div id="divPCB" class="bg-faded p-3 my-4">
+            <div id="divMemory" class="bg-faded p-3 my-4">
               <label>
-                  Processes
+                  Memory
                   <br>
-                  <div class="tableContainer" id="pcbContainer">
-                      <table name = "taProces"
-                            id   = "taProcess">
-                      <thead>
-                        <tr style="border-bottom: 1px solid #666666;">
-                          <th> PC </th>
-                          <th> IR </th>
-                          <th> ACC </th>
-                          <th> X </th>
-                          <th> Y </th>
-                          <th> Z </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td id="pPC"> 0 </td>
-                          <td id="pIR"> 0 </td>
-                          <td id="pACC"> 0 </td>
-                          <td id="pX"> 0 </td>
-                          <td id="pY"> 0 </td>
-                          <td id="pZ"> 0 </td>
-                        </tr>
-                      </tbody>
-                    </table>
+                  <div class="tableContainer" id="memoryContainer">
                   </div>
               </label>
             </div>
@@ -206,19 +183,37 @@
                 <br>
                 <textarea name="taProgramInput"
                           id  ="taProgramInput"
-                          rows="6"
-                          cols="38"
+                          rows="5"
+                          cols="47"
                 >A9 11</textarea>
             </label>
           </div>
-          <div id="divMemory" class="bg-faded p-3 my-4">
-              <label>
-                  Memory
-                  <br>
-                  <div class="tableContainer" id="memoryContainer">
-                  </div>
-              </label>
-            </div>
+          <div id="divPCB" class="bg-faded p-3 my-4">
+            <label>
+                Processes
+                <br>
+                <div class="tableContainer" id="pcbContainer">
+                    <table name = "tbProcess"
+                          id   = "tbProcess">
+                    <thead>
+                      <tr style="border-bottom: 1px solid #666666;">
+                        <th width="10%"> PID </th>                            
+                        <th> PC </th>
+                        <th> IR </th>
+                        <th> ACC </th>
+                        <th> X </th>
+                        <th> Y </th>
+                        <th> Z </th>
+                        <th width="20%"> State </th>
+                        <th width="25%"> Location </th>                          
+                      </tr>
+                    </thead>
+                    <tbody id="processTbody">
+                    </tbody>
+                  </table>
+                </div>
+            </label>
+          </div>
         </th>
       </tr>
     </table>
@@ -228,7 +223,7 @@
     <div class="container">
       <p class="m-0">
           <br>
-          Copyright &copy; 2008 - 2016 No Rights Reserved.
+          Copyright &copy; 2008 - 2017 No Rights Reserved.
           <br>
           Reproduction is inhibited without the express written consent of
           Ted Codd, Stevie Ray Vaughan, and Ian Fleming.

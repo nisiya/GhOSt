@@ -20,6 +20,7 @@ module TSOS {
     export class Cpu {
 
         constructor(public PC: number = 0,
+                    public IR: string = "00",
                     public Acc: number = 0,
                     public Xreg: number = 0,
                     public Yreg: number = 0,
@@ -30,6 +31,7 @@ module TSOS {
 
         public init(): void {
             this.PC = 0;
+            this.IR = "00";
             this.Acc = 0;
             this.Xreg = 0;
             this.Yreg = 0;
@@ -38,9 +40,9 @@ module TSOS {
         }
 
         public updateCPUTable(): void {
-            var cpuTable: HTMLTableElement = <HTMLTableElement> document.getElementById("taCPU");
+            var cpuTable: HTMLTableElement = <HTMLTableElement> document.getElementById("tbCPU");
             cpuTable.rows[1].cells.namedItem("cPC").innerHTML = this.PC.toString();
-            cpuTable.rows[1].cells.namedItem("cIR").innerHTML = this.PC.toString();            
+            cpuTable.rows[1].cells.namedItem("cIR").innerHTML = this.IR.toString();            
             cpuTable.rows[1].cells.namedItem("cACC").innerHTML = this.Acc.toString();            
             cpuTable.rows[1].cells.namedItem("cX").innerHTML = this.Xreg.toString();            
             cpuTable.rows[1].cells.namedItem("cY").innerHTML = this.Yreg.toString();            
@@ -55,17 +57,23 @@ module TSOS {
             if(this.PC==0){
                 // move pcb from ready queue to running
                 var process = _ReadyQueue.dequeue();
-                process.pState = "Running";
+                Control.updateProcessTable(this.PC, this.IR, this.Acc, this.Xreg, this.Yreg, this.Zflag);
             }
+            
             // fetch instruction from memory
             var opCode = this.fetch(this.PC);
-            console.log(opCode);
+            this.IR = opCode;
+
+            // process.pIR = opCode;        
 
             // decode then execute the op codes
             this.decodeExecute(opCode);   
 
             // update display table
             this.updateCPUTable();
+            if(this.isExecuting){
+                Control.updateProcessTable(this.PC, this.IR, this.Acc, this.Xreg, this.Yreg, this.Zflag);
+            }
         }
 
         public fetch(PC) {
@@ -91,8 +99,7 @@ module TSOS {
 
                     // load accumulator from memory
                     case "AD":
-                        addr = this.fetch(this.PC+1);
-                        addr = this.fetch(this.PC+2) + addr;
+                        addr = this.fetch(this.PC+2) + this.fetch(this.PC+1);
                         index = parseInt(addr, 16);  
                         data = parseInt(this.fetch(index), 16);
                         this.Acc = data;
@@ -102,8 +109,7 @@ module TSOS {
                     // store accumulator in memory
                     case "8D":
                         data = this.Acc;
-                        addr = this.fetch(this.PC+1);
-                        addr = this.fetch(this.PC+2) + addr;
+                        addr = this.fetch(this.PC+2) + this.fetch(this.PC+1);                        
                         _MemoryManager.updateMemory(addr, data);
                         this.PC+=3;
                         break;
@@ -112,8 +118,7 @@ module TSOS {
                     /* add content of an address to content of accumulator
                         and keeps resut in the accumulator*/
                     case "6D":
-                        addr = this.fetch(this.PC+1);
-                        addr = this.fetch(this.PC+2) + addr;
+                        addr = this.fetch(this.PC+2) + this.fetch(this.PC+1);                    
                         index = parseInt(addr, 16);  
                         data = parseInt(this.fetch(index), 16);
                         this.Acc = data + this.Acc;
@@ -129,8 +134,7 @@ module TSOS {
 
                     // load the x register from memory
                     case "AE":
-                        addr = this.fetch(this.PC+1);
-                        addr = this.fetch(this.PC+2) + addr;
+                        addr = this.fetch(this.PC+2) + this.fetch(this.PC+1);                
                         index = parseInt(addr, 16);  
                         data = parseInt(this.fetch(index), 16);
                         this.Xreg = data;
@@ -146,8 +150,7 @@ module TSOS {
 
                     // load the y register from memory
                     case "AC":
-                        addr = this.fetch(this.PC+1);
-                        addr = this.fetch(this.PC+2) + addr;
+                        addr = this.fetch(this.PC+2) + this.fetch(this.PC+1);                    
                         index = parseInt(addr, 16);  
                         data = parseInt(this.fetch(index), 16);
                         this.Yreg = data;
@@ -171,8 +174,7 @@ module TSOS {
                     // compare a byte in memory to the X reg
                     // if equal, set z flag 
                     case "EC":
-                        addr = this.fetch(this.PC+1);
-                        addr = this.fetch(this.PC+2) + addr;
+                        addr = this.fetch(this.PC+2) + this.fetch(this.PC+1);                    
                         index = parseInt(addr, 16);  
                         data = parseInt(this.fetch(index), 16);
                         if (data == this.Xreg){
@@ -200,8 +202,7 @@ module TSOS {
 
                     // increment the value of a byte
                     case "EE":
-                        addr = this.fetch(this.PC+1);
-                        addr = this.fetch(this.PC+2) + addr;
+                        addr = this.fetch(this.PC+2) + this.fetch(this.PC+1);                    
                         index = parseInt(addr, 16);  
                         data = parseInt(this.fetch(index), 16);
                         data++;

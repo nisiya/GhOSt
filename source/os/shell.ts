@@ -447,7 +447,7 @@ module TSOS {
 
         // date
         public shellDate(args) {
-            var currDate: string = _Date + " " + _Time;
+            var currDate: string = _Datetime;
             _StdOut.putText(currDate);
         }
 
@@ -476,14 +476,18 @@ module TSOS {
             userProgram = userProgram.replace(/(\r\n|\n|\r)/gm,"");  
             var valText = /^[a-f\d\s]+$/i;
             if (valText.test(userProgram)) {
-                var inputOpCodes: string[] = userProgram.split(" "); 
-                // base register value from when memory was loaded
-                var baseReg: number = _MemoryManager.loadMemory(inputOpCodes);
-                if (baseReg == 999){
-                    _StdOut.putText("Memory is full. Please wait to load");                    
+                var inputOpCodes: string[] = userProgram.split(" ");
+                if (inputOpCodes.length > 256){
+                    _StdOut.putText("Process is too big for memory.");
                 } else {
-                    var pid: number = _Kernel.krnCreateProcess(baseReg);
-                    _StdOut.putText("Process id: " + pid + " is in Resident Queue");
+                    // base register value from when memory was loaded
+                    var baseReg: number = _MemoryManager.loadMemory(inputOpCodes);
+                    if (baseReg == 999){
+                        _StdOut.putText("Memory is full. Please run the current process then load more.");                    
+                    } else {
+                        var pid: number = _Kernel.krnCreateProcess(baseReg);
+                        _StdOut.putText("Process id: " + pid + " is in Resident Queue");
+                    }
                 }
             } else if(userProgram == ""){
                 _StdOut.putText("Please enter 6502a op codes in the input area below.");
