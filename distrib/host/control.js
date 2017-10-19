@@ -254,9 +254,11 @@ var TSOS;
             // page from its cache, which is not what we want.
         };
         Control.hostBtnSingle_click = function (btn) {
-            _isSingle = !(_isSingle);
-            if (_isSingle) {
+            _singleMode = !(_singleMode);
+            if (_singleMode) {
                 btn.style.backgroundImage = "url(distrib/images/single2.png)";
+                // check if next button should be enabled
+                this.hostBtnNext_onOff();
             }
             else {
                 btn.style.backgroundImage = "url(distrib/images/single1.png)";
@@ -266,16 +268,18 @@ var TSOS;
         };
         // click = 1 CPU cycle
         Control.hostBtnNext_click = function (btn) {
-            _CPU.isExecuting = true;
+            if (_CPU.isExecuting) {
+                _CPU.cycle();
+            }
         };
-        // on only if process is available to run
+        // enable next btn if process is executing and disable if not
         Control.hostBtnNext_onOff = function () {
-            var btnState = document.getElementById("btnNext").disabled;
-            document.getElementById("btnNext").disabled = !btnState;
-            if (btnState) {
+            if (_CPU.isExecuting) {
+                document.getElementById("btnNext").disabled = false;
                 document.getElementById("btnNext").style.backgroundImage = "url(distrib/images/next.png)";
             }
             else {
+                document.getElementById("btnNext").disabled = true;
                 document.getElementById("btnNext").style.backgroundImage = "url(distrib/images/next1.png)";
             }
         };

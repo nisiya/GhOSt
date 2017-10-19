@@ -509,14 +509,7 @@ module TSOS {
                     // check if value matches current pid
                     _StdOut.putText("No process with id: " + args);                    
                 } else{
-                    // only one process in ready queue for now
-                    _ReadyQueue.enqueue(_ResidentQueue.dequeue());
-                    // if not single then run normally
-                    if (_isSingle){
-                        Control.hostBtnNext_onOff();                        
-                    } else{
-                        _CPU.isExecuting = true;                        
-                    }
+                    _Kernel.krnExecuteProcess();
                 }
             } else {
                 _StdOut.putText("Please enter an integer for process id after run command.");

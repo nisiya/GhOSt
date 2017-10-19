@@ -290,30 +290,35 @@ module TSOS {
         }
 
         public static hostBtnSingle_click(btn): void {
-            _isSingle = !(_isSingle);
-            if (_isSingle){ // ready to mingle ;) 
-                btn.style.backgroundImage = "url(distrib/images/single2.png)";         
+            _singleMode = !(_singleMode);
+            if (_singleMode){ // ready to mingle ;) 
+                btn.style.backgroundImage = "url(distrib/images/single2.png)";
+                // check if next button should be enabled
+                this.hostBtnNext_onOff();
             } else {
                 btn.style.backgroundImage = "url(distrib/images/single1.png)";
                 (<HTMLButtonElement>document.getElementById("btnNext")).disabled = true;
-                document.getElementById("btnNext").style.backgroundImage = "url(distrib/images/next1.png)";  
+                document.getElementById("btnNext").style.backgroundImage = "url(distrib/images/next1.png)";
             }
         }
 
         // click = 1 CPU cycle
         public static hostBtnNext_click(btn): void {
-            _CPU.isExecuting = true;
-        }
-
-        // on only if process is available to run
-        public static hostBtnNext_onOff(): void {
-            var btnState = (<HTMLButtonElement>document.getElementById("btnNext")).disabled;
-            (<HTMLButtonElement>document.getElementById("btnNext")).disabled = !btnState; 
-            if (btnState){
-                document.getElementById("btnNext").style.backgroundImage = "url(distrib/images/next.png)";            
-            } else {
-                document.getElementById("btnNext").style.backgroundImage = "url(distrib/images/next1.png)";                   
+            if(_CPU.isExecuting){
+                _CPU.cycle();
             }
         }
+
+        // enable next btn if process is executing and disable if not
+        public static hostBtnNext_onOff(): void{
+            if(_CPU.isExecuting){
+                (<HTMLButtonElement>document.getElementById("btnNext")).disabled = false;
+                document.getElementById("btnNext").style.backgroundImage = "url(distrib/images/next.png)";                                    
+            } else {
+                (<HTMLButtonElement>document.getElementById("btnNext")).disabled = true;
+                document.getElementById("btnNext").style.backgroundImage = "url(distrib/images/next1.png)";
+            }
+        }
+        
     }
 }

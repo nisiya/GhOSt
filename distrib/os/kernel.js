@@ -82,7 +82,13 @@ var TSOS;
                 this.krnInterruptHandler(interrupt.irq, interrupt.params);
             }
             else if (_CPU.isExecuting) {
-                _CPU.cycle();
+                if (!_singleMode) {
+                    _CPU.cycle();
+                }
+                else {
+                    // enable next button in single step mode
+                    TSOS.Control.hostBtnNext_onOff();
+                }
             }
             else {
                 this.krnTrace("Idle");
@@ -131,16 +137,6 @@ var TSOS;
             // The built-in TIMER (not clock) Interrupt Service Routine (as opposed to an ISR coming from a device driver). {
             // Check multiprogramming parameters and enforce quanta here. Call the scheduler / context switch here if necessary.
         };
-        Kernel.prototype.userPrgError = function (opCode) {
-            // When user program entry is not a valid op ocde
-            _StdOut.putText("Error. Op code " + opCode + " does not exist.");
-            _StdOut.advanceLine();
-            _OsShell.putPrompt();
-        };
-        Kernel.prototype.processPrint = function (chr) {
-            // When user program makes system call to print to canvas
-            _StdOut.putText(chr);
-        };
         //
         // System Calls... that generate software interrupts via tha Application Programming Interface library routines.
         //
@@ -154,18 +150,33 @@ var TSOS;
             _PID++;
             var pid = _PID;
             var process = new TSOS.PCB(pBase, pid);
-            // put pcb on ready queue
+            // put process on ready queue
             _ResidentQueue.enqueue(process);
             // update process table
-            // _PCB.addProcessTable(process);
             TSOS.Control.addProcessTable(process);
             return pid;
+        };
+        Kernel.prototype.krnExecuteProcess = function () {
+            // only one process in ready queue for now
+            _ReadyQueue.enqueue(_ResidentQueue.dequeue());
+            // start CPU
+            _CPU.isExecuting = true;
         };
         Kernel.prototype.krnExitProcess = function () {
             // exit process upon completion
             // clear partion starting from base 0
             _MemoryManager.clearPartition(0);
             TSOS.Control.removeProcessTable();
+        };
+        Kernel.prototype.userPrgError = function (opCode) {
+            // When user program entry is not a valid op ocde
+            _StdOut.putText("Error. Op code " + opCode + " does not exist.");
+            _StdOut.advanceLine();
+            _OsShell.putPrompt();
+        };
+        Kernel.prototype.processPrint = function (text) {
+            // When user program makes system call to print to canvas
+            _StdOut.putText(text);
         };
         // - WaitForProcessToExit
         // - CreateFile

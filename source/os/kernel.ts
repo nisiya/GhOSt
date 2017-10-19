@@ -93,7 +93,12 @@ module TSOS {
                 var interrupt = _KernelInterruptQueue.dequeue();
                 this.krnInterruptHandler(interrupt.irq, interrupt.params);
             } else if (_CPU.isExecuting) { // If there are no interrupts then run one CPU cycle if there is anything being processed. {
-                _CPU.cycle();
+                if(!_singleMode){
+                    _CPU.cycle();
+                } else {
+                    // enable next button in single step mode
+                    Control.hostBtnNext_onOff();
+                }
             } else {                      // If there are no interrupts and there is nothing being executed then just be idle. {
                 this.krnTrace("Idle");
             }
@@ -149,18 +154,6 @@ module TSOS {
 
         }
 
-        public userPrgError(opCode){
-            // When user program entry is not a valid op ocde
-            _StdOut.putText("Error. Op code " + opCode + " does not exist.");
-            _StdOut.advanceLine();
-            _OsShell.putPrompt();
-        }
-
-        public processPrint(chr){
-            // When user program makes system call to print to canvas
-            _StdOut.putText(chr);
-        }
-
         //
         // System Calls... that generate software interrupts via tha Application Programming Interface library routines.
         //
@@ -175,12 +168,18 @@ module TSOS {
             _PID++;
             var pid = _PID;            
             var process = new PCB(pBase, pid);
-            // put pcb on ready queue
+            // put process on ready queue
             _ResidentQueue.enqueue(process);
             // update process table
-            // _PCB.addProcessTable(process);
             Control.addProcessTable(process);
             return pid;
+        }
+
+        public krnExecuteProcess(){
+            // only one process in ready queue for now
+            _ReadyQueue.enqueue(_ResidentQueue.dequeue());
+            // start CPU
+            _CPU.isExecuting = true;
         }
 
         public krnExitProcess(){
@@ -189,6 +188,19 @@ module TSOS {
             _MemoryManager.clearPartition(0);
             Control.removeProcessTable();
         }
+
+        public userPrgError(opCode){
+            // When user program entry is not a valid op ocde
+            _StdOut.putText("Error. Op code " + opCode + " does not exist.");
+            _StdOut.advanceLine();
+            _OsShell.putPrompt();
+        }
+
+        public processPrint(text){
+            // When user program makes system call to print to canvas
+            _StdOut.putText(text);
+        }
+
         // - WaitForProcessToExit
         // - CreateFile
         // - OpenFile

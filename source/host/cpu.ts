@@ -62,11 +62,6 @@ module TSOS {
             if(this.isExecuting){
                 Control.updateProcessTable(this.PC, this.IR, this.Acc, this.Xreg, this.Yreg, this.Zflag);
             }
-
-            // if single stepping then stop after executing one instruction
-            if(_isSingle) {
-                this.isExecuting = false;
-            }
         }
 
         public fetch(PC) {
@@ -159,12 +154,11 @@ module TSOS {
                     case "00":
                         // stop
                         _Kernel.krnExitProcess();
-                        if (_isSingle){
-                            Control.hostBtnNext_onOff();                        
-                        }
                         // reset CPU
                         this.init();
                         Control.updateCPUTable(this);
+                        // disable next button
+                        Control.hostBtnNext_onOff();                        
                         break;
 
                     // compare a byte in memory to the X reg
@@ -211,23 +205,23 @@ module TSOS {
                         #$02 in x reg = print 00-terminated string stored at
                                         address in y reg */
                     case "FF":
-                        var str: string = "";
+                        var text: string = "";
                         if (this.Xreg == 1){
-                            str = this.Yreg.toString();
+                            text = this.Yreg.toString();
                         } else if (this.Xreg == 2){
                             addr = this.Yreg.toString(16);
                             index = parseInt(addr, 16);
                             data = parseInt(this.fetch(index), 16);
                             var chr: string = String.fromCharCode(data);                    
                             while (data != 0){
-                                str = str + chr;
+                                text = text + chr;
                                 index++;
                                 data = parseInt(this.fetch(index), 16);     
                                 chr = String.fromCharCode(data);                              
                             }  
                         }
                         // call Kernel to print to canvas
-                        _KernelInterruptQueue.enqueue(new Interrupt(PROCESS_PRINT_IRQ, str));                        
+                        _KernelInterruptQueue.enqueue(new Interrupt(PROCESS_PRINT_IRQ, text));                        
                         this.PC++;
                         break;
 
