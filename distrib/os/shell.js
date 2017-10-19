@@ -73,7 +73,10 @@ var TSOS;
             sc = new TSOS.ShellCommand(this.shellMeow, "meow", "- Flushes the toilet. [audio warning]");
             this.commandList[this.commandList.length] = sc;
             // load
-            sc = new TSOS.ShellCommand(this.shellLoad, "load", "- Validates the user code in user program input.");
+            sc = new TSOS.ShellCommand(this.shellLoad, "load", "- Validates and loads user program input into memory.");
+            this.commandList[this.commandList.length] = sc;
+            // run
+            sc = new TSOS.ShellCommand(this.shellRun, "run", "- <pid> - Runs the process with the id.");
             this.commandList[this.commandList.length] = sc;
             // welp
             sc = new TSOS.ShellCommand(this.shellWelp, "welp", "- Displays BSOD when the kernel traps an OS error.");
@@ -292,9 +295,11 @@ var TSOS;
                         break;
                     // load
                     case "load":
-                        _StdOut.putText("Load validates the user input in the User Program Input ");
-                        _StdOut.advanceLine();
-                        _StdOut.putText("box.");
+                        _StdOut.putText("Validates and loads the 6502a op codes in User Program Input.");
+                        break;
+                    // run <pid>
+                    case "run":
+                        _StdOut.putText("Runs the process with id <pid>.");
                         break;
                     // welp
                     case "welp":
@@ -356,7 +361,7 @@ var TSOS;
         };
         // date
         Shell.prototype.shellDate = function (args) {
-            var currDate = _Date + " " + _Time;
+            var currDate = _Datetime;
             _StdOut.putText(currDate);
         };
         // whereami
@@ -373,19 +378,59 @@ var TSOS;
             audio.play();
             _StdOut.putText("He's a cat~ Meow~ Flushing the toliet~");
         };
-        //load
+        // load
         Shell.prototype.shellLoad = function (args) {
             // gets text of textarea
-            var userIn = document.getElementById("taProgramInput").value;
-            // checks if text only contains hex decimals and spaces
+            var userProgram = document.getElementById("taProgramInput").value;
+            // remove line breaks and extra spaces
+            userProgram = userProgram.replace(/(\r\n|\n|\r)/gm, "");
+            // checks if text only contains hex decimals and spaces and is not empty
             var valText = /^[a-f\d\s]+$/i;
-            if (valText.test(userIn)) {
-                _StdOut.putText("Your input is valid.");
+            if (valText.test(userProgram)) {
+                var inputOpCodes = userProgram.split(" ");
+                if (inputOpCodes.length > 256) {
+                    _StdOut.putText("Process is too big for memory.");
+                }
+                else {
+                    // base register value from when memory was loaded
+                    var baseReg = _MemoryManager.loadMemory(inputOpCodes);
+                    if (baseReg == 999) {
+                        _StdOut.putText("Memory is full. Please run the current process then load more.");
+                    }
+                    else {
+                        var pid = _Kernel.krnCreateProcess(baseReg);
+                        _StdOut.putText("Process id: " + pid + " is in Resident Queue");
+                    }
+                }
+            }
+            else if (userProgram == "") {
+                _StdOut.putText("Please enter 6502a op codes in the input area below.");
             }
             else {
-                _StdOut.putText("Only hex digits and spaces are allowed. Please enter a new");
-                _StdOut.advanceLine();
-                _StdOut.putText("code.");
+                _StdOut.putText("Only hex digits and spaces are allowed. Please enter a new set of codes.");
+            }
+        };
+        // run <pid>
+        Shell.prototype.shellRun = function (args) {
+            var valText = /^\d*$/;
+            // validate input for integer
+            if (valText.test(args) && args != "") {
+                // check if there are processes to be run
+                if (_ResidentQueue.isEmpty()) {
+                    _StdOut.putText("No process is loaded in memory.");
+                }
+                else if (args != _PID) {
+                    // check if value matches current pid
+                    _StdOut.putText("No process with id: " + args);
+                }
+                else {
+                    // only one process in ready queue for now
+                    _ReadyQueue.enqueue(_ResidentQueue.dequeue());
+                    _CPU.isExecuting = true;
+                }
+            }
+            else {
+                _StdOut.putText("Please enter an integer for process id after run command.");
             }
         };
         // welp aka BSOD

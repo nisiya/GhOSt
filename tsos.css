@@ -1,7 +1,7 @@
 /* TSOS.css */
 
 body {
-  background: #909193 url(distrib/images/grey.jpg);
+  /* background: #909193 url(distrib/images/grey.jpg); */
   font-family: Helvetica, Verdana, Arial, sans-serif;
   font-size: 12pt;
   font-weight: normal;
@@ -71,13 +71,27 @@ textarea{
   background-image: url(distrib/images/ghostRed.png);
 }
 
-text{
-  color: #FFFFFF;
-  font-weight: normal;
+#btnSingle {
+  background-image: url(distrib/images/single1.png);
+  background-color: transparent;
+  background-repeat: no-repeat;
+  background-size: 100px;
+  border: none;  
+  width: 100px;  
 }
 
-label {
-  color: #FEF200;
+#btnNext {
+  background-image: url(distrib/images/next1.png);
+  background-color: transparent;
+  background-repeat: no-repeat;
+  background-size: 25px;
+  border: none;  
+  width: 40px;  
+}
+
+text {
+  color: #FFFFFF;
+  font-weight: normal;
 }
 
 table {
@@ -87,6 +101,65 @@ table {
 #mainContent {
   border-spacing: 10px;
   border-collapse: separate;
+  /* border: 1px solid #FEF200; */
+}
+
+#mainContent th {
+  vertical-align: top;
+}
+
+.tableContainer {
+  border: 2px solid black;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  white-space: nowrap;
+  background-color: white;
+}
+
+#cpuContainer {
+  width: 327px;
+  height: 60px;
+  border: 2px solid black;
+  background-color: white;  
+}
+
+#memoryContainer {
+  width: 330px;
+  height: 140px;
+}
+
+#pcbContainer{
+  width: 400px;
+  height: 115px;
+}
+
+#tbMemory{
+  color: black;
+  font-weight: normal;
+  font-family: Courier New, Courier, monospace;  
+  width: 100%;
+  text-align: center; 
+  border-collapse: collapse;
+  padding: 5px; 
+  /* border-bottom: 1px solid #666666;   */
+}
+
+table#tbMemory tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+table#tbProcess tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+#tbCPU, #tbProcess{
+  color: black;
+  font-family: Courier New, Courier, monospace;
+  font-weight: normal;
+  width: 100%;
+  text-align: center;  
+  border-collapse: collapse;
+  table-layout: fixed;
 }
 
 .footerText {
@@ -94,4 +167,46 @@ table {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 8pt;
   text-align: center;
+}
+
+.fullscreen-bg {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  overflow: hidden;
+  z-index: -100;
+}
+
+.fullscreen-bg__video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+@media (min-aspect-ratio: 16/9) {
+  .fullscreen-bg__video {
+    height: 300%;
+    top: -100%;
+  }
+}
+
+@media (max-aspect-ratio: 16/9) {
+  .fullscreen-bg__video {
+    width: 300%;
+    left: -100%;
+  }
+}
+
+@media (max-width: 767px) {
+  .fullscreen-bg {
+    background: url('distrib/images/grey.jpg') center center / cover no-repeat;
+  }
+
+  .fullscreen-bg__video {
+    display: none;
+  }
 }

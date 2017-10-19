@@ -1,9 +1,21 @@
 <!DOCTYPE HTML>
 <html>
 <head>
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-   <meta name="author"             content="Alan G. Labouseur" />
+   <meta name="author"             content="Alan G. Labouseur and Wendy Ni" />
    <link rel="stylesheet" href="tsos.css" type="text/css" media="screen" />
+   <!-- Bootstrap core CSS -->
+   <link href="style/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  
+      <!-- Custom fonts for this template -->
+      <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
+      <link href="https://fonts.googleapis.com/css?family=Josefin+Slab:100,300,400,600,700,100italic,300italic,400italic,600italic,700italic" rel="stylesheet" type="text/css">
+  
+      <!-- Custom styles for this template -->
+      <link href="style/css/style.css" rel="stylesheet">
+
    <title>
       ghOSt - a browser-based virtual Operating System in TypeScript
    </title>
@@ -15,6 +27,7 @@
    <script type="text/javascript" src="distrib/host/control.js"></script>
    <script type="text/javascript" src="distrib/host/devices.js"></script>
    <script type="text/javascript" src="distrib/host/cpu.js"></script>
+   <script type="text/javascript" src="distrib/host/memory.js"></script>
 
    <!-- Virtual OS Routines: Make sure Kernel code is last, since it needs those above it. -->
    <script type="text/javascript" src="distrib/os/interrupt.js"></script>
@@ -27,110 +40,219 @@
    <script type="text/javascript" src="distrib/os/shellCommand.js"></script>
    <script type="text/javascript" src="distrib/os/userCommand.js"></script>
    <script type="text/javascript" src="distrib/os/kernel.js"></script>
+   <script type="text/javascript" src="distrib/os/pcb.js"></script>
+   <script type="text/javascript" src="distrib/os/memoryManager.js"></script>
 
    <!-- Other Routines -->
    <script type="text/javascript" src="distrib/utils.js"></script>
    <!-- Uncomment the line below to enable GLaDOS testing. -->
-   <script type="text/javascript" src="http://alanclasses.github.io/TSOS/test/glados-ip0.js"></script>
+   <script type="text/javascript" src="http://alanclasses.github.io/TSOS/test/glados-ip2.js"></script>
    
 </head>
 
 <body onload="onDocumentLoad()">
+  <!-- background video for future-->
+  <!-- <div class="fullscreen-bg">
+    <video loop muted poster="distrib/images/grey.jpg" class="fullscreen-bg__video">
+        <source src="distrib/video/pacmanGame.mp4" type="video/mp4">
+    </video>
+  </div> -->
 
-<div id="divMain" style="width:100%;">
-  <img src="distrib/images/title.png" alt="title" style="padding:10px;">
-  <div id="divButtonBar" style="margin:4px;">      
-    <table id="headContent">
+  <!-- time, time and status -->
+  <div class="tagline-upper text-center text-heading text-shadow text-white mt-5 d-none d-lg-block">  
+      <img src="distrib/images/title.png" alt="title" style="padding:10px;">
+  </div>
+  <div class="tagline-lower text-center text-expanded text-shadow text-uppercase text-white mb-5 d-none d-lg-block">
+      <text id="clock"> </text><br />
+      <text id="usrStatus"> <b>Status: </b> I Lurve Operating Systems </text>
+  </div>
+
+  <div id="divMain" style="width:100%;">
+      <div class="navbar-expand-lg navbar-light bg-faded">
+        <div id="divButtonBar" style="margin:4px;">      
+          <table id="headContent">
+            <tr>
+              <th>
+                  <input type="button"
+                        id = "btnStartOS"
+                        name="brnStartOS"
+                        class="normal_button"
+                        value=""
+                        title="Start"
+                        tabindex="0"
+                        onclick="TSOS.Control.hostBtnStartOS_click(this);">
+
+                  <input type="button"
+                        id = "btnHaltOS"
+                        name="brnHaltOS"
+                        class="normal_button stop_button"
+                        disabled="disabled"
+                        value=""
+                        title="Halt"
+                        tabindex="1"
+                        onclick="TSOS.Control.hostBtnHaltOS_click(this);">
+
+                  <input type="button"
+                        id = "btnReset"
+                        name="brnReset"
+                        class="normal_button stop_button"
+                        disabled="disabled"
+                        value=""
+                        title="Reset"
+                        tabindex="2"
+                        onclick="TSOS.Control.hostBtnReset_click(this);">
+                
+                  <input type="button"
+                        id = "btnSingle"
+                        name="btnSingle"
+                        disabled="disabled"
+                        value=""
+                        title="Single"
+                        tabindex="3"
+                        onclick="TSOS.Control.hostBtnSingle_click(this);">
+                  
+                  <input type="button"
+                        id = "btnNext"
+                        name="btnNext"
+                        disabled="disabled"
+                        value=""
+                        title="Next"
+                        tabindex="4"
+                        onclick="TSOS.Control.hostBtnNext_click(this);">
+              </th>
+            </tr>
+          </table>
+        </div>
+      </div>
+      
+    <table id="mainContent">    
       <tr>
         <th>
-            <input type="button"
-                  id = "btnStartOS"
-                  name="brnStartOS"
-                  class="normal_button"
-                  value=""
-                  title="Start"
-                  tabindex="0"
-                  onclick="TSOS.Control.hostBtnStartOS_click(this);">
-
-            <input type="button"
-                  id = "btnHaltOS"
-                  name="brnHaltOS"
-                  class="normal_button stop_button"
-                  disabled="disabled"
-                  value=""
-                  title="Halt"
-                  tabindex="1"
-                  onclick="TSOS.Control.hostBtnHaltOS_click(this);">
-
-            <input type="button"
-                  id = "btnReset"
-                  name="brnReset"
-                  class="normal_button stop_button"
-                  disabled="disabled"
-                  value=""
-                  title="Reset"
-                  tabindex="2"
-                  onclick="TSOS.Control.hostBtnReset_click(this);">
+            <div id="divConsole" class="bg-faded p-3 my-4">
+              <label>
+                Console
+                <br>
+                <canvas id="display"
+                      width="500px"
+                      height="500px"
+                      tabindex="3"
+                      style="margin-left:8px;"
+                        >
+                </canvas>
+              </label>
+            </div>                              
         </th>
         <th>
-          <text id="clock"> </text><br />
-          <text id="usrStatus"> <b>Status: </b> I Lurve Operating Systems </text>
+          <div id="divLog" class="bg-faded p-3 my-4">
+            <label>
+                Host Log
+                <br>
+                <textarea name="taHostLog"
+                          id  ="taHostLog"
+                          rows="5"
+                          cols="40"
+                ></textarea>
+            </label>
+          </div>
+          <div id="divCPU" class="bg-faded p-3 my-4">
+              <label>
+                CPU 
+                <br>
+                <div id="cpuContainer">
+                  <table name = "tbCPU"
+                        id   = "tbCPU">
+                    <thead>
+                      <tr style="border-bottom: 1px solid #666666;">
+                        <th> PC </th>
+                        <th> IR </th>
+                        <th> ACC </th>
+                        <th> X </th>
+                        <th> Y </th>
+                        <th> Z </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td id="cPC"> 0 </td>
+                        <td id="cIR"> 0 </td>
+                        <td id="cACC"> 0 </td>
+                        <td id="cX"> 0 </td>
+                        <td id="cY"> 0 </td>
+                        <td id="cZ"> 0 </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>                
+              </label>
+            </div>
+            <div id="divMemory" class="bg-faded p-3 my-4">
+              <label>
+                  Memory
+                  <br>
+                  <div class="tableContainer" id="memoryContainer">
+                  </div>
+              </label>
+            </div>
+        </th>
+        <th>
+          <div id="divUserProgramInput" class="bg-faded p-3 my-4">
+            <label>
+                User Program Input
+                <br>
+                <textarea name="taProgramInput"
+                          id  ="taProgramInput"
+                          rows="5"
+                          cols="47"
+                >A9 11</textarea>
+            </label>
+          </div>
+          <div id="divPCB" class="bg-faded p-3 my-4">
+            <label>
+                Processes
+                <br>
+                <div class="tableContainer" id="pcbContainer">
+                    <table name = "tbProcess"
+                          id   = "tbProcess">
+                    <thead>
+                      <tr style="border-bottom: 1px solid #666666;">
+                        <th width="10%"> PID </th>                            
+                        <th> PC </th>
+                        <th> IR </th>
+                        <th> ACC </th>
+                        <th> X </th>
+                        <th> Y </th>
+                        <th> Z </th>
+                        <th width="20%"> State </th>
+                        <th width="25%"> Location </th>                          
+                      </tr>
+                    </thead>
+                    <tbody id="processTbody">
+                    </tbody>
+                  </table>
+                </div>
+            </label>
+          </div>
         </th>
       </tr>
     </table>
   </div>
-      
-  <table id="mainContent">    
-    <tr>
-      <th>
-        <div id="divConsole" style="margin:4px; width:500px; height:500px; float:left;">
-          <label>
-            Console
-            <canvas id="display"
-                  width="500px"
-                  height="500px"
-                  tabindex="3"
-                    >
-            </canvas>
-          <label>
-        </div>
-      </th>
-      <th>
-        <div id="divLog" style="margin-left:0px;">
-          <label>
-              Host Log
-              <br>
-              <textarea name="taHostLog"
-                        id  ="taHostLog"
-                        rows="26"
-                        cols="48"
-              ></textarea>
-          </label>
-        </div>
 
-        <div id="divUserProgramInput" style="margin-left:0px;">
-          <label>
-              User Program Input
-              <br>
-              <textarea name="taProgramInput"
-                        id  ="taProgramInput"
-                        rows="8"
-                        cols="48"
-              >A9 A9 A2 01 EC 13 00 AC 0B 00 8D 14 00 EE 0B 00 D0 F5 00 00</textarea>
-          </label>
-        </div>
-      </th>
-    </tr> 
-  </table>
-</div>
+<footer class="bg-faded text-center">
+    <div class="container">
+      <p class="m-0">
+          <br>
+          Copyright &copy; 2008 - 2017 No Rights Reserved.
+          <br>
+          Reproduction is inhibited without the express written consent of
+          Ted Codd, Stevie Ray Vaughan, and Ian Fleming.
+      </p>
+    </div>
+  </footer>
 
-<p class="footerText" style="clear:both;">
-   <br>
-   Copyright &copy; 2008 - 2016 No Rights Reserved.
-   <br>
-   Reproduction is inhibited without the express written consent of
-   Ted Codd, Stevie Ray Vaughan, and Ian Fleming.
-</p>
+<!-- Bootstrap core JavaScript -->
+<script src="style/vendor/jquery/jquery.min.js"></script>
+<script src="style/vendor/popper/popper.min.js"></script>
+<script src="style/vendor/bootstrap/js/bootstrap.min.js"></script>
 
 </body>
 </html>

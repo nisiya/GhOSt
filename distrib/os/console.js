@@ -57,6 +57,7 @@ var TSOS;
                     this.prevCmd.push(this.buffer);
                     // ... and reset our buffer.
                     this.buffer = "";
+                    this.updown = 0;
                 }
                 else if (chr === String.fromCharCode(8)) {
                     // delete a character
@@ -94,7 +95,6 @@ var TSOS;
                                 this.matchCmd.push(_OsShell.commandList[i].command);
                             }
                         }
-                        console.log(this.matchCmd.length);
                         this.matchIndex = 0;
                     }
                     if (this.matchCmd.length > 0) {
@@ -136,7 +136,6 @@ var TSOS;
                 var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, text);
                 this.currentXPosition = this.currentXPosition + offset;
             }
-            // console.log(this.currentXPosition);
         };
         Console.prototype.removeChr = function (chr) {
             if (this.buffer !== "") {
@@ -160,12 +159,6 @@ var TSOS;
                     _DrawingContext.fontDescent(this.currentFont, this.currentFontSize));
                 // offset is the width of the rectangle
                 _DrawingContext.clearRect(this.currentXPosition, chrTop, offset, chrHeight);
-                // console.log(this.currentXPosition);
-                // save for future debugging
-                // console.log(chrHeight + "," + chrTop)
-                // _DrawingContext.beginPath();
-                // _DrawingContext.rect(this.currentXPosition, chrTop , offset, chrHeight);
-                // _DrawingContext.stroke();
                 // remove chr from buffer
                 var newBuffer = this.buffer.substring(0, this.buffer.length - 1);
                 this.buffer = newBuffer;
@@ -187,25 +180,26 @@ var TSOS;
              * Font descent measures from the baseline to the lowest point in the font.
              * Font height margin is extra spacing between the lines.
              */
+            var saveYPosition = this.currentYPosition;
             this.currentYPosition += _DefaultFontSize +
                 _DrawingContext.fontDescent(this.currentFont, this.currentFontSize) +
                 _FontHeightMargin;
             // TODO: Handle scrolling. (iProject 1)
             if (this.currentYPosition > _Canvas.height) {
                 // keep track of position of last line
-                var saveYPosition = this.currentYPosition;
                 // start copying after first line which will "scroll up"
-                var copyYPostion = this.currentYPosition - _Canvas.height;
+                var startYPostion = _DefaultFontSize +
+                    _DrawingContext.fontDescent(this.currentFont, this.currentFontSize) +
+                    _FontHeightMargin;
+                var copyHeight = _Canvas.height - startYPostion - _DrawingContext.fontDescent(this.currentFont, this.currentFontSize);
                 // save screenshot
-                var imgData = _DrawingContext.getImageData(0, copyYPostion, _Canvas.width, _Canvas.height);
-                // use below for debugging
-                // console.log(imgData);
+                var imgData = _DrawingContext.getImageData(0, startYPostion, _Canvas.width, copyHeight);
                 // clear screen
                 this.init();
                 // put screenshot to top of screen
                 _DrawingContext.putImageData(imgData, 0, 0);
                 // put cursor back to correct
-                this.currentYPosition = saveYPosition - copyYPostion - _FontHeightMargin;
+                this.currentYPosition = saveYPosition;
             }
         };
         return Console;

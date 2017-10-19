@@ -1,10 +1,12 @@
 ///<reference path="../globals.ts" />
 ///<reference path="queue.ts" />
+///<reference path="pcb.ts" />
 /* ------------
      Kernel.ts
 
      Requires globals.ts
               queue.ts
+              pcb.ts
 
      Routines for the Operating System, NOT the host.
 
@@ -25,6 +27,8 @@ var TSOS;
             _KernelInterruptQueue = new TSOS.Queue(); // A (currently) non-priority queue for interrupt requests (IRQs).
             _KernelBuffers = new Array(); // Buffers... for the kernel.
             _KernelInputQueue = new TSOS.Queue(); // Where device input lands before being processed out somewhere.
+            _ResidentQueue = new TSOS.Queue(); // Where loaded process reside
+            _ReadyQueue = new TSOS.Queue(); // Where process are ready to run sit
             // Initialize the console.
             _Console = new TSOS.Console(); // The command line interface / console I/O device.
             _Console.init();
@@ -38,7 +42,8 @@ var TSOS;
             this.krnTrace(_krnKeyboardDriver.status);
             //
             // ... more?
-            //
+            // Launch memory manager
+            _MemoryManager = new TSOS.MemoryManager();
             // Enable the OS Interrupts.  (Not the CPU clock interrupt, as that is done in the hardware sim.)
             this.krnTrace("Enabling the interrupts.");
             this.krnEnableInterrupts();
@@ -54,6 +59,7 @@ var TSOS;
         Kernel.prototype.krnShutdown = function () {
             this.krnTrace("begin shutdown OS");
             // TODO: Check for running processes.  If there are some, alert and stop. Else...
+            _CPU.isExecuting = false;
             // ... Disable the Interrupts.
             this.krnTrace("Disabling the interrupts.");
             this.krnDisableInterrupts();
@@ -111,6 +117,12 @@ var TSOS;
                     _krnKeyboardDriver.isr(params); // Kernel mode device driver
                     _StdIn.handleInput();
                     break;
+                case PROCESS_ERROR_IRQ:
+                    this.userPrgError(params);
+                    break;
+                case PROCESS_PRINT_IRQ:
+                    this.processPrint(params);
+                    break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
             }
@@ -119,14 +131,42 @@ var TSOS;
             // The built-in TIMER (not clock) Interrupt Service Routine (as opposed to an ISR coming from a device driver). {
             // Check multiprogramming parameters and enforce quanta here. Call the scheduler / context switch here if necessary.
         };
+        Kernel.prototype.userPrgError = function (opCode) {
+            // When user program entry is not a valid op ocde
+            _StdOut.putText("Error. Op code " + opCode + " does not exist.");
+            _StdOut.advanceLine();
+            _OsShell.putPrompt();
+        };
+        Kernel.prototype.processPrint = function (chr) {
+            // When user program makes system call to print to canvas
+            _StdOut.putText(chr);
+        };
         //
         // System Calls... that generate software interrupts via tha Application Programming Interface library routines.
         //
         // Some ideas:
         // - ReadConsole
         // - WriteConsole
-        // - CreateProcess
-        // - ExitProcess
+        Kernel.prototype.krnCreateProcess = function (pBase) {
+            // Creates process when it is loaded into memory
+            // base register value retrieved from loading process into memory
+            // pid incremented upon creation
+            _PID++;
+            var pid = _PID;
+            var process = new TSOS.PCB(pBase, pid);
+            // put pcb on ready queue
+            _ResidentQueue.enqueue(process);
+            // update process table
+            // _PCB.addProcessTable(process);
+            TSOS.Control.addProcessTable(process);
+            return pid;
+        };
+        Kernel.prototype.krnExitProcess = function () {
+            // exit process upon completion
+            // clear partion starting from base 0
+            _MemoryManager.clearPartition(0);
+            TSOS.Control.removeProcessTable();
+        };
         // - WaitForProcessToExit
         // - CreateFile
         // - OpenFile
@@ -155,9 +195,7 @@ var TSOS;
         Kernel.prototype.krnTrapError = function (msg) {
             TSOS.Control.hostLog("OS ERROR - TRAP: " + msg);
             // TODO: Display error on console, perhaps in some sort of colored screen. (Maybe blue?)
-            _StdOut.putText("BSOD. You know what it means. Buy Some Organic ");
-            _StdOut.advanceLine();
-            _StdOut.putText("Donuts. Well you can, I prefer matcha ones.");
+            _StdOut.putText("BSOD. You know what it means. Buy Some Organic Donuts. Well you can, I prefer matcha ones.");
             this.krnShutdown();
         };
         return Kernel;
