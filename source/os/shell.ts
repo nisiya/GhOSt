@@ -511,7 +511,12 @@ module TSOS {
                 } else{
                     // only one process in ready queue for now
                     _ReadyQueue.enqueue(_ResidentQueue.dequeue());
-                    _CPU.isExecuting = true;
+                    // check if single stepping
+                    if (!_isSingle){
+                        _CPU.isExecuting = true;
+                    } else{
+                        Control.hostBtnNext_onOff();
+                    }
                 }
             } else {
                 _StdOut.putText("Please enter an integer for process id after run command.");

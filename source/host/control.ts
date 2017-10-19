@@ -260,6 +260,10 @@ module TSOS {
             _Memory = new Memory();  // one memory for now
             _Memory.init();  
 
+            // ... Create and initialize the Memory Accessor
+            _MemoryAccessor = new MemoryAccessor();
+            _MemoryAccessor.init();
+
             // ... then set the host clock pulse ...
             _hardwareClockID = setInterval(Devices.hostClockPulse, CPU_CLOCK_INTERVAL);
             // .. and call the OS Kernel Bootstrap routine.
@@ -286,14 +290,30 @@ module TSOS {
         }
 
         public static hostBtnSingle_click(btn): void {
-            btn.style.backgroundImage = "url(distrib/images/single2.png)";
-            (<HTMLButtonElement>document.getElementById("btnNext")).disabled = false;
-            document.getElementById("btnNext").style.backgroundImage = "url(distrib/images/next.png)";            
-            
+            _isSingle = !(_isSingle);
+            if (_isSingle){ // ready to mingle ;) 
+                btn.style.backgroundImage = "url(distrib/images/single2.png)";         
+            } else {
+                btn.style.backgroundImage = "url(distrib/images/single1.png)";
+                (<HTMLButtonElement>document.getElementById("btnNext")).disabled = true;
+                document.getElementById("btnNext").style.backgroundImage = "url(distrib/images/next1.png)";  
+            }
         }
 
+        // click = 1 CPU cycle
         public static hostBtnNext_click(btn): void {
-            
+            _CPU.isExecuting = true;
+        }
+
+        // on only if process is available to run
+        public static hostBtnNext_onOff(): void {
+            var btnState = (<HTMLButtonElement>document.getElementById("btnNext")).disabled;
+            (<HTMLButtonElement>document.getElementById("btnNext")).disabled = !btnState; 
+            if (btnState){
+                document.getElementById("btnNext").style.backgroundImage = "url(distrib/images/next.png)";            
+            } else {
+                document.getElementById("btnNext").style.backgroundImage = "url(distrib/images/next1.png)";                   
+            }
         }
     }
 }

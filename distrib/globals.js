@@ -23,8 +23,9 @@ var PROCESS_PRINT_IRQ = 3;
 // TODO: Make a global object and use that instead of the "_" naming convention in the global namespace.
 //
 var _CPU; // Utilize TypeScript's type annotation system to ensure that _CPU is an instance of the Cpu class.
-var _Memory;
-var _MemoryManager;
+var _Memory; // same with Memory
+var _MemoryAccessor; // and Memory Accessor
+var _MemoryManager; // and Memory Manager
 var _OSclock = 0; // Page 23.
 var _Mode = 0; // (currently unused)  0 = Kernel Mode, 1 = User Mode.  See page 21.
 var _Canvas; // Initialized in Control.hostInit().
@@ -41,6 +42,7 @@ var _KernelBuffers = null; // when clearly 'any' is not what we want. There is l
 var _ResidentQueue;
 var _ReadyQueue;
 var _PID = -1; // keep track of process ids
+var _isSingle = false;
 // Standard input and output
 var _StdIn; // Same "to null or not to null" issue as above.
 var _StdOut;

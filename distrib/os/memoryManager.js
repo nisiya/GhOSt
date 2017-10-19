@@ -12,24 +12,24 @@ var TSOS;
         MemoryManager.prototype.loadMemory = function (inputOpCodes) {
             var baseReg;
             // check if memory is full and return the base of free partition
-            if (_Memory.memoryP1) {
+            if (_Memory.memoryS1) {
                 // memory is full
                 baseReg = 999;
                 // for iPj3
-                // if(_Memory.memoryP2){
-                //     if(_Memory.memoryP3){
+                // if(_Memory.memoryS2){
+                //     if(_Memory.memoryS3){
                 //         _StdOut.putText("Memory is full. Please wait to load");
                 //     } else{
-                //         _Memory.memoryP3 = true;
+                //         _Memory.memoryS3 = true;
                 //         baseReg = 512;
                 //     }
                 // } else{
-                //     _Memory.memoryP2 = true; 
+                //     _Memory.memoryS2 = true; 
                 //     baseReg = 256;
                 // }
             }
             else {
-                _Memory.memoryP1 = true;
+                _Memory.memoryS1 = true;
                 baseReg = 0;
             }
             // load user program into memory
@@ -56,7 +56,7 @@ var TSOS;
                 _Memory.memory[i] = "00";
             }
             if (baseReg == 0) {
-                _Memory.memoryP1 = false;
+                _Memory.memoryS1 = false;
             } // add other partitions later
             TSOS.Control.updateMemoryTable(baseReg);
         };

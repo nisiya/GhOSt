@@ -55,11 +55,15 @@ var TSOS;
             var opCode = this.fetch(this.PC);
             this.IR = opCode;
             // decode then execute the op codes
-            this.decodeExecute(opCode);
+            this.decodeExecute(this.IR);
             // update display tables
             TSOS.Control.updateCPUTable(this);
             if (this.isExecuting) {
                 TSOS.Control.updateProcessTable(this.PC, this.IR, this.Acc, this.Xreg, this.Yreg, this.Zflag);
+            }
+            // if single stepping then stop after executing one instruction
+            if (_isSingle) {
+                this.isExecuting = false;
             }
         };
         Cpu.prototype.fetch = function (PC) {
@@ -140,6 +144,9 @@ var TSOS;
                     case "00":
                         // stop
                         _Kernel.krnExitProcess();
+                        if (_isSingle) {
+                            TSOS.Control.hostBtnNext_onOff();
+                        }
                         // reset CPU
                         this.init();
                         TSOS.Control.updateCPUTable(this);
