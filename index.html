@@ -28,6 +28,8 @@
    <script type="text/javascript" src="distrib/host/devices.js"></script>
    <script type="text/javascript" src="distrib/host/cpu.js"></script>
    <script type="text/javascript" src="distrib/host/memory.js"></script>
+   <script type="text/javascript" src="distrib/host/memoryAccessor.js"></script>
+   
 
    <!-- Virtual OS Routines: Make sure Kernel code is last, since it needs those above it. -->
    <script type="text/javascript" src="distrib/os/interrupt.js"></script>
@@ -46,7 +48,7 @@
    <!-- Other Routines -->
    <script type="text/javascript" src="distrib/utils.js"></script>
    <!-- Uncomment the line below to enable GLaDOS testing. -->
-   <script type="text/javascript" src="http://alanclasses.github.io/TSOS/test/glados-ip2.js"></script>
+   <!-- <script type="text/javascript" src="http://alanclasses.github.io/TSOS/test/glados-ip2.js"></script> -->
    
 </head>
 
@@ -73,6 +75,7 @@
           <table id="headContent">
             <tr>
               <th>
+                  <label class="btnLabel">
                   <input type="button"
                         id = "btnStartOS"
                         name="brnStartOS"
@@ -81,7 +84,9 @@
                         title="Start"
                         tabindex="0"
                         onclick="TSOS.Control.hostBtnStartOS_click(this);">
+                  </label>
 
+                  <label class="btnLabel">
                   <input type="button"
                         id = "btnHaltOS"
                         name="brnHaltOS"
@@ -91,7 +96,9 @@
                         title="Halt"
                         tabindex="1"
                         onclick="TSOS.Control.hostBtnHaltOS_click(this);">
-
+                  </label>
+                   
+                  <label class="btnLabel">
                   <input type="button"
                         id = "btnReset"
                         name="brnReset"
@@ -101,7 +108,9 @@
                         title="Reset"
                         tabindex="2"
                         onclick="TSOS.Control.hostBtnReset_click(this);">
-                
+                  </label>
+                  
+                  <label class="btnLabel">
                   <input type="button"
                         id = "btnSingle"
                         name="btnSingle"
@@ -110,7 +119,9 @@
                         title="Single"
                         tabindex="3"
                         onclick="TSOS.Control.hostBtnSingle_click(this);">
-                  
+                  </label>
+
+                  <label class="btnLabel">
                   <input type="button"
                         id = "btnNext"
                         name="btnNext"
@@ -119,6 +130,7 @@
                         title="Next"
                         tabindex="4"
                         onclick="TSOS.Control.hostBtnNext_click(this);">
+                  </label>
               </th>
             </tr>
           </table>

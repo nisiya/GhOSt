@@ -228,6 +228,9 @@ var TSOS;
             // ... Create and initialize the Memory (yup part of hardware too)
             _Memory = new TSOS.Memory(); // one memory for now
             _Memory.init();
+            // ... Create and initialize the Memory Accessor
+            _MemoryAccessor = new TSOS.MemoryAccessor();
+            _MemoryAccessor.init();
             // ... then set the host clock pulse ...
             _hardwareClockID = setInterval(TSOS.Devices.hostClockPulse, CPU_CLOCK_INTERVAL);
             // .. and call the OS Kernel Bootstrap routine.
@@ -251,11 +254,30 @@ var TSOS;
             // page from its cache, which is not what we want.
         };
         Control.hostBtnSingle_click = function (btn) {
-            btn.style.backgroundImage = "url(distrib/images/single2.png)";
-            document.getElementById("btnNext").disabled = false;
-            document.getElementById("btnNext").style.backgroundImage = "url(distrib/images/next.png)";
+            _isSingle = !(_isSingle);
+            if (_isSingle) {
+                btn.style.backgroundImage = "url(distrib/images/single2.png)";
+            }
+            else {
+                btn.style.backgroundImage = "url(distrib/images/single1.png)";
+                document.getElementById("btnNext").disabled = true;
+                document.getElementById("btnNext").style.backgroundImage = "url(distrib/images/next1.png)";
+            }
         };
+        // click = 1 CPU cycle
         Control.hostBtnNext_click = function (btn) {
+            _CPU.isExecuting = true;
+        };
+        // on only if process is available to run
+        Control.hostBtnNext_onOff = function () {
+            var btnState = document.getElementById("btnNext").disabled;
+            document.getElementById("btnNext").disabled = !btnState;
+            if (btnState) {
+                document.getElementById("btnNext").style.backgroundImage = "url(distrib/images/next.png)";
+            }
+            else {
+                document.getElementById("btnNext").style.backgroundImage = "url(distrib/images/next1.png)";
+            }
         };
         return Control;
     }());

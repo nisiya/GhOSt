@@ -426,7 +426,13 @@ var TSOS;
                 else {
                     // only one process in ready queue for now
                     _ReadyQueue.enqueue(_ResidentQueue.dequeue());
-                    _CPU.isExecuting = true;
+                    // check if single stepping
+                    if (!_isSingle) {
+                        _CPU.isExecuting = true;
+                    }
+                    else {
+                        TSOS.Control.hostBtnNext_onOff();
+                    }
                 }
             }
             else {

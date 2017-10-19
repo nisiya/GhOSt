@@ -27,8 +27,9 @@ const PROCESS_PRINT_IRQ: number = 3;
 // TODO: Make a global object and use that instead of the "_" naming convention in the global namespace.
 //
 var _CPU: TSOS.Cpu;  // Utilize TypeScript's type annotation system to ensure that _CPU is an instance of the Cpu class.
-var _Memory: TSOS.Memory;
-var _MemoryManager: TSOS.MemoryManager;
+var _Memory: TSOS.Memory; // same with Memory
+var _MemoryAccessor: TSOS.MemoryAccessor; // and Memory Accessor
+var _MemoryManager: TSOS.MemoryManager; // and Memory Manager
 
 var _OSclock: number = 0;  // Page 23.
 
@@ -50,6 +51,7 @@ var _KernelBuffers: any[] = null;   // when clearly 'any' is not what we want. T
 var _ResidentQueue;
 var _ReadyQueue;
 var _PID: number = -1; // keep track of process ids
+var _isSingle = false;
 
 // Standard input and output
 var _StdIn;    // Same "to null or not to null" issue as above.
