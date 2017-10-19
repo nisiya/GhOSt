@@ -10,6 +10,7 @@
      ------------ */
 var TSOS;
 (function (TSOS) {
+    // please ignore for project 2
     var MemoryAccessor = /** @class */ (function () {
         function MemoryAccessor() {
             // checks if memory partition is loaded

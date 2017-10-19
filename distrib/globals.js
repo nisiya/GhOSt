@@ -10,8 +10,9 @@
 //
 // Global CONSTANTS (TypeScript 1.5 introduced const. Very cool.)
 //
-var APP_NAME = "GhOSt"; // Cause I'm craving thoses now
-var APP_VERSION = "7"; // The amount that I want to eat
+var APP_NAME = "GhOSt"; // spooky
+var APP_VERSION = "7"; // I like 7
+var TEST_SUBJECT = "Wendy"; // for glados...why did I sign up for it?
 var CPU_CLOCK_INTERVAL = 100; // This is in ms (milliseconds) so 1000 = 1 second.
 var TIMER_IRQ = 0; // Pages 23 (timer), 9 (interrupts), and 561 (interrupt priority).
 // NOTE: The timer is different from hardware/host clock pulses. Don't confuse these.

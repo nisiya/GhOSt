@@ -49,6 +49,8 @@ textarea{
   background-color: transparent;
   background-size: 40px;
   border: none;
+  display: inline-block;
+  text-align: center;
 }
 
 .stop_button {
@@ -87,9 +89,6 @@ textarea{
   background-size: 25px;
   border: none;  
   width: 40px;  
-}
-
-.btnLabel {
 }
 
 text {

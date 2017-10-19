@@ -177,7 +177,7 @@ var TSOS;
         Shell.prototype.shellInvalidCommand = function () {
             _StdOut.putText("Invalid Command. ");
             if (_SarcasticMode) {
-                _StdOut.putText("Unbelievable. You, [subject name here],");
+                _StdOut.putText("Unbelievable. You, " + TEST_SUBJECT + ",");
                 _StdOut.advanceLine();
                 _StdOut.putText("must be the pride of [subject hometown here].");
             }
@@ -426,12 +426,12 @@ var TSOS;
                 else {
                     // only one process in ready queue for now
                     _ReadyQueue.enqueue(_ResidentQueue.dequeue());
-                    // check if single stepping
-                    if (!_isSingle) {
-                        _CPU.isExecuting = true;
+                    // if not single then run normally
+                    if (_isSingle) {
+                        TSOS.Control.hostBtnNext_onOff();
                     }
                     else {
-                        TSOS.Control.hostBtnNext_onOff();
+                        _CPU.isExecuting = true;
                     }
                 }
             }

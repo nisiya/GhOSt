@@ -11,7 +11,7 @@
      ------------ */
 
      module TSOS {
-        
+            // please ignore for project 2
             export class MemoryAccessor {
 
                 // checks if memory partition is loaded
