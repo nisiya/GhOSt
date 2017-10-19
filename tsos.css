@@ -71,6 +71,24 @@ textarea{
   background-image: url(distrib/images/ghostRed.png);
 }
 
+#btnSingle {
+  background-image: url(distrib/images/single1.png);
+  background-color: transparent;
+  background-repeat: no-repeat;
+  background-size: 100px;
+  border: none;  
+  width: 100px;  
+}
+
+#btnNext {
+  background-image: url(distrib/images/next1.png);
+  background-color: transparent;
+  background-repeat: no-repeat;
+  background-size: 25px;
+  border: none;  
+  width: 40px;  
+}
+
 text {
   color: #FFFFFF;
   font-weight: normal;

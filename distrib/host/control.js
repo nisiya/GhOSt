@@ -62,7 +62,66 @@ var TSOS;
             taLog.value = str + taLog.value;
             // TODO in the future: Optionally update a log database or some streaming service.
         };
+        //
+        // updating memory display
+        Control.loadMemoryTable = function () {
+            // load Memory table at start up
+            var memoryContainer = document.getElementById("memoryContainer");
+            var memoryTable = document.createElement("table");
+            memoryTable.className = "tbMemory";
+            memoryTable.id = "tbMemory";
+            var memoryTableBody = document.createElement("tbody");
+            // creating cells for "bytes"
+            for (var i = 0; i < 96; i++) {
+                // create rows
+                var row = document.createElement("tr");
+                row.id = "memoryRow-" + (8 * i);
+                var cell = document.createElement("td");
+                // row label
+                var val = 8 * i;
+                var hexVal = "000" + val.toString(16).toUpperCase();
+                var cellText = document.createTextNode(hexVal.slice(-4));
+                cell.id = "byte" + hexVal.slice(-4);
+                cell.appendChild(cellText);
+                row.appendChild(cell);
+                for (var j = 0; j < 8; j++) {
+                    cell = document.createElement("td");
+                    var index = j + (8 * i);
+                    var id = "000" + index.toString(16).toUpperCase();
+                    var memoryValue = _Memory.memory[index];
+                    cellText = document.createTextNode(memoryValue);
+                    cell.id = id.slice(-4);
+                    cell.appendChild(cellText);
+                    row.appendChild(cell);
+                }
+                memoryTableBody.appendChild(row);
+                // for debugging
+                // console.log(memoryTable);
+            }
+            memoryTable.appendChild(memoryTableBody);
+            memoryContainer.appendChild(memoryTable);
+        };
+        Control.updateMemoryTable = function (baseReg) {
+            // update Memory table after new process is loaded
+            var memoryTable = document.getElementById("tbMemory");
+            var rowId;
+            var index;
+            var cellId;
+            var limitReg = baseReg + 256;
+            for (var i = baseReg; i < limitReg / 8; i++) {
+                rowId = "memoryRow-" + (8 * i);
+                for (var j = 0; j < 8; j++) {
+                    index = j + (8 * i);
+                    var id = "000" + index.toString(16).toUpperCase();
+                    cellId = id.slice(-4);
+                    memoryTable.rows.namedItem(rowId).cells.namedItem(cellId).innerHTML = _Memory.memory[index];
+                }
+            }
+        };
+        //
+        // updating process display
         Control.addProcessTable = function (process) {
+            // add new process to display
             var processTableBody = document.getElementById("processTbody");
             var row = document.createElement("tr");
             row.id = "pid" + process.pid;
@@ -115,6 +174,7 @@ var TSOS;
             processTableBody.appendChild(row);
         };
         Control.updateProcessTable = function (pCounter, pIR, pAcc, pXreg, pYreg, pZflag) {
+            // update process display when process is running
             var processTableBody = document.getElementById("processTbody");
             var row = processTableBody.rows.item(0);
             row.cells.item(1).innerHTML = pCounter;
@@ -126,10 +186,23 @@ var TSOS;
             row.cells.item(7).innerHTML = "Running";
         };
         Control.removeProcessTable = function () {
+            // remove process from display upon completion
             var processTableBody = document.getElementById("processTbody");
             // var row: HTMLTableRowElement = <HTMLTableRowElement> document.getElementById("pid"+pid);     
             processTableBody.deleteRow(0);
             // row.parentNode.removeChild(row);      
+        };
+        //
+        // updating the CPU display
+        Control.updateCPUTable = function (cpu) {
+            // update the CPU display when  process is running
+            var cpuTable = document.getElementById("tbCPU");
+            cpuTable.rows[1].cells.namedItem("cPC").innerHTML = cpu.PC.toString();
+            cpuTable.rows[1].cells.namedItem("cIR").innerHTML = cpu.IR.toString();
+            cpuTable.rows[1].cells.namedItem("cACC").innerHTML = cpu.Acc.toString();
+            cpuTable.rows[1].cells.namedItem("cX").innerHTML = cpu.Xreg.toString();
+            cpuTable.rows[1].cells.namedItem("cY").innerHTML = cpu.Yreg.toString();
+            cpuTable.rows[1].cells.namedItem("cZ").innerHTML = cpu.Zflag.toString();
         };
         //
         // Host Events
@@ -143,9 +216,10 @@ var TSOS;
             document.getElementById("cpuContainer").style.border = "5px solid #0101FF";
             // Disable the (passed-in) start button...
             btn.disabled = true;
-            // .. enable the Halt and Reset buttons ...
+            // .. enable the Halt, Reset, and single step buttons ...
             document.getElementById("btnHaltOS").disabled = false;
             document.getElementById("btnReset").disabled = false;
+            document.getElementById("btnSingle").disabled = false;
             // .. set focus on the OS console display ...
             document.getElementById("display").focus();
             // ... Create and initialize the CPU (because it's part of the hardware)  ...
@@ -175,6 +249,13 @@ var TSOS;
             // That boolean parameter is the 'forceget' flag. When it is true it causes the page to always
             // be reloaded from the server. If it is false or not specified the browser may reload the
             // page from its cache, which is not what we want.
+        };
+        Control.hostBtnSingle_click = function (btn) {
+            btn.style.backgroundImage = "url(distrib/images/single2.png)";
+            document.getElementById("btnNext").disabled = false;
+            document.getElementById("btnNext").style.backgroundImage = "url(distrib/images/next.png)";
+        };
+        Control.hostBtnNext_click = function (btn) {
         };
         return Control;
     }());

@@ -41,15 +41,6 @@ var TSOS;
             this.Zflag = 0;
             this.isExecuting = false;
         };
-        Cpu.prototype.updateCPUTable = function () {
-            var cpuTable = document.getElementById("tbCPU");
-            cpuTable.rows[1].cells.namedItem("cPC").innerHTML = this.PC.toString();
-            cpuTable.rows[1].cells.namedItem("cIR").innerHTML = this.IR.toString();
-            cpuTable.rows[1].cells.namedItem("cACC").innerHTML = this.Acc.toString();
-            cpuTable.rows[1].cells.namedItem("cX").innerHTML = this.Xreg.toString();
-            cpuTable.rows[1].cells.namedItem("cY").innerHTML = this.Yreg.toString();
-            cpuTable.rows[1].cells.namedItem("cZ").innerHTML = this.Zflag.toString();
-        };
         Cpu.prototype.cycle = function () {
             _Kernel.krnTrace('CPU cycle');
             // TODO: Accumulate CPU usage and profiling statistics here.
@@ -66,7 +57,7 @@ var TSOS;
             // decode then execute the op codes
             this.decodeExecute(opCode);
             // update display table
-            this.updateCPUTable();
+            TSOS.Control.updateCPUTable(this);
             if (this.isExecuting) {
                 TSOS.Control.updateProcessTable(this.PC, this.IR, this.Acc, this.Xreg, this.Yreg, this.Zflag);
             }
@@ -151,7 +142,7 @@ var TSOS;
                         _Kernel.krnExitProcess();
                         // reset CPU
                         this.init();
-                        this.updateCPUTable();
+                        TSOS.Control.updateCPUTable(this);
                         break;
                     // compare a byte in memory to the X reg
                     // if equal, set z flag 
@@ -220,7 +211,7 @@ var TSOS;
                         _KernelInterruptQueue.enqueue(new TSOS.Interrupt(PROCESS_ERROR_IRQ, opCode));
                         _Kernel.krnExitProcess();
                         this.init();
-                        this.updateCPUTable();
+                        TSOS.Control.updateCPUTable(this);
                         break;
                 }
             }

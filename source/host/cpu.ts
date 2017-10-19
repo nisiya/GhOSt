@@ -39,16 +39,6 @@ module TSOS {
             this.isExecuting = false;
         }
 
-        public updateCPUTable(): void {
-            var cpuTable: HTMLTableElement = <HTMLTableElement> document.getElementById("tbCPU");
-            cpuTable.rows[1].cells.namedItem("cPC").innerHTML = this.PC.toString();
-            cpuTable.rows[1].cells.namedItem("cIR").innerHTML = this.IR.toString();            
-            cpuTable.rows[1].cells.namedItem("cACC").innerHTML = this.Acc.toString();            
-            cpuTable.rows[1].cells.namedItem("cX").innerHTML = this.Xreg.toString();            
-            cpuTable.rows[1].cells.namedItem("cY").innerHTML = this.Yreg.toString();            
-            cpuTable.rows[1].cells.namedItem("cZ").innerHTML = this.Zflag.toString();                        
-        } 
-
         public cycle(): void {
             _Kernel.krnTrace('CPU cycle');
             // TODO: Accumulate CPU usage and profiling statistics here.
@@ -70,7 +60,7 @@ module TSOS {
             this.decodeExecute(opCode);   
 
             // update display table
-            this.updateCPUTable();
+            Control.updateCPUTable(this);
             if(this.isExecuting){
                 Control.updateProcessTable(this.PC, this.IR, this.Acc, this.Xreg, this.Yreg, this.Zflag);
             }
@@ -168,7 +158,7 @@ module TSOS {
                         _Kernel.krnExitProcess();
                         // reset CPU
                         this.init();
-                        this.updateCPUTable();
+                        Control.updateCPUTable(this);
                         break;
 
                     // compare a byte in memory to the X reg
@@ -238,7 +228,7 @@ module TSOS {
                         _KernelInterruptQueue.enqueue(new Interrupt(PROCESS_ERROR_IRQ, opCode));
                         _Kernel.krnExitProcess();
                         this.init();
-                        this.updateCPUTable();
+                        Control.updateCPUTable(this);
                         break;
                 }
             }

@@ -52,11 +52,11 @@
 
 <body onload="onDocumentLoad()">
   <!-- background video for future-->
-  <div class="fullscreen-bg">
+  <!-- <div class="fullscreen-bg">
     <video loop muted poster="distrib/images/grey.jpg" class="fullscreen-bg__video">
         <source src="distrib/video/pacmanGame.mp4" type="video/mp4">
     </video>
-  </div>
+  </div> -->
 
   <!-- time, time and status -->
   <div class="tagline-upper text-center text-heading text-shadow text-white mt-5 d-none d-lg-block">  
@@ -101,6 +101,24 @@
                         title="Reset"
                         tabindex="2"
                         onclick="TSOS.Control.hostBtnReset_click(this);">
+                
+                  <input type="button"
+                        id = "btnSingle"
+                        name="btnSingle"
+                        disabled="disabled"
+                        value=""
+                        title="Single"
+                        tabindex="3"
+                        onclick="TSOS.Control.hostBtnSingle_click(this);">
+                  
+                  <input type="button"
+                        id = "btnNext"
+                        name="btnNext"
+                        disabled="disabled"
+                        value=""
+                        title="Next"
+                        tabindex="4"
+                        onclick="TSOS.Control.hostBtnNext_click(this);">
               </th>
             </tr>
           </table>

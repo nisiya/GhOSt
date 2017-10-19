@@ -33,7 +33,7 @@
                 for (var i = baseReg; i <inputOpCodes.length; i++){
                     _Memory.memory[i] = inputOpCodes[i];
                 }
-                _Memory.updateTable(baseReg);
+                Control.updateMemoryTable(baseReg);
                 return baseReg;
             }
             
@@ -46,7 +46,7 @@
                 var index: number = parseInt(addr, 16);  
                 _Memory.memory[index] = data.toString(16);
                 // 0 for now bc only one parition
-                _Memory.updateTable(0);
+                Control.updateMemoryTable(0);
             }
 
             public clearPartition(baseReg) : void{
@@ -57,7 +57,7 @@
                     _Memory.memoryP1 = false;
                 }
                 // add other partitions later
-                _Memory.updateTable(baseReg);
+                Control.updateMemoryTable(baseReg);
             }
         }
     }

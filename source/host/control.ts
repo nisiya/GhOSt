@@ -74,7 +74,74 @@ module TSOS {
             // TODO in the future: Optionally update a log database or some streaming service.
         }
 
+        //
+        // updating memory display
+        public static loadMemoryTable(): void {
+            // load Memory table at start up
+            var memoryContainer: HTMLDivElement = <HTMLDivElement> document.getElementById("memoryContainer");
+            var memoryTable: HTMLTableElement = <HTMLTableElement> document.createElement("table");
+            memoryTable.className = "tbMemory";
+            memoryTable.id = "tbMemory";
+            var memoryTableBody: HTMLTableSectionElement = <HTMLTableSectionElement> document.createElement("tbody");
+            
+            // creating cells for "bytes"
+            for (var i = 0; i < 96; i++){
+                // create rows
+                var row: HTMLTableRowElement = <HTMLTableRowElement> document.createElement("tr");
+                row.id = "memoryRow-" + (8*i);
+                var cell: HTMLTableCellElement = <HTMLTableCellElement> document.createElement("td");
+
+                // row label
+                var val: number = 8*i;
+                var hexVal: string = "000" + val.toString(16).toUpperCase();
+                var cellText = document.createTextNode(hexVal.slice(-4));
+                cell.id = "byte" + hexVal.slice(-4);
+                cell.appendChild(cellText);
+                row.appendChild(cell);        
+
+                for (var j = 0; j < 8; j++) {
+                    cell = document.createElement("td");
+                    var index: number = j + (8 * i);
+                    var id: string = "000" + index.toString(16).toUpperCase();
+                    var memoryValue: string = _Memory.memory[index];
+                    cellText = document.createTextNode(memoryValue);
+                    cell.id = id.slice(-4);
+                    cell.appendChild(cellText);
+                    row.appendChild(cell);
+                }
+                memoryTableBody.appendChild(row);
+
+                // for debugging
+                // console.log(memoryTable);
+            }
+            
+            memoryTable.appendChild(memoryTableBody);
+            memoryContainer.appendChild(memoryTable);
+        }
+
+        public static updateMemoryTable(baseReg): void {
+            // update Memory table after new process is loaded
+            var memoryTable: HTMLTableElement = <HTMLTableElement> document.getElementById("tbMemory");
+            var rowId: string;
+            var index: number;                    
+            var cellId: string;
+            var limitReg: number = baseReg + 256;
+            for (var i = baseReg; i < limitReg/8 ; i++){
+                rowId = "memoryRow-" + (8*i);
+                for (var j = 0; j < 8; j ++){
+                    index = j + (8 * i);
+                    var id: string = "000" + index.toString(16).toUpperCase();                            
+                    cellId = id.slice(-4);                            
+                    memoryTable.rows.namedItem(rowId).cells.namedItem(cellId).innerHTML = _Memory.memory[index];
+                }
+            }
+        }
+        
+
+        //
+        // updating process display
         public static addProcessTable(process): void {
+            // add new process to display
             var processTableBody: HTMLTableSectionElement = <HTMLTableSectionElement> document.getElementById("processTbody");         
             var row: HTMLTableRowElement = <HTMLTableRowElement> document.createElement("tr");
             row.id = "pid" + process.pid;
@@ -128,6 +195,7 @@ module TSOS {
         } 
 
         public static updateProcessTable(pCounter, pIR, pAcc, pXreg, pYreg, pZflag): void{
+            // update process display when process is running
             var processTableBody: HTMLTableSectionElement = <HTMLTableSectionElement> document.getElementById("processTbody");                
             var row = processTableBody.rows.item(0);
             row.cells.item(1).innerHTML = pCounter;
@@ -140,11 +208,26 @@ module TSOS {
         }
 
         public static removeProcessTable(): void{
+            // remove process from display upon completion
             var processTableBody: HTMLTableSectionElement = <HTMLTableSectionElement> document.getElementById("processTbody");    
             // var row: HTMLTableRowElement = <HTMLTableRowElement> document.getElementById("pid"+pid);     
             processTableBody.deleteRow(0);
             // row.parentNode.removeChild(row);      
         }
+
+
+        //
+        // updating the CPU display
+        public static updateCPUTable(cpu): void {
+            // update the CPU display when  process is running
+            var cpuTable: HTMLTableElement = <HTMLTableElement> document.getElementById("tbCPU");
+            cpuTable.rows[1].cells.namedItem("cPC").innerHTML = cpu.PC.toString();
+            cpuTable.rows[1].cells.namedItem("cIR").innerHTML = cpu.IR.toString();            
+            cpuTable.rows[1].cells.namedItem("cACC").innerHTML = cpu.Acc.toString();            
+            cpuTable.rows[1].cells.namedItem("cX").innerHTML = cpu.Xreg.toString();            
+            cpuTable.rows[1].cells.namedItem("cY").innerHTML = cpu.Yreg.toString();            
+            cpuTable.rows[1].cells.namedItem("cZ").innerHTML = cpu.Zflag.toString();                        
+        } 
 
 
         //
@@ -161,9 +244,10 @@ module TSOS {
             // Disable the (passed-in) start button...
             btn.disabled = true;
 
-            // .. enable the Halt and Reset buttons ...
+            // .. enable the Halt, Reset, and single step buttons ...
             (<HTMLButtonElement>document.getElementById("btnHaltOS")).disabled = false;
             (<HTMLButtonElement>document.getElementById("btnReset")).disabled = false;
+            (<HTMLButtonElement>document.getElementById("btnSingle")).disabled = false;                        
 
             // .. set focus on the OS console display ...
             document.getElementById("display").focus();
@@ -199,6 +283,17 @@ module TSOS {
             // That boolean parameter is the 'forceget' flag. When it is true it causes the page to always
             // be reloaded from the server. If it is false or not specified the browser may reload the
             // page from its cache, which is not what we want.
+        }
+
+        public static hostBtnSingle_click(btn): void {
+            btn.style.backgroundImage = "url(distrib/images/single2.png)";
+            (<HTMLButtonElement>document.getElementById("btnNext")).disabled = false;
+            document.getElementById("btnNext").style.backgroundImage = "url(distrib/images/next.png)";            
+            
+        }
+
+        public static hostBtnNext_click(btn): void {
+            
         }
     }
 }

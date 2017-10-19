@@ -59,6 +59,7 @@ var TSOS;
         Kernel.prototype.krnShutdown = function () {
             this.krnTrace("begin shutdown OS");
             // TODO: Check for running processes.  If there are some, alert and stop. Else...
+            _CPU.isExecuting = false;
             // ... Disable the Interrupts.
             this.krnTrace("Disabling the interrupts.");
             this.krnDisableInterrupts();
@@ -132,14 +133,12 @@ var TSOS;
         };
         Kernel.prototype.userPrgError = function (opCode) {
             // When user program entry is not a valid op ocde
-            console.log("yes");
             _StdOut.putText("Error. Op code " + opCode + " does not exist.");
             _StdOut.advanceLine();
             _OsShell.putPrompt();
         };
         Kernel.prototype.processPrint = function (chr) {
             // When user program makes system call to print
-            console.log("yes");
             _StdOut.putText(chr);
         };
         //
