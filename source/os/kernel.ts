@@ -93,7 +93,11 @@ module TSOS {
                 var interrupt = _KernelInterruptQueue.dequeue();
                 this.krnInterruptHandler(interrupt.irq, interrupt.params);
             } else if (_CPU.isExecuting) { // If there are no interrupts then run one CPU cycle if there is anything being processed. {
-                _CPU.cycle();
+                if(!_isSingle){
+                    _CPU.cycle();
+                } else {
+                    Control.hostBtnNext_onOff();
+                }
             } else {                      // If there are no interrupts and there is nothing being executed then just be idle. {
                 this.krnTrace("Idle");
             }
@@ -149,18 +153,6 @@ module TSOS {
 
         }
 
-        public userPrgError(opCode){
-            // When user program entry is not a valid op ocde
-            _StdOut.putText("Error. Op code " + opCode + " does not exist.");
-            _StdOut.advanceLine();
-            _OsShell.putPrompt();
-        }
-
-        public processPrint(chr){
-            // When user program makes system call to print to canvas
-            _StdOut.putText(chr);
-        }
-
         //
         // System Calls... that generate software interrupts via tha Application Programming Interface library routines.
         //
@@ -183,12 +175,38 @@ module TSOS {
             return pid;
         }
 
+        public krnExecuteProcess(){
+            // only one process in ready queue for now
+            _ReadyQueue.enqueue(_ResidentQueue.dequeue());
+            // if not single then run normally
+            _CPU.isExecuting = true;
+            // if(_isSingle){
+            //     Control.hostBtnNext_onOff();
+            // }
+        }
+
         public krnExitProcess(){
             // exit process upon completion
             // clear partion starting from base 0
             _MemoryManager.clearPartition(0);
             Control.removeProcessTable();
+            // if(_isSingle){
+            //     Control.hostBtnNext_onOff();
+            // }
         }
+
+        public userPrgError(opCode){
+            // When user program entry is not a valid op ocde
+            _StdOut.putText("Error. Op code " + opCode + " does not exist.");
+            _StdOut.advanceLine();
+            _OsShell.putPrompt();
+        }
+
+        public processPrint(text){
+            // When user program makes system call to print to canvas
+            _StdOut.putText(text);
+        }
+
         // - WaitForProcessToExit
         // - CreateFile
         // - OpenFile

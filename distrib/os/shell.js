@@ -424,15 +424,7 @@ var TSOS;
                     _StdOut.putText("No process with id: " + args);
                 }
                 else {
-                    // only one process in ready queue for now
-                    _ReadyQueue.enqueue(_ResidentQueue.dequeue());
-                    // if not single then run normally
-                    if (_isSingle) {
-                        TSOS.Control.hostBtnNext_onOff();
-                    }
-                    else {
-                        _CPU.isExecuting = true;
-                    }
+                    _Kernel.krnExecuteProcess();
                 }
             }
             else {

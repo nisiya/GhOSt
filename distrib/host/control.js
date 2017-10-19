@@ -257,6 +257,7 @@ var TSOS;
             _isSingle = !(_isSingle);
             if (_isSingle) {
                 btn.style.backgroundImage = "url(distrib/images/single2.png)";
+                this.hostBtnNext_onOff();
             }
             else {
                 btn.style.backgroundImage = "url(distrib/images/single1.png)";
@@ -266,16 +267,17 @@ var TSOS;
         };
         // click = 1 CPU cycle
         Control.hostBtnNext_click = function (btn) {
-            _CPU.isExecuting = true;
+            if (_CPU.isExecuting) {
+                _CPU.cycle();
+            }
         };
-        // on only if process is available to run
         Control.hostBtnNext_onOff = function () {
-            var btnState = document.getElementById("btnNext").disabled;
-            document.getElementById("btnNext").disabled = !btnState;
-            if (btnState) {
+            if (_CPU.isExecuting) {
+                document.getElementById("btnNext").disabled = false;
                 document.getElementById("btnNext").style.backgroundImage = "url(distrib/images/next.png)";
             }
             else {
+                document.getElementById("btnNext").disabled = true;
                 document.getElementById("btnNext").style.backgroundImage = "url(distrib/images/next1.png)";
             }
         };

@@ -61,10 +61,6 @@ var TSOS;
             if (this.isExecuting) {
                 TSOS.Control.updateProcessTable(this.PC, this.IR, this.Acc, this.Xreg, this.Yreg, this.Zflag);
             }
-            // if single stepping then stop after executing one instruction
-            if (_isSingle) {
-                this.isExecuting = false;
-            }
         };
         Cpu.prototype.fetch = function (PC) {
             return _MemoryManager.readMemory(PC);
@@ -144,9 +140,6 @@ var TSOS;
                     case "00":
                         // stop
                         _Kernel.krnExitProcess();
-                        if (_isSingle) {
-                            TSOS.Control.hostBtnNext_onOff();
-                        }
                         // reset CPU
                         this.init();
                         TSOS.Control.updateCPUTable(this);
@@ -195,9 +188,9 @@ var TSOS;
                         #$02 in x reg = print 00-terminated string stored at
                                         address in y reg */
                     case "FF":
-                        var str = "";
+                        var text = "";
                         if (this.Xreg == 1) {
-                            str = this.Yreg.toString();
+                            text = this.Yreg.toString();
                         }
                         else if (this.Xreg == 2) {
                             addr = this.Yreg.toString(16);
@@ -205,14 +198,14 @@ var TSOS;
                             data = parseInt(this.fetch(index), 16);
                             var chr = String.fromCharCode(data);
                             while (data != 0) {
-                                str = str + chr;
+                                text = text + chr;
                                 index++;
                                 data = parseInt(this.fetch(index), 16);
                                 chr = String.fromCharCode(data);
                             }
                         }
                         // call Kernel to print to canvas
-                        _KernelInterruptQueue.enqueue(new TSOS.Interrupt(PROCESS_PRINT_IRQ, str));
+                        _KernelInterruptQueue.enqueue(new TSOS.Interrupt(PROCESS_PRINT_IRQ, text));
                         this.PC++;
                         break;
                     default:
