@@ -11,8 +11,9 @@
 //
 // Global CONSTANTS (TypeScript 1.5 introduced const. Very cool.)
 //
-const APP_NAME: string    = "GhOSt";   // Cause I'm craving thoses now
-const APP_VERSION: string = "7";   // The amount that I want to eat
+const APP_NAME: string    = "GhOSt";   // spooky
+const APP_VERSION: string = "7";   // I like 7
+const TEST_SUBJECT: string = "Wendy";   // for glados...why did I sign up for it?
 
 const CPU_CLOCK_INTERVAL: number = 100;   // This is in ms (milliseconds) so 1000 = 1 second.
 
@@ -119,6 +120,7 @@ var _KeyToChr = {
 var _SaveX = 0; // use for backspace and line wrapping for now, will improve
 
 var onDocumentLoad = function() {
+
     TSOS.Control.hostInit();
     updateTime();
 };
