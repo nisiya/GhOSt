@@ -93,9 +93,10 @@ module TSOS {
                 var interrupt = _KernelInterruptQueue.dequeue();
                 this.krnInterruptHandler(interrupt.irq, interrupt.params);
             } else if (_CPU.isExecuting) { // If there are no interrupts then run one CPU cycle if there is anything being processed. {
-                if(!_isSingle){
+                if(!_singleMode){
                     _CPU.cycle();
                 } else {
+                    // enable next button in single step mode
                     Control.hostBtnNext_onOff();
                 }
             } else {                      // If there are no interrupts and there is nothing being executed then just be idle. {
@@ -167,10 +168,9 @@ module TSOS {
             _PID++;
             var pid = _PID;            
             var process = new PCB(pBase, pid);
-            // put pcb on ready queue
+            // put process on ready queue
             _ResidentQueue.enqueue(process);
             // update process table
-            // _PCB.addProcessTable(process);
             Control.addProcessTable(process);
             return pid;
         }
@@ -178,11 +178,8 @@ module TSOS {
         public krnExecuteProcess(){
             // only one process in ready queue for now
             _ReadyQueue.enqueue(_ResidentQueue.dequeue());
-            // if not single then run normally
+            // start CPU
             _CPU.isExecuting = true;
-            // if(_isSingle){
-            //     Control.hostBtnNext_onOff();
-            // }
         }
 
         public krnExitProcess(){
@@ -190,9 +187,6 @@ module TSOS {
             // clear partion starting from base 0
             _MemoryManager.clearPartition(0);
             Control.removeProcessTable();
-            // if(_isSingle){
-            //     Control.hostBtnNext_onOff();
-            // }
         }
 
         public userPrgError(opCode){

@@ -157,6 +157,8 @@ module TSOS {
                         // reset CPU
                         this.init();
                         Control.updateCPUTable(this);
+                        // disable next button
+                        Control.hostBtnNext_onOff();                        
                         break;
 
                     // compare a byte in memory to the X reg

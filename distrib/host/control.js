@@ -254,9 +254,10 @@ var TSOS;
             // page from its cache, which is not what we want.
         };
         Control.hostBtnSingle_click = function (btn) {
-            _isSingle = !(_isSingle);
-            if (_isSingle) {
+            _singleMode = !(_singleMode);
+            if (_singleMode) {
                 btn.style.backgroundImage = "url(distrib/images/single2.png)";
+                // check if next button should be enabled
                 this.hostBtnNext_onOff();
             }
             else {
@@ -271,6 +272,7 @@ var TSOS;
                 _CPU.cycle();
             }
         };
+        // enable next btn if process is executing and disable if not
         Control.hostBtnNext_onOff = function () {
             if (_CPU.isExecuting) {
                 document.getElementById("btnNext").disabled = false;

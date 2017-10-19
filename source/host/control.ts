@@ -290,9 +290,10 @@ module TSOS {
         }
 
         public static hostBtnSingle_click(btn): void {
-            _isSingle = !(_isSingle);
-            if (_isSingle){ // ready to mingle ;) 
+            _singleMode = !(_singleMode);
+            if (_singleMode){ // ready to mingle ;) 
                 btn.style.backgroundImage = "url(distrib/images/single2.png)";
+                // check if next button should be enabled
                 this.hostBtnNext_onOff();
             } else {
                 btn.style.backgroundImage = "url(distrib/images/single1.png)";
@@ -308,6 +309,7 @@ module TSOS {
             }
         }
 
+        // enable next btn if process is executing and disable if not
         public static hostBtnNext_onOff(): void{
             if(_CPU.isExecuting){
                 (<HTMLButtonElement>document.getElementById("btnNext")).disabled = false;

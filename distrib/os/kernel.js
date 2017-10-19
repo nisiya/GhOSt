@@ -82,10 +82,11 @@ var TSOS;
                 this.krnInterruptHandler(interrupt.irq, interrupt.params);
             }
             else if (_CPU.isExecuting) {
-                if (!_isSingle) {
+                if (!_singleMode) {
                     _CPU.cycle();
                 }
                 else {
+                    // enable next button in single step mode
                     TSOS.Control.hostBtnNext_onOff();
                 }
             }
@@ -149,30 +150,23 @@ var TSOS;
             _PID++;
             var pid = _PID;
             var process = new TSOS.PCB(pBase, pid);
-            // put pcb on ready queue
+            // put process on ready queue
             _ResidentQueue.enqueue(process);
             // update process table
-            // _PCB.addProcessTable(process);
             TSOS.Control.addProcessTable(process);
             return pid;
         };
         Kernel.prototype.krnExecuteProcess = function () {
             // only one process in ready queue for now
             _ReadyQueue.enqueue(_ResidentQueue.dequeue());
-            // if not single then run normally
+            // start CPU
             _CPU.isExecuting = true;
-            // if(_isSingle){
-            //     Control.hostBtnNext_onOff();
-            // }
         };
         Kernel.prototype.krnExitProcess = function () {
             // exit process upon completion
             // clear partion starting from base 0
             _MemoryManager.clearPartition(0);
             TSOS.Control.removeProcessTable();
-            // if(_isSingle){
-            //     Control.hostBtnNext_onOff();
-            // }
         };
         Kernel.prototype.userPrgError = function (opCode) {
             // When user program entry is not a valid op ocde

@@ -43,7 +43,7 @@ var _KernelBuffers = null; // when clearly 'any' is not what we want. There is l
 var _ResidentQueue;
 var _ReadyQueue;
 var _PID = -1; // keep track of process ids
-var _isSingle = false;
+var _singleMode = false;
 // Standard input and output
 var _StdIn; // Same "to null or not to null" issue as above.
 var _StdOut;

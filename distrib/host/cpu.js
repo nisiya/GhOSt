@@ -143,6 +143,8 @@ var TSOS;
                         // reset CPU
                         this.init();
                         TSOS.Control.updateCPUTable(this);
+                        // disable next button
+                        TSOS.Control.hostBtnNext_onOff();
                         break;
                     // compare a byte in memory to the X reg
                     // if equal, set z flag 
