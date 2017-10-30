@@ -29,6 +29,7 @@ var TSOS;
             _KernelInputQueue = new TSOS.Queue(); // Where device input lands before being processed out somewhere.
             _ResidentQueue = new TSOS.Queue(); // Where loaded process reside
             _ReadyQueue = new TSOS.Queue(); // Where process are ready to run sit
+            _RunningQueue = new TSOS.Queue(); // Where running process sit
             // Initialize the console.
             _Console = new TSOS.Console(); // The command line interface / console I/O device.
             _Console.init();
@@ -158,7 +159,9 @@ var TSOS;
         };
         Kernel.prototype.krnExecuteProcess = function () {
             // only one process in ready queue for now
-            _ReadyQueue.enqueue(_ResidentQueue.dequeue());
+            var process = _ResidentQueue.dequeue();
+            process.pState = "Ready";
+            _ReadyQueue.enqueue(process);
             // start CPU
             _CPU.isExecuting = true;
         };
@@ -167,6 +170,7 @@ var TSOS;
             // clear partion starting from base 0
             _MemoryManager.clearPartition(0);
             TSOS.Control.removeProcessTable();
+            _RunningQueue.dequeue();
         };
         Kernel.prototype.userPrgError = function (opCode) {
             // When user program entry is not a valid op ocde

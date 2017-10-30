@@ -395,7 +395,7 @@ var TSOS;
                     // base register value from when memory was loaded
                     var baseReg = _MemoryManager.loadMemory(inputOpCodes);
                     if (baseReg == 999) {
-                        _StdOut.putText("Memory is full. Please run the current process then load more.");
+                        _StdOut.putText("Memory is full. Please run process to free up space.");
                     }
                     else {
                         var pid = _Kernel.krnCreateProcess(baseReg);

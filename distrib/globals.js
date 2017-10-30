@@ -42,6 +42,7 @@ var _KernelInputQueue = null; // Is this better? I don't like uninitialized vari
 var _KernelBuffers = null; // when clearly 'any' is not what we want. There is likely a better way, but what is it?
 var _ResidentQueue;
 var _ReadyQueue;
+var _RunningQueue;
 var _PID = -1; // keep track of process ids
 var _singleMode = false;
 // Standard input and output

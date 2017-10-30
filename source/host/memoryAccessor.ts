@@ -14,19 +14,23 @@
             // please ignore for project 2
             export class MemoryAccessor {
 
-                // checks if memory partition is loaded
-                public memoryS1: boolean = false;
-                public memoryS2: boolean = false;
-                public memoryS3: boolean = false;
-
                 public init(): void {
                     // all partitions are available
-                    this.memoryS1 = false;
-                    this.memoryS2 = false;
-                    this.memoryS3 = false;
 
                     // load table on user interface
                     // Control.loadMemoryTable();
+                }
+
+                public writeMemory(addr, data){
+                    var index: number = parseInt(addr, 16);  
+                    _Memory.memory[index] = data.toString(16);
+                    
+                    // 0 for now bc only one parition
+                    Control.updateMemoryTable(0);
+                }
+
+                public readMemory(addr){
+
                 }
 
             }

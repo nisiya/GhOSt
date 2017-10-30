@@ -484,7 +484,7 @@ module TSOS {
                     // base register value from when memory was loaded
                     var baseReg: number = _MemoryManager.loadMemory(inputOpCodes);
                     if (baseReg == 999){
-                        _StdOut.putText("Memory is full. Please run the current process then load more.");                    
+                        _StdOut.putText("Memory is full. Please run process to free up space.");                    
                     } else {
                         var pid: number = _Kernel.krnCreateProcess(baseReg);
                         _StdOut.putText("Process id: " + pid + " is in Resident Queue");

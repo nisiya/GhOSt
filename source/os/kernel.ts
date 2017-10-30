@@ -30,6 +30,7 @@ module TSOS {
             _KernelInputQueue = new Queue();      // Where device input lands before being processed out somewhere.
             _ResidentQueue = new Queue();         // Where loaded process reside
             _ReadyQueue = new Queue();            // Where process are ready to run sit
+            _RunningQueue = new Queue();          // Where running process sit
 
             // Initialize the console.
             _Console = new Console();          // The command line interface / console I/O device.
@@ -169,6 +170,7 @@ module TSOS {
             var pid = _PID;            
             var process = new PCB(pBase, pid);
             // put process on ready queue
+            
             _ResidentQueue.enqueue(process);
             // update process table
             Control.addProcessTable(process);
@@ -177,7 +179,9 @@ module TSOS {
 
         public krnExecuteProcess(){
             // only one process in ready queue for now
-            _ReadyQueue.enqueue(_ResidentQueue.dequeue());
+            var process = _ResidentQueue.dequeue();
+            process.pState = "Ready";
+            _ReadyQueue.enqueue(process);
             // start CPU
             _CPU.isExecuting = true;
         }
@@ -187,6 +191,7 @@ module TSOS {
             // clear partion starting from base 0
             _MemoryManager.clearPartition(0);
             Control.removeProcessTable();
+            _RunningQueue.dequeue();
         }
 
         public userPrgError(opCode){

@@ -49,6 +49,8 @@ var TSOS;
             if (this.PC == 0) {
                 // move pcb from ready queue to running
                 var process = _ReadyQueue.dequeue();
+                process.pState = "Running";
+                _RunningQueue.enqueue(process);
                 TSOS.Control.updateProcessTable(this.PC, this.IR, this.Acc, this.Xreg, this.Yreg, this.Zflag);
             }
             // fetch instruction from memory
@@ -91,7 +93,7 @@ var TSOS;
                     case "8D":
                         data = this.Acc;
                         addr = this.fetch(this.PC + 2) + this.fetch(this.PC + 1);
-                        _MemoryManager.updateMemory(addr, data);
+                        _MemoryAccessor.writeMemory(addr, data);
                         this.PC += 3;
                         break;
                     // add with carry
@@ -182,7 +184,7 @@ var TSOS;
                         index = parseInt(addr, 16);
                         data = parseInt(this.fetch(index), 16);
                         data++;
-                        _MemoryManager.updateMemory(addr, data);
+                        _MemoryAccessor.writeMemory(addr, data);
                         this.PC += 3;
                         break;
                     // system call

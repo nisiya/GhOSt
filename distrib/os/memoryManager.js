@@ -13,20 +13,20 @@ var TSOS;
             var baseReg;
             // check if memory is full and return the base of free partition
             if (_Memory.memoryS1) {
-                // memory is full
-                baseReg = 999;
-                // for iPj3
-                // if(_Memory.memoryS2){
-                //     if(_Memory.memoryS3){
-                //         _StdOut.putText("Memory is full. Please wait to load");
-                //     } else{
-                //         _Memory.memoryS3 = true;
-                //         baseReg = 512;
-                //     }
-                // } else{
-                //     _Memory.memoryS2 = true; 
-                //     baseReg = 256;
-                // }
+                if (_Memory.memoryS2) {
+                    if (_Memory.memoryS3) {
+                        // memory is full
+                        baseReg == 999;
+                    }
+                    else {
+                        _Memory.memoryS3 = true;
+                        baseReg = 512;
+                    }
+                }
+                else {
+                    _Memory.memoryS2 = true;
+                    baseReg = 256;
+                }
             }
             else {
                 _Memory.memoryS1 = true;
@@ -43,12 +43,6 @@ var TSOS;
             // retrieve from Memory
             var opCode = _Memory.memory[index];
             return opCode;
-        };
-        MemoryManager.prototype.updateMemory = function (addr, data) {
-            var index = parseInt(addr, 16);
-            _Memory.memory[index] = data.toString(16);
-            // 0 for now bc only one parition
-            TSOS.Control.updateMemoryTable(0);
         };
         MemoryManager.prototype.clearPartition = function (baseReg) {
             // free up memory when process completes

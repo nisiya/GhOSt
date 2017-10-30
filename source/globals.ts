@@ -51,6 +51,7 @@ var _KernelInputQueue: any = null;  // Is this better? I don't like uninitialize
 var _KernelBuffers: any[] = null;   // when clearly 'any' is not what we want. There is likely a better way, but what is it?
 var _ResidentQueue;
 var _ReadyQueue;
+var _RunningQueue;
 var _PID: number = -1; // keep track of process ids
 var _singleMode = false;
 

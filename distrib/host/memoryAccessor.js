@@ -13,18 +13,19 @@ var TSOS;
     // please ignore for project 2
     var MemoryAccessor = /** @class */ (function () {
         function MemoryAccessor() {
-            // checks if memory partition is loaded
-            this.memoryS1 = false;
-            this.memoryS2 = false;
-            this.memoryS3 = false;
         }
         MemoryAccessor.prototype.init = function () {
             // all partitions are available
-            this.memoryS1 = false;
-            this.memoryS2 = false;
-            this.memoryS3 = false;
             // load table on user interface
             // Control.loadMemoryTable();
+        };
+        MemoryAccessor.prototype.writeMemory = function (addr, data) {
+            var index = parseInt(addr, 16);
+            _Memory.memory[index] = data.toString(16);
+            // 0 for now bc only one parition
+            TSOS.Control.updateMemoryTable(0);
+        };
+        MemoryAccessor.prototype.readMemory = function (addr) {
         };
         return MemoryAccessor;
     }());
