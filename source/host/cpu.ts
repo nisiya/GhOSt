@@ -67,7 +67,7 @@ module TSOS {
         }
 
         public fetch(PC) {
-            return _MemoryManager.readMemory(PC);
+            return _MemoryAccessor.readMemory(PC);
         }
 
         public decodeExecute(opCode) {

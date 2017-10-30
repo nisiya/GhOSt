@@ -65,7 +65,7 @@ var TSOS;
             }
         };
         Cpu.prototype.fetch = function (PC) {
-            return _MemoryManager.readMemory(PC);
+            return _MemoryAccessor.readMemory(PC);
         };
         Cpu.prototype.decodeExecute = function (opCode) {
             if (opCode.length > 0) {

@@ -8,41 +8,47 @@ var TSOS;
 (function (TSOS) {
     var MemoryManager = /** @class */ (function () {
         function MemoryManager() {
+            // checks if memory partition is loaded
+            this.memoryS1 = false;
+            this.memoryS2 = false;
+            this.memoryS3 = false;
         }
         MemoryManager.prototype.loadMemory = function (inputOpCodes) {
             var baseReg;
             // check if memory is full and return the base of free partition
-            if (_Memory.memoryS1) {
-                if (_Memory.memoryS2) {
-                    if (_Memory.memoryS3) {
+            if (this.memoryS1) {
+                if (this.memoryS2) {
+                    if (this.memoryS3) {
                         // memory is full
                         baseReg == 999;
                     }
                     else {
-                        _Memory.memoryS3 = true;
+                        console.log("hit3");
+                        this.memoryS3 = true;
                         baseReg = 512;
                     }
                 }
                 else {
-                    _Memory.memoryS2 = true;
+                    console.log("hit2");
+                    this.memoryS2 = true;
                     baseReg = 256;
                 }
             }
             else {
-                _Memory.memoryS1 = true;
+                console.log("hit");
+                this.memoryS1 = true;
                 baseReg = 0;
             }
             // load user program into memory
-            for (var i = baseReg; i < inputOpCodes.length; i++) {
-                _Memory.memory[i] = inputOpCodes[i];
+            if (baseReg != 999) {
+                for (var i = 0; i < inputOpCodes.length; i++) {
+                    _Memory.memory[baseReg + i] = inputOpCodes[i];
+                    // _MemoryAccessor.writeMemory(baseReg+i, inputOpCodes[i]);
+                }
             }
+            console.log(_Memory.memory);
             TSOS.Control.updateMemoryTable(baseReg);
             return baseReg;
-        };
-        MemoryManager.prototype.readMemory = function (index) {
-            // retrieve from Memory
-            var opCode = _Memory.memory[index];
-            return opCode;
         };
         MemoryManager.prototype.clearPartition = function (baseReg) {
             // free up memory when process completes
@@ -50,7 +56,13 @@ var TSOS;
                 _Memory.memory[i] = "00";
             }
             if (baseReg == 0) {
-                _Memory.memoryS1 = false;
+                this.memoryS1 = false;
+            }
+            else if (baseReg == 256) {
+                this.memoryS2 = false;
+            }
+            else {
+                this.memoryS3 = false;
             } // add other partitions later
             TSOS.Control.updateMemoryTable(baseReg);
         };

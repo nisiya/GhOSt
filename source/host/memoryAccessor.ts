@@ -22,14 +22,17 @@
                 }
 
                 public writeMemory(addr, data){
-                    var index: number = parseInt(addr, 16);  
-                    _Memory.memory[index] = data.toString(16);
-                    
+                    // var index: number = parseInt(addr, 16);  
+                    // _Memory.memory[index] = data.toString(16);
+                    _Memory.memory[addr] = data;
                     // 0 for now bc only one parition
                     Control.updateMemoryTable(0);
                 }
 
                 public readMemory(addr){
+                    var baseReg = _RunningQueue.q[0].pBase;
+                    var value = _Memory.memory[baseReg+addr];
+                    return value;
 
                 }
 
