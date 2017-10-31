@@ -41,9 +41,9 @@
                         _Memory.memory[baseReg+i] = inputOpCodes[i];
                         // _MemoryAccessor.writeMemory(baseReg+i, inputOpCodes[i]);
                     }
+                    Control.updateMemoryTable(baseReg);               
                 }
                 console.log(_Memory.memory);
-                Control.updateMemoryTable(baseReg);
                 return baseReg;
             }
             

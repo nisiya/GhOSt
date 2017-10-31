@@ -102,16 +102,16 @@ var TSOS;
             memoryContainer.appendChild(memoryTable);
         };
         Control.updateMemoryTable = function (baseReg) {
+            console.log("update");
             // update Memory table after new process is loaded
             var memoryTable = document.getElementById("tbMemory");
             var rowId;
             var index;
             var cellId;
-            var limitReg = baseReg + 256;
-            for (var i = baseReg; i < limitReg / 8; i++) {
-                rowId = "memoryRow-" + (8 * i);
+            for (var i = 0; i < 32; i++) {
+                rowId = "memoryRow-" + ((8 * i) + baseReg);
                 for (var j = 0; j < 8; j++) {
-                    index = j + (8 * i);
+                    index = j + ((8 * i) + baseReg);
                     var id = "000" + index.toString(16).toUpperCase();
                     cellId = id.slice(-4);
                     memoryTable.rows.namedItem(rowId).cells.namedItem(cellId).innerHTML = _Memory.memory[index];

@@ -45,9 +45,9 @@ var TSOS;
                     _Memory.memory[baseReg + i] = inputOpCodes[i];
                     // _MemoryAccessor.writeMemory(baseReg+i, inputOpCodes[i]);
                 }
+                TSOS.Control.updateMemoryTable(baseReg);
             }
             console.log(_Memory.memory);
-            TSOS.Control.updateMemoryTable(baseReg);
             return baseReg;
         };
         MemoryManager.prototype.clearPartition = function (baseReg) {
