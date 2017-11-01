@@ -172,10 +172,10 @@ var TSOS;
             row.appendChild(cell);
             processTableBody.appendChild(row);
         };
-        Control.updateProcessTable = function (pCounter, pIR, pAcc, pXreg, pYreg, pZflag) {
+        Control.updateProcessTable = function (pid, pCounter, pIR, pAcc, pXreg, pYreg, pZflag) {
             // update process display when process is running
             var processTableBody = document.getElementById("processTbody");
-            var row = processTableBody.rows.item(0);
+            var row = document.getElementById("pid" + pid);
             row.cells.item(1).innerHTML = pCounter;
             row.cells.item(2).innerHTML = pIR;
             row.cells.item(3).innerHTML = pAcc;
@@ -184,12 +184,12 @@ var TSOS;
             row.cells.item(6).innerHTML = pZflag;
             row.cells.item(7).innerHTML = "Running";
         };
-        Control.removeProcessTable = function () {
+        Control.removeProcessTable = function (pid) {
             // remove process from display upon completion
             var processTableBody = document.getElementById("processTbody");
-            // var row: HTMLTableRowElement = <HTMLTableRowElement> document.getElementById("pid"+pid);     
-            processTableBody.deleteRow(0);
-            // row.parentNode.removeChild(row);      
+            var row = document.getElementById("pid" + pid);
+            // processTableBody.deleteRow(0);
+            row.parentNode.removeChild(row);
         };
         //
         // updating the CPU display

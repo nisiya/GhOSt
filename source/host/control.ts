@@ -194,10 +194,10 @@ module TSOS {
             processTableBody.appendChild(row);
         } 
 
-        public static updateProcessTable(pCounter, pIR, pAcc, pXreg, pYreg, pZflag): void{
+        public static updateProcessTable(pid, pCounter, pIR, pAcc, pXreg, pYreg, pZflag): void{
             // update process display when process is running
             var processTableBody: HTMLTableSectionElement = <HTMLTableSectionElement> document.getElementById("processTbody");                
-            var row = processTableBody.rows.item(0);
+            var row: HTMLTableRowElement = <HTMLTableRowElement> document.getElementById("pid"+pid);     
             row.cells.item(1).innerHTML = pCounter;
             row.cells.item(2).innerHTML = pIR;
             row.cells.item(3).innerHTML = pAcc;
@@ -207,12 +207,12 @@ module TSOS {
             row.cells.item(7).innerHTML = "Running";
         }
 
-        public static removeProcessTable(): void{
+        public static removeProcessTable(pid): void{
             // remove process from display upon completion
             var processTableBody: HTMLTableSectionElement = <HTMLTableSectionElement> document.getElementById("processTbody");    
-            // var row: HTMLTableRowElement = <HTMLTableRowElement> document.getElementById("pid"+pid);     
-            processTableBody.deleteRow(0);
-            // row.parentNode.removeChild(row);      
+            var row: HTMLTableRowElement = <HTMLTableRowElement> document.getElementById("pid"+pid);     
+            // processTableBody.deleteRow(0);
+            row.parentNode.removeChild(row);      
         }
 
 

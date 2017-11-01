@@ -182,8 +182,7 @@ var TSOS;
             // clear partion starting from base 0
             var process = _RunningQueue.dequeue();
             _MemoryManager.clearPartition(process.pBase);
-            TSOS.Control.removeProcessTable();
-            _RunningQueue.dequeue();
+            TSOS.Control.removeProcessTable(process.pid);
         };
         Kernel.prototype.userPrgError = function (opCode) {
             // When user program entry is not a valid op ocde

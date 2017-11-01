@@ -43,13 +43,14 @@ module TSOS {
             _Kernel.krnTrace('CPU cycle');
             // TODO: Accumulate CPU usage and profiling statistics here.
             // Do the real work here. Be sure to set this.isExecuting appropriately.
-
+            var process;
+            
             if(this.PC==0){
                 // move pcb from ready queue to running
-                var process = _ReadyQueue.dequeue();
+                process = _ReadyQueue.dequeue();
                 process.pState = "Running";
                 _RunningQueue.enqueue(process);
-                Control.updateProcessTable(this.PC, this.IR, this.Acc, this.Xreg, this.Yreg, this.Zflag);
+                Control.updateProcessTable(process.pid, this.PC, this.IR, this.Acc, this.Xreg, this.Yreg, this.Zflag);
             }
             
             // fetch instruction from memory
@@ -62,7 +63,7 @@ module TSOS {
             // update display tables
             Control.updateCPUTable(this);
             if(this.isExecuting){
-                Control.updateProcessTable(this.PC, this.IR, this.Acc, this.Xreg, this.Yreg, this.Zflag);
+                Control.updateProcessTable(process.pid, this.PC, this.IR, this.Acc, this.Xreg, this.Yreg, this.Zflag);
             }
         }
 

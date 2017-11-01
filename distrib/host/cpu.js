@@ -46,12 +46,13 @@ var TSOS;
             _Kernel.krnTrace('CPU cycle');
             // TODO: Accumulate CPU usage and profiling statistics here.
             // Do the real work here. Be sure to set this.isExecuting appropriately.
+            var process;
             if (this.PC == 0) {
                 // move pcb from ready queue to running
-                var process = _ReadyQueue.dequeue();
+                process = _ReadyQueue.dequeue();
                 process.pState = "Running";
                 _RunningQueue.enqueue(process);
-                TSOS.Control.updateProcessTable(this.PC, this.IR, this.Acc, this.Xreg, this.Yreg, this.Zflag);
+                TSOS.Control.updateProcessTable(process.pid, this.PC, this.IR, this.Acc, this.Xreg, this.Yreg, this.Zflag);
             }
             // fetch instruction from memory
             var opCode = this.fetch(this.PC);
@@ -61,7 +62,7 @@ var TSOS;
             // update display tables
             TSOS.Control.updateCPUTable(this);
             if (this.isExecuting) {
-                TSOS.Control.updateProcessTable(this.PC, this.IR, this.Acc, this.Xreg, this.Yreg, this.Zflag);
+                TSOS.Control.updateProcessTable(process.pid, this.PC, this.IR, this.Acc, this.Xreg, this.Yreg, this.Zflag);
             }
         };
         Cpu.prototype.fetch = function (PC) {

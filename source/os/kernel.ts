@@ -203,8 +203,7 @@ module TSOS {
             // clear partion starting from base 0
             var process = _RunningQueue.dequeue();
             _MemoryManager.clearPartition(process.pBase);
-            Control.removeProcessTable();
-            _RunningQueue.dequeue();
+            Control.removeProcessTable(process.pid);
         }
 
         public userPrgError(opCode){
