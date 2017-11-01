@@ -22,7 +22,9 @@
                 }
 
                 public writeMemory(addr, data){
-                    var baseReg = _RunningQueue.q[0].pBase;
+                    var process = _RunningQueue.dequeue();
+                    _RunningQueue.enqueue(process);
+                    var baseReg = process.pBase;
                     var index: number = parseInt(addr, 16) + baseReg;  
                     _Memory.memory[index] = data.toString(16);
                     

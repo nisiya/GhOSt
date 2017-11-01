@@ -180,7 +180,8 @@ var TSOS;
         Kernel.prototype.krnExitProcess = function () {
             // exit process upon completion
             // clear partion starting from base 0
-            _MemoryManager.clearPartition(0);
+            var process = _RunningQueue.dequeue();
+            _MemoryManager.clearPartition(process.pBase);
             TSOS.Control.removeProcessTable();
             _RunningQueue.dequeue();
         };

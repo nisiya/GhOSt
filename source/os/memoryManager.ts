@@ -56,8 +56,20 @@
                     this.memoryS2 = false;
                 } else {
                     this.memoryS3 = false;
-                } // add other partitions later
+                }
                 Control.updateMemoryTable(baseReg);
+            }
+
+            public clearMemory(): void{
+                // clear all memory partitions
+                this.clearPartition(0);
+                this.memoryS1 = false;
+
+                this.clearPartition(256);
+                this.memoryS2 = false;
+
+                this.clearPartition(512);
+                this.memoryS3 = false;
             }
         }
     }

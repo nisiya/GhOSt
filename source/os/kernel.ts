@@ -201,7 +201,8 @@ module TSOS {
         public krnExitProcess(){
             // exit process upon completion
             // clear partion starting from base 0
-            _MemoryManager.clearPartition(0);
+            var process = _RunningQueue.dequeue();
+            _MemoryManager.clearPartition(process.pBase);
             Control.removeProcessTable();
             _RunningQueue.dequeue();
         }

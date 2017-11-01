@@ -61,8 +61,17 @@ var TSOS;
             }
             else {
                 this.memoryS3 = false;
-            } // add other partitions later
+            }
             TSOS.Control.updateMemoryTable(baseReg);
+        };
+        MemoryManager.prototype.clearMemory = function () {
+            // clear all memory partitions
+            this.clearPartition(0);
+            this.memoryS1 = false;
+            this.clearPartition(256);
+            this.memoryS2 = false;
+            this.clearPartition(512);
+            this.memoryS3 = false;
         };
         return MemoryManager;
     }());

@@ -139,6 +139,12 @@ module TSOS {
                 "<string> - Sets the user status.");
             this.commandList[this.commandList.length] = sc;
 
+            // clearmem
+            sc = new ShellCommand(this.shellClearmem,
+                "clearmem",
+                "clear all memory partition");
+            this.commandList[this.commandList.length] = sc;
+
             //
             // Display the initial prompt.
             this.putPrompt();
@@ -382,19 +388,24 @@ module TSOS {
 
                     // run <pid>
                     case "run":
-                    _StdOut.putText("Runs the process with id <pid>.");
-                    break;
+                        _StdOut.putText("Runs the process with id <pid>.");
+                        break;
 
                     // welp
                     case "welp":
                         _StdOut.putText("Welp triggers the BSOD, when the kernel traps an OS error.");
                         break;
 
-                    // prompt
+                    // status
                     case "status":
-                    _StdOut.putText("Status followed by a string would set the user status as the string.");
-                    break;
+                        _StdOut.putText("Status followed by a string would set the user status as the string.");
+                        break;
 
+                    // clearmem
+                    case "clearmem":
+                    _StdOut.putText("Clears all memory partitions.");
+                    break;
+                    
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
 
@@ -541,6 +552,11 @@ module TSOS {
             } else {
                 _StdOut.putText("Usage: status <string>  Please supply a string.");
             }
+        }
+
+        // clearmem
+        public shellClearmem(args){
+            _MemoryManager.clearMemory();
         }
     }
 }
