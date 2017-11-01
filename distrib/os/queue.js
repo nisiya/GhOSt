@@ -30,6 +30,23 @@ var TSOS;
             }
             return retVal;
         };
+        // public removeProcess(pid) {
+        //     var retVal = null;
+        //     if (this.q.length > 0) {
+        //         var index;
+        //         for (var i = 0; i < this.q.length; i++){
+        //             if(this.q[i].pid == pid){
+        //                 index = i;
+        //             }
+        //         }
+        //         // var index = this.q.indexOf(pid);
+        //         retVal = this.q[index];
+        //         this.q.splice(index, 1);
+        //     }
+        //     console.log(retVal);
+        //     console.log(this.q);
+        //     return retVal;   
+        // }
         Queue.prototype.toString = function () {
             var retVal = "";
             for (var i in this.q) {

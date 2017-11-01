@@ -31,6 +31,7 @@ var _CPU: TSOS.Cpu;  // Utilize TypeScript's type annotation system to ensure th
 var _Memory: TSOS.Memory; // same with Memory
 var _MemoryAccessor: TSOS.MemoryAccessor; // and Memory Accessor
 var _MemoryManager: TSOS.MemoryManager; // and Memory Manager
+var _CpuScheduler: TSOS.CpuScheduler; // and CPU Scheduler
 
 var _OSclock: number = 0;  // Page 23.
 
@@ -53,6 +54,7 @@ var _ResidentQueue;
 var _ReadyQueue;
 var _RunningQueue;
 var _PID: number = -1; // keep track of process ids
+// var _QID: number = 0; // to index the queue...
 var _singleMode = false;
 
 // Standard input and output

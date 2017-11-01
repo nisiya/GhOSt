@@ -416,16 +416,24 @@ var TSOS;
             // validate input for integer
             if (valText.test(args) && args != "") {
                 // check if there are processes to be run
+                // if (_ResidentQueue.isEmpty()){
+                //     _StdOut.putText("No process is loaded in memory.");
+                // } else if(args!=_PID) {
+                //     // check if value matches current pid
+                //     _StdOut.putText("No process with id: " + args);                    
+                // } else{
+                //     _Kernel.krnExecuteProcess();
+                // }
                 if (_ResidentQueue.isEmpty()) {
                     _StdOut.putText("No process is loaded in memory.");
                 }
-                else if (args != _PID) {
-                    // check if value matches current pid
-                    _StdOut.putText("No process with id: " + args);
-                }
                 else {
-                    _Kernel.krnExecuteProcess();
+                    _Kernel.krnExecuteProcess(args);
                 }
+                // else {
+                //     // check if value matches current pid
+                //     _StdOut.putText("No process with id: " + args);                    
+                // } 
             }
             else {
                 _StdOut.putText("Please enter an integer for process id after run command.");

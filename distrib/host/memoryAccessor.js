@@ -20,14 +20,15 @@ var TSOS;
             // Control.loadMemoryTable();
         };
         MemoryAccessor.prototype.writeMemory = function (addr, data) {
-            // var index: number = parseInt(addr, 16);  
-            // _Memory.memory[index] = data.toString(16);
-            _Memory.memory[addr] = data;
+            var baseReg = _RunningQueue.q[0].pBase;
+            var index = parseInt(addr, 16) + baseReg;
+            _Memory.memory[index] = data.toString(16);
             // 0 for now bc only one parition
             TSOS.Control.updateMemoryTable(0);
         };
         MemoryAccessor.prototype.readMemory = function (addr) {
             var baseReg = _RunningQueue.q[0].pBase;
+            console.log(baseReg + "base");
             var value = _Memory.memory[baseReg + addr];
             return value;
         };

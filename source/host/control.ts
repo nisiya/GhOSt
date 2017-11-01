@@ -120,13 +120,12 @@ module TSOS {
         }
 
         public static updateMemoryTable(baseReg): void {
-            console.log("update");
             // update Memory table after new process is loaded
             var memoryTable: HTMLTableElement = <HTMLTableElement> document.getElementById("tbMemory");
             var rowId: string;
             var index: number;                    
             var cellId: string;
-            
+
             for (var i = 0; i < 32 ; i++){
                 rowId = "memoryRow-" + ((8*i)+baseReg);
                 for (var j = 0; j < 8; j ++){
@@ -260,6 +259,8 @@ module TSOS {
             // ... Create and initialize the Memory (yup part of hardware too)
             _Memory = new Memory();  // one memory for now
             _Memory.init();  
+            // load table on user interface
+            Control.loadMemoryTable();
 
             // ... Create and initialize the Memory Accessor
             _MemoryAccessor = new MemoryAccessor();

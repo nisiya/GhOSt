@@ -19,8 +19,6 @@ var TSOS;
             for (var i = 0; i < 768; i++) {
                 this.memory.push("00");
             }
-            // load table on user interface
-            TSOS.Control.loadMemoryTable();
         };
         return Memory;
     }());

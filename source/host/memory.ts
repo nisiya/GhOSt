@@ -23,9 +23,6 @@
                     for (var i = 0; i<768; i++){
                         this.memory.push("00");
                     }
-
-                    // load table on user interface
-                    Control.loadMemoryTable();
                 }
 
             }

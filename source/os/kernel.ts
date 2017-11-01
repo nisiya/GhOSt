@@ -51,6 +51,8 @@ module TSOS {
             // Launch memory manager
             _MemoryManager = new MemoryManager();
 
+            // Launch CPU scheduler
+            _CpuScheduler = new CpuScheduler();
             // Enable the OS Interrupts.  (Not the CPU clock interrupt, as that is done in the hardware sim.)
             this.krnTrace("Enabling the interrupts.");
             this.krnEnableInterrupts();
@@ -177,10 +179,20 @@ module TSOS {
             return pid;
         }
 
-        public krnExecuteProcess(){
+        public krnExecuteProcess(pid){
             // only one process in ready queue for now
             var process = _ResidentQueue.dequeue();
+            var switched:boolean = false;
+            while (process.pid != pid){
+                _ResidentQueue.enqueue(process);
+                process = _ResidentQueue.dequeue();
+                switched = !switched;
+            }
+            if (switched){
+                _ResidentQueue.enqueue(_ResidentQueue.dequeue());
+            }
             process.pState = "Ready";
+            console.log(_ResidentQueue.q);
             _ReadyQueue.enqueue(process);
             // start CPU
             _CPU.isExecuting = true;

@@ -102,7 +102,6 @@ var TSOS;
             memoryContainer.appendChild(memoryTable);
         };
         Control.updateMemoryTable = function (baseReg) {
-            console.log("update");
             // update Memory table after new process is loaded
             var memoryTable = document.getElementById("tbMemory");
             var rowId;
@@ -228,6 +227,8 @@ var TSOS;
             // ... Create and initialize the Memory (yup part of hardware too)
             _Memory = new TSOS.Memory(); // one memory for now
             _Memory.init();
+            // load table on user interface
+            Control.loadMemoryTable();
             // ... Create and initialize the Memory Accessor
             _MemoryAccessor = new TSOS.MemoryAccessor();
             _MemoryAccessor.init();
