@@ -19,22 +19,20 @@
                     if(this.memoryS2){
                         if(this.memoryS3){
                             // memory is full
-                            baseReg == 999;
+                            baseReg = 999;
                         } else{
-                            console.log("hit3");
                             this.memoryS3 = true;
                             baseReg = 512;
                         }
                     } else{
-                        console.log("hit2");
                         this.memoryS2 = true; 
                         baseReg = 256;
                     }
                 } else{
-                    console.log("hit");
                     this.memoryS1 = true;
                     baseReg = 0;
                 }
+                console.log(baseReg);
                 // load user program into memory
                 if(baseReg!=999){
                     for (var i = 0; i <inputOpCodes.length; i++){
