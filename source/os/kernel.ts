@@ -96,8 +96,11 @@ module TSOS {
                 this.krnInterruptHandler(interrupt.irq, interrupt.params);
             } else if (_CPU.isExecuting) { // If there are no interrupts then run one CPU cycle if there is anything being processed. {
                 if(!_singleMode){
+                    // check scheduler to see which process to run
                     _CpuScheduler.checkSchedule();
                     _CPU.cycle();
+
+                    // update display tables
                     Control.updateCPUTable();
                     Control.updateProcessTable(_RunningPID, "Running");
                 } else {
@@ -219,9 +222,12 @@ module TSOS {
         }
 
         public krnExecuteAllProcess(){
+            // bring all process to Ready queue
             while (_ResidentQueue.getSize() > 0){
                 _ReadyQueue.enqueue(_ResidentQueue.dequeue());
             }
+
+            // start CPU
             _CPU.isExecuting = true;
         }
 
@@ -249,17 +255,20 @@ module TSOS {
 
         public contextSwitch(){
             // save current process to PCB
-            var currProcess = new PCB(_RunningpBase, _RunningPID);
-            currProcess.pCounter = _CPU.PC;
-            currProcess.pAcc = _CPU.Acc;
-            currProcess.pXreg = _CPU.Xreg;
-            currProcess.pYreg = _CPU.Yreg;
-            currProcess.pZflag = _CPU.Zflag;
-            currProcess.pState = "Resident";
-            _ReadyQueue.enqueue(currProcess);
+            // if process finished, dont save it
+            if (_CPU.IR != "00"){
+                var currProcess = new PCB(_RunningpBase, _RunningPID);
+                currProcess.pCounter = _CPU.PC;
+                currProcess.pAcc = _CPU.Acc;
+                currProcess.pXreg = _CPU.Xreg;
+                currProcess.pYreg = _CPU.Yreg;
+                currProcess.pZflag = _CPU.Zflag;
+                currProcess.pState = "Resident";
+                _ReadyQueue.enqueue(currProcess);
 
-            Control.updateProcessTable(_RunningPID, currProcess.pState);
-            
+                Control.updateProcessTable(_RunningPID, currProcess.pState);
+            }
+
             // load next process to CPU
             var nextProcess = _ReadyQueue.dequeue();
             _CPU.PC = nextProcess.pCounter + 1;

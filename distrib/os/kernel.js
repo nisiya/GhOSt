@@ -85,8 +85,10 @@ var TSOS;
             }
             else if (_CPU.isExecuting) {
                 if (!_singleMode) {
+                    // check scheduler to see which process to run
                     _CpuScheduler.checkSchedule();
                     _CPU.cycle();
+                    // update display tables
                     TSOS.Control.updateCPUTable();
                     TSOS.Control.updateProcessTable(_RunningPID, "Running");
                 }
@@ -197,9 +199,11 @@ var TSOS;
             }
         };
         Kernel.prototype.krnExecuteAllProcess = function () {
+            // bring all process to Ready queue
             while (_ResidentQueue.getSize() > 0) {
                 _ReadyQueue.enqueue(_ResidentQueue.dequeue());
             }
+            // start CPU
             _CPU.isExecuting = true;
         };
         Kernel.prototype.krnExitProcess = function () {
@@ -223,15 +227,18 @@ var TSOS;
         };
         Kernel.prototype.contextSwitch = function () {
             // save current process to PCB
-            var currProcess = new TSOS.PCB(_RunningpBase, _RunningPID);
-            currProcess.pCounter = _CPU.PC;
-            currProcess.pAcc = _CPU.Acc;
-            currProcess.pXreg = _CPU.Xreg;
-            currProcess.pYreg = _CPU.Yreg;
-            currProcess.pZflag = _CPU.Zflag;
-            currProcess.pState = "Resident";
-            _ReadyQueue.enqueue(currProcess);
-            TSOS.Control.updateProcessTable(_RunningPID, currProcess.pState);
+            // if process finished, dont save it
+            if (_CPU.IR != "00") {
+                var currProcess = new TSOS.PCB(_RunningpBase, _RunningPID);
+                currProcess.pCounter = _CPU.PC;
+                currProcess.pAcc = _CPU.Acc;
+                currProcess.pXreg = _CPU.Xreg;
+                currProcess.pYreg = _CPU.Yreg;
+                currProcess.pZflag = _CPU.Zflag;
+                currProcess.pState = "Resident";
+                _ReadyQueue.enqueue(currProcess);
+                TSOS.Control.updateProcessTable(_RunningPID, currProcess.pState);
+            }
             // load next process to CPU
             var nextProcess = _ReadyQueue.dequeue();
             _CPU.PC = nextProcess.pCounter + 1;
