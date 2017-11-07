@@ -19,6 +19,7 @@ var TIMER_IRQ = 0; // Pages 23 (timer), 9 (interrupts), and 561 (interrupt prior
 var KEYBOARD_IRQ = 1;
 var PROCESS_ERROR_IRQ = 2;
 var PROCESS_PRINT_IRQ = 3;
+var CONTEXT_SWITCH_IRQ = 4;
 //
 // Global Variables
 // TODO: Make a global object and use that instead of the "_" naming convention in the global namespace.
@@ -45,7 +46,8 @@ var _ResidentQueue;
 var _ReadyQueue;
 var _RunningQueue;
 var _PID = -1; // keep track of process ids
-// var _QID: number = 0; // to index the queue...
+var _RunningPID = 0; // current running pid
+var _RunningpBase = 0; // base reg of running process
 var _singleMode = false;
 // Standard input and output
 var _StdIn; // Same "to null or not to null" issue as above.

@@ -22,19 +22,15 @@
                 }
 
                 public writeMemory(addr, data){
-                    var process = _RunningQueue.dequeue();
-                    _RunningQueue.enqueue(process);
-                    var baseReg = process.pBase;
+                    var baseReg = _RunningpBase;
                     var index: number = parseInt(addr, 16) + baseReg;  
                     _Memory.memory[index] = data.toString(16);
-                    
                     // 0 for now bc only one parition
                     Control.updateMemoryTable(0);
                 }
 
                 public readMemory(addr){
-                    var baseReg = _RunningQueue.q[0].pBase;
-                    console.log(baseReg + "base");
+                    var baseReg = _RunningpBase;
                     var value = _Memory.memory[baseReg+addr];
                     return value;
 

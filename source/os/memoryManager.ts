@@ -32,7 +32,6 @@
                     this.memoryS1 = true;
                     baseReg = 0;
                 }
-                console.log(baseReg);
                 // load user program into memory
                 if(baseReg!=999){
                     for (var i = 0; i <inputOpCodes.length; i++){
@@ -41,7 +40,6 @@
                     }
                     Control.updateMemoryTable(baseReg);               
                 }
-                console.log(_Memory.memory);
                 return baseReg;
             }
             

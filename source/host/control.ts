@@ -194,17 +194,17 @@ module TSOS {
             processTableBody.appendChild(row);
         } 
 
-        public static updateProcessTable(pid, pCounter, pIR, pAcc, pXreg, pYreg, pZflag): void{
+        public static updateProcessTable(pid, pState): void{
             // update process display when process is running
             var processTableBody: HTMLTableSectionElement = <HTMLTableSectionElement> document.getElementById("processTbody");                
             var row: HTMLTableRowElement = <HTMLTableRowElement> document.getElementById("pid"+pid);     
-            row.cells.item(1).innerHTML = pCounter;
-            row.cells.item(2).innerHTML = pIR;
-            row.cells.item(3).innerHTML = pAcc;
-            row.cells.item(4).innerHTML = pXreg;
-            row.cells.item(5).innerHTML = pYreg;
-            row.cells.item(6).innerHTML = pZflag;
-            row.cells.item(7).innerHTML = "Running";
+            row.cells.item(1).innerHTML = _CPU.PC.toString();
+            row.cells.item(2).innerHTML = _CPU.IR.toString();
+            row.cells.item(3).innerHTML = _CPU.Acc.toString();
+            row.cells.item(4).innerHTML = _CPU.Xreg.toString();
+            row.cells.item(5).innerHTML = _CPU.Yreg.toString();
+            row.cells.item(6).innerHTML = _CPU.Zflag.toString();
+            row.cells.item(7).innerHTML = pState;
         }
 
         public static removeProcessTable(pid): void{
@@ -218,15 +218,15 @@ module TSOS {
 
         //
         // updating the CPU display
-        public static updateCPUTable(cpu): void {
+        public static updateCPUTable(): void {
             // update the CPU display when  process is running
             var cpuTable: HTMLTableElement = <HTMLTableElement> document.getElementById("tbCPU");
-            cpuTable.rows[1].cells.namedItem("cPC").innerHTML = cpu.PC.toString();
-            cpuTable.rows[1].cells.namedItem("cIR").innerHTML = cpu.IR.toString();            
-            cpuTable.rows[1].cells.namedItem("cACC").innerHTML = cpu.Acc.toString();            
-            cpuTable.rows[1].cells.namedItem("cX").innerHTML = cpu.Xreg.toString();            
-            cpuTable.rows[1].cells.namedItem("cY").innerHTML = cpu.Yreg.toString();            
-            cpuTable.rows[1].cells.namedItem("cZ").innerHTML = cpu.Zflag.toString();                        
+            cpuTable.rows[1].cells.namedItem("cPC").innerHTML = _CPU.PC.toString();
+            cpuTable.rows[1].cells.namedItem("cIR").innerHTML = _CPU.IR.toString();            
+            cpuTable.rows[1].cells.namedItem("cACC").innerHTML = _CPU.Acc.toString();            
+            cpuTable.rows[1].cells.namedItem("cX").innerHTML = _CPU.Xreg.toString();            
+            cpuTable.rows[1].cells.namedItem("cY").innerHTML = _CPU.Yreg.toString();            
+            cpuTable.rows[1].cells.namedItem("cZ").innerHTML = _CPU.Zflag.toString();                        
         } 
 
 
@@ -308,6 +308,8 @@ module TSOS {
         public static hostBtnNext_click(btn): void {
             if(_CPU.isExecuting){
                 _CPU.cycle();
+                Control.updateCPUTable();
+                Control.updateProcessTable(_RunningPID, "Running");
             }
         }
 

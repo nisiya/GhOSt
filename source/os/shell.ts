@@ -127,6 +127,12 @@ module TSOS {
                 "- <pid> - Runs the process with the id.");
             this.commandList[this.commandList.length] = sc;
 
+            // runall
+            sc = new ShellCommand(this.shellRunall,
+                "runall",
+                "- Runs all loaded process.");
+            this.commandList[this.commandList.length] = sc;
+
             // welp
             sc = new ShellCommand(this.shellWelp,
                 "welp",
@@ -391,6 +397,11 @@ module TSOS {
                         _StdOut.putText("Runs the process with id <pid>.");
                         break;
 
+                    // runall
+                    case "runall":
+                        _StdOut.putText("Runs all the loaded processes.");
+                        break;
+
                     // welp
                     case "welp":
                         _StdOut.putText("Welp triggers the BSOD, when the kernel traps an OS error.");
@@ -513,29 +524,25 @@ module TSOS {
             var valText = /^\d*$/;
             // validate input for integer
             if (valText.test(args) && args != ""){
-                // check if there are processes to be run
-                // if (_ResidentQueue.isEmpty()){
-                //     _StdOut.putText("No process is loaded in memory.");
-                // } else if(args!=_PID) {
-                //     // check if value matches current pid
-                //     _StdOut.putText("No process with id: " + args);                    
-                // } else{
-                //     _Kernel.krnExecuteProcess();
-                // }
                 if (_ResidentQueue.isEmpty()){
                     _StdOut.putText("No process is loaded in memory.");
                 } else {
                     _Kernel.krnExecuteProcess(args);
                 } 
-                // else {
-                //     // check if value matches current pid
-                //     _StdOut.putText("No process with id: " + args);                    
-                // } 
             } else {
                 _StdOut.putText("Please enter an integer for process id after run command.");
             }  
         }
 
+        // runall
+        public shellRunall(args) {
+            if (_ResidentQueue.isEmpty()){
+                _StdOut.putText("No process is loaded in memory.");
+            } else {
+                _Kernel.krnExecuteAllProcess();
+            } 
+        }
+    
         // welp aka BSOD
         public shellWelp(args) {
             // adds element that Interrupt Handler does not know how to handle

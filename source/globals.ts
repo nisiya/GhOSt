@@ -22,6 +22,7 @@ const TIMER_IRQ: number = 0;  // Pages 23 (timer), 9 (interrupts), and 561 (inte
 const KEYBOARD_IRQ: number = 1;
 const PROCESS_ERROR_IRQ: number = 2;
 const PROCESS_PRINT_IRQ: number = 3;
+const CONTEXT_SWITCH_IRQ: number = 4;
 
 //
 // Global Variables
@@ -54,7 +55,8 @@ var _ResidentQueue;
 var _ReadyQueue;
 var _RunningQueue;
 var _PID: number = -1; // keep track of process ids
-// var _QID: number = 0; // to index the queue...
+var _RunningPID: number = 0; // current running pid
+var _RunningpBase: number = 0; // base reg of running process
 var _singleMode = false;
 
 // Standard input and output

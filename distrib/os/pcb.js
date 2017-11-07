@@ -27,7 +27,7 @@ var TSOS;
             this.pLocation = "Memory";
             this.pid = pid;
             this.pBase = pBase;
-            this.pLimit = pBase + 255;
+            this.pLimit = 256;
             this.pState = "Resident";
         }
         return PCB;
