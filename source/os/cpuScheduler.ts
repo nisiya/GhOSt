@@ -17,6 +17,7 @@
             // }
 
             public checkSchedule(): void {
+                console.log(_RunningPID+ " is running");
                 // run very first process normally
                 if (this.currCycle == 0 && _CPU.PC == 0){
                     var process = _ReadyQueue.dequeue();
@@ -32,7 +33,7 @@
                     
                     // if there are processes waiting in Ready queue, context switch
                     if (!_ReadyQueue.isEmpty()){
-                        _KernelInterruptQueue.enqueue(new Interrupt(CONTEXT_SWITCH_IRQ, null));
+                        _KernelInterruptQueue.enqueue(new Interrupt(CONTEXT_SWITCH_IRQ, _RunningPID));
                     } else {
                         // if none, check if current process is finishing
                         if(_CPU.IR == "00"){

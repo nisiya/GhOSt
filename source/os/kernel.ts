@@ -93,6 +93,7 @@ module TSOS {
                 // Process the first interrupt on the interrupt queue.
                 // TODO: Implement a priority queue based on the IRQ number/id to enforce interrupt priority.
                 var interrupt = _KernelInterruptQueue.dequeue();
+                console.log("irq = " + interrupt.irq + " , params = " + interrupt.params);
                 this.krnInterruptHandler(interrupt.irq, interrupt.params);
             } else if (_CPU.isExecuting) { // If there are no interrupts then run one CPU cycle if there is anything being processed. {
                 if(!_singleMode){
@@ -153,6 +154,7 @@ module TSOS {
                     break;
                 case CONTEXT_SWITCH_IRQ: //
                     this.contextSwitch();
+                    break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
             }
@@ -265,8 +267,9 @@ module TSOS {
                 currProcess.pZflag = _CPU.Zflag;
                 currProcess.pState = "Resident";
                 _ReadyQueue.enqueue(currProcess);
-
-                Control.updateProcessTable(_RunningPID, currProcess.pState);
+                console.log(_CPU + " is saved");
+                console.log(_RunningPID + " is saved");
+                // Control.updateProcessTable(_RunningPID, currProcess.pState);
             }
 
             // load next process to CPU
@@ -279,8 +282,9 @@ module TSOS {
             nextProcess.pState = "Running";
             _RunningPID = nextProcess.pid;
             _RunningpBase = nextProcess.pBase;
-
-            Control.updateProcessTable(_RunningPID, nextProcess.pState);            
+            console.log(_CPU + " is loaded");            
+            console.log(_RunningPID + " is loaded")            
+            // Control.updateProcessTable(_RunningPID, nextProcess.pState);            
         }
 
         // - WaitForProcessToExit

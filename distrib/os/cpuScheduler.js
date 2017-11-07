@@ -16,6 +16,7 @@ var TSOS;
         //     this.currCycle = 0;
         // }
         CpuScheduler.prototype.checkSchedule = function () {
+            console.log(_RunningPID + " is running");
             // run very first process normally
             if (this.currCycle == 0 && _CPU.PC == 0) {
                 var process = _ReadyQueue.dequeue();
@@ -29,7 +30,7 @@ var TSOS;
             if (this.currCycle > this.quantum) {
                 // if there are processes waiting in Ready queue, context switch
                 if (!_ReadyQueue.isEmpty()) {
-                    _KernelInterruptQueue.enqueue(new TSOS.Interrupt(CONTEXT_SWITCH_IRQ, null));
+                    _KernelInterruptQueue.enqueue(new TSOS.Interrupt(CONTEXT_SWITCH_IRQ, _RunningPID));
                 }
                 else {
                     // if none, check if current process is finishing
