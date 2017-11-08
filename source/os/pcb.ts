@@ -32,7 +32,7 @@
         constructor(pBase, pid) {
             this.pid = pid;
             this.pBase = pBase;
-            this.pLimit = 256;
+            this.pLimit = 255;
             this.pState = "Resident";
         }
     }

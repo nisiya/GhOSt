@@ -93,7 +93,6 @@ module TSOS {
                 // Process the first interrupt on the interrupt queue.
                 // TODO: Implement a priority queue based on the IRQ number/id to enforce interrupt priority.
                 var interrupt = _KernelInterruptQueue.dequeue();
-                console.log("irq = " + interrupt.irq + " , params = " + interrupt.params);
                 this.krnInterruptHandler(interrupt.irq, interrupt.params);
             } else if (_CPU.isExecuting) { // If there are no interrupts then run one CPU cycle if there is anything being processed. {
                 if(!_singleMode){
@@ -103,7 +102,7 @@ module TSOS {
 
                     // update display tables
                     Control.updateCPUTable();
-                    Control.updateProcessTable(_RunningPID, "Running");
+                    if (_CPU.IR!=="00") Control.updateProcessTable(_RunningPID, "Running");
                 } else {
                     // enable next button in single step mode
                     Control.hostBtnNext_onOff();
@@ -180,8 +179,7 @@ module TSOS {
             _PID++;
             var pid = _PID;            
             var process = new PCB(pBase, pid);
-            // put process on ready queue
-            
+            // put process on resident queue
             _ResidentQueue.enqueue(process);
             // update process table
             Control.addProcessTable(process);
@@ -195,18 +193,18 @@ module TSOS {
             var pidExists:boolean = false;
 
             // extract correct process
+            // console.log("resident size"+_ResidentQueue.getSize());
             for (var i=0; i<_ResidentQueue.getSize(); i++){
                 process = _ResidentQueue.dequeue();
                 if (process.pid == pid){
                     pidExists = true;
-                    _ReadyQueue.enqueue(process);
                     break;
                 }
+                _ResidentQueue.enqueue(process);
                 // order of process in ready queue was switched
                 switched = !switched;
-                _ResidentQueue.enqueue(process);
             }
-            console.log(_ResidentQueue);
+            // console.log(_ResidentQueue);
             
             // if process exists, run it
             if (pidExists){
@@ -215,7 +213,8 @@ module TSOS {
                 }
                 process.pState = "Ready";
                 _ReadyQueue.enqueue(process);
-                // start CPU
+                // start CPU and scheduler
+                _CpuScheduler.start();                
                 _CPU.isExecuting = true;
             } else {
                 _StdOut.putText("No process with id: " + pid); 
@@ -228,8 +227,9 @@ module TSOS {
             while (_ResidentQueue.getSize() > 0){
                 _ReadyQueue.enqueue(_ResidentQueue.dequeue());
             }
-
-            // start CPU
+            console.log(_ReadyQueue.getSize());
+            // start CPU and scheduler
+            _CpuScheduler.start();
             _CPU.isExecuting = true;
         }
 
@@ -240,6 +240,7 @@ module TSOS {
             Control.removeProcessTable(_RunningPID);
             // _CPU.init();
             _CpuScheduler.currCycle = _CpuScheduler.quantum;
+            console.log("currCycle"+_CpuScheduler.currCycle);
             _CpuScheduler.checkSchedule();            
         }
 
@@ -269,12 +270,12 @@ module TSOS {
                 _ReadyQueue.enqueue(currProcess);
                 console.log(_CPU + " is saved");
                 console.log(_RunningPID + " is saved");
-                // Control.updateProcessTable(_RunningPID, currProcess.pState);
+                Control.updateProcessTable(_RunningPID, currProcess.pState);
             }
 
             // load next process to CPU
             var nextProcess = _ReadyQueue.dequeue();
-            _CPU.PC = nextProcess.pCounter + 1;
+            _CPU.PC = nextProcess.pCounter;
             _CPU.Acc = nextProcess.pAcc;
             _CPU.Xreg = nextProcess.pXreg;
             _CPU.Yreg = nextProcess.pYreg;
@@ -283,8 +284,8 @@ module TSOS {
             _RunningPID = nextProcess.pid;
             _RunningpBase = nextProcess.pBase;
             console.log(_CPU + " is loaded");            
-            console.log(_RunningPID + " is loaded")            
-            // Control.updateProcessTable(_RunningPID, nextProcess.pState);            
+            console.log(_RunningPID + " is loaded");            
+            Control.updateProcessTable(_RunningPID, nextProcess.pState);            
         }
 
         // - WaitForProcessToExit

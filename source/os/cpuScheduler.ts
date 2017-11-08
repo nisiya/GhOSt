@@ -11,23 +11,20 @@
             public quantum = 6;
             public currCycle = 0;
 
-            // public start(): void {
-            //     this.currCycle = 0;
-                
-            // }
+            public start(): void {
+                // run first process normally
+                this.currCycle = 0;
+                var process = _ReadyQueue.dequeue();
+                process.pState = "Running";
+                Control.updateProcessTable(process.pid, process.pState);
+                _RunningPID = process.pid;
+                _RunningpBase = process.pBase;
+                console.log(_RunningPID + " is running with base " + _RunningpBase);
+            }
 
             public checkSchedule(): void {
-                console.log(_RunningPID+ " is running");
-                // run very first process normally
-                if (this.currCycle == 0 && _CPU.PC == 0){
-                    var process = _ReadyQueue.dequeue();
-                    process.pState = "Running";
-                    _RunningPID = process.pid;
-                    _RunningpBase = process.pBase;
-                    Control.updateProcessTable(_RunningPID, process.pState);
-                }
                 this.currCycle++;
-                
+                console.log(this.currCycle+" cycle");
                 // if time's up
                 if (this.currCycle > this.quantum){
                     
@@ -36,6 +33,7 @@
                         _KernelInterruptQueue.enqueue(new Interrupt(CONTEXT_SWITCH_IRQ, _RunningPID));
                     } else {
                         // if none, check if current process is finishing
+                        console.log("IR" + _CPU.IR);
                         if(_CPU.IR == "00"){
                             _CPU.init();
                         }

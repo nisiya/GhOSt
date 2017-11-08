@@ -159,7 +159,7 @@ module TSOS {
                         // reset CPU
                         // this.init();
                         // disable next button
-                        Control.hostBtnNext_onOff();                        
+                        if(_singleMode) Control.hostBtnNext_onOff();
                         break;
 
                     // compare a byte in memory to the X reg

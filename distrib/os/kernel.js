@@ -81,7 +81,6 @@ var TSOS;
                 // Process the first interrupt on the interrupt queue.
                 // TODO: Implement a priority queue based on the IRQ number/id to enforce interrupt priority.
                 var interrupt = _KernelInterruptQueue.dequeue();
-                console.log("irq = " + interrupt.irq + " , params = " + interrupt.params);
                 this.krnInterruptHandler(interrupt.irq, interrupt.params);
             }
             else if (_CPU.isExecuting) {
@@ -91,7 +90,8 @@ var TSOS;
                     _CPU.cycle();
                     // update display tables
                     TSOS.Control.updateCPUTable();
-                    TSOS.Control.updateProcessTable(_RunningPID, "Running");
+                    if (_CPU.IR !== "00")
+                        TSOS.Control.updateProcessTable(_RunningPID, "Running");
                 }
                 else {
                     // enable next button in single step mode
@@ -161,7 +161,7 @@ var TSOS;
             _PID++;
             var pid = _PID;
             var process = new TSOS.PCB(pBase, pid);
-            // put process on ready queue
+            // put process on resident queue
             _ResidentQueue.enqueue(process);
             // update process table
             TSOS.Control.addProcessTable(process);
@@ -173,18 +173,18 @@ var TSOS;
             var switched = false;
             var pidExists = false;
             // extract correct process
+            // console.log("resident size"+_ResidentQueue.getSize());
             for (var i = 0; i < _ResidentQueue.getSize(); i++) {
                 process = _ResidentQueue.dequeue();
                 if (process.pid == pid) {
                     pidExists = true;
-                    _ReadyQueue.enqueue(process);
                     break;
                 }
+                _ResidentQueue.enqueue(process);
                 // order of process in ready queue was switched
                 switched = !switched;
-                _ResidentQueue.enqueue(process);
             }
-            console.log(_ResidentQueue);
+            // console.log(_ResidentQueue);
             // if process exists, run it
             if (pidExists) {
                 if (switched) {
@@ -192,7 +192,8 @@ var TSOS;
                 }
                 process.pState = "Ready";
                 _ReadyQueue.enqueue(process);
-                // start CPU
+                // start CPU and scheduler
+                _CpuScheduler.start();
                 _CPU.isExecuting = true;
             }
             else {
@@ -205,7 +206,9 @@ var TSOS;
             while (_ResidentQueue.getSize() > 0) {
                 _ReadyQueue.enqueue(_ResidentQueue.dequeue());
             }
-            // start CPU
+            console.log(_ReadyQueue.getSize());
+            // start CPU and scheduler
+            _CpuScheduler.start();
             _CPU.isExecuting = true;
         };
         Kernel.prototype.krnExitProcess = function () {
@@ -215,6 +218,7 @@ var TSOS;
             TSOS.Control.removeProcessTable(_RunningPID);
             // _CPU.init();
             _CpuScheduler.currCycle = _CpuScheduler.quantum;
+            console.log("currCycle" + _CpuScheduler.currCycle);
             _CpuScheduler.checkSchedule();
         };
         Kernel.prototype.userPrgError = function (opCode) {
@@ -241,11 +245,11 @@ var TSOS;
                 _ReadyQueue.enqueue(currProcess);
                 console.log(_CPU + " is saved");
                 console.log(_RunningPID + " is saved");
-                // Control.updateProcessTable(_RunningPID, currProcess.pState);
+                TSOS.Control.updateProcessTable(_RunningPID, currProcess.pState);
             }
             // load next process to CPU
             var nextProcess = _ReadyQueue.dequeue();
-            _CPU.PC = nextProcess.pCounter + 1;
+            _CPU.PC = nextProcess.pCounter;
             _CPU.Acc = nextProcess.pAcc;
             _CPU.Xreg = nextProcess.pXreg;
             _CPU.Yreg = nextProcess.pYreg;
@@ -255,7 +259,7 @@ var TSOS;
             _RunningpBase = nextProcess.pBase;
             console.log(_CPU + " is loaded");
             console.log(_RunningPID + " is loaded");
-            // Control.updateProcessTable(_RunningPID, nextProcess.pState);            
+            TSOS.Control.updateProcessTable(_RunningPID, nextProcess.pState);
         };
         // - WaitForProcessToExit
         // - CreateFile
