@@ -175,7 +175,6 @@ var TSOS;
         Control.updateProcessTable = function (pid, pState) {
             // update process display when process is running
             var processTableBody = document.getElementById("processTbody");
-            // console.log("? pid " + pid);
             var row = document.getElementById("pid" + pid);
             row.cells.item(1).innerHTML = _CPU.PC.toString();
             row.cells.item(2).innerHTML = _CPU.IR.toString();

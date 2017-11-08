@@ -197,7 +197,6 @@ module TSOS {
         public static updateProcessTable(pid, pState): void{
             // update process display when process is running
             var processTableBody: HTMLTableSectionElement = <HTMLTableSectionElement> document.getElementById("processTbody");                
-            // console.log("? pid " + pid);
             var row: HTMLTableRowElement = <HTMLTableRowElement> document.getElementById("pid"+pid);     
             row.cells.item(1).innerHTML = _CPU.PC.toString();
             row.cells.item(2).innerHTML = _CPU.IR.toString();

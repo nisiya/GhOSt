@@ -31,7 +31,6 @@ var TSOS;
                 }
                 else {
                     // if none, check if current process is finishing
-                    console.log("IR" + _CPU.IR);
                     if (_CPU.IR == "00") {
                         _CPU.init();
                     }

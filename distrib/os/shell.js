@@ -81,11 +81,14 @@ var TSOS;
             // runall
             sc = new TSOS.ShellCommand(this.shellRunall, "runall", "- Runs all loaded process.");
             this.commandList[this.commandList.length] = sc;
+            // quantum
+            sc = new TSOS.ShellCommand(this.shellQuantum, "quantum", "- <int> - Sets the Round Robin quantum to this value.");
+            this.commandList[this.commandList.length] = sc;
+            // ps
+            sc = new TSOS.ShellCommand(this.shellPs, "ps", "Outputs pid of active processes.");
+            this.commandList[this.commandList.length] = sc;
             // welp
             sc = new TSOS.ShellCommand(this.shellWelp, "welp", "- Displays BSOD when the kernel traps an OS error.");
-            this.commandList[this.commandList.length] = sc;
-            // run
-            sc = new TSOS.ShellCommand(this.shellQuantum, "quantum", "- <int> - Sets the Round Robin quantum to this value.");
             this.commandList[this.commandList.length] = sc;
             // prompt <string>
             sc = new TSOS.ShellCommand(this.shellStatus, "status", "<string> - Sets the user status.");
@@ -314,6 +317,9 @@ var TSOS;
                     case "quantum":
                         _StdOut.putText("Sets the Round Robin quantum to <int>.");
                         break;
+                    case "ps":
+                        _StdOut.putText("Outputs pid of active processes.");
+                        break;
                     // welp
                     case "welp":
                         _StdOut.putText("Welp triggers the BSOD, when the kernel traps an OS error.");
@@ -462,6 +468,17 @@ var TSOS;
             else {
                 _StdOut.putText("Please enter an integer for quantum value after quantum command.");
             }
+        };
+        // ps
+        Shell.prototype.shellPs = function (args) {
+            var activeProcess;
+            var process;
+            for (var i = 0; i < _ReadyQueue.getSize(); i++) {
+                process = _ReadyQueue.dequeue();
+                activeProcess.push(process.pid);
+                _ReadyQueue.enqueue();
+            }
+            _StdOut.putText(activeProcess.toString());
         };
         // welp aka BSOD
         Shell.prototype.shellWelp = function (args) {
