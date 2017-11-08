@@ -53,6 +53,8 @@ module TSOS {
             //     Control.updateProcessTable(_RunningPID, process.pState);
             // }
             
+            console.log(_RunningPID);
+            console.log(_ActivePIDs);
             // fetch instruction from memory
             var opCode = this.fetch(this.PC);
             this.IR = opCode;

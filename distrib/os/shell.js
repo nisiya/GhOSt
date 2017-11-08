@@ -480,6 +480,17 @@ var TSOS;
             }
             _StdOut.putText(activeProcess.toString());
         };
+        // kill
+        Shell.prototype.shellKill = function (args) {
+            var valText = /^\d*$/;
+            // validate input for integer
+            if (valText.test(args) && args != "") {
+                _CpuScheduler.quantum = args;
+            }
+            else {
+                _StdOut.putText("Please enter an integer for quantum value after quantum command.");
+            }
+        };
         // welp aka BSOD
         Shell.prototype.shellWelp = function (args) {
             // adds element that Interrupt Handler does not know how to handle

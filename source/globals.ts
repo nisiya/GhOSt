@@ -55,6 +55,7 @@ var _ResidentQueue;
 var _ReadyQueue;
 var _RunningQueue;
 var _PID: number = -1; // keep track of process ids
+var _ActivePIDs = new Array<number>();
 var _RunningPID: number = 0; // current running pid
 var _RunningpBase: number = 0; // base reg of running process
 var _singleMode = false;

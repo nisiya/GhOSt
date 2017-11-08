@@ -18,6 +18,7 @@
                 process.pState = "Running";
                 Control.updateProcessTable(process.pid, process.pState);
                 _RunningPID = process.pid;
+                _ActivePIDs.push(_RunningPID);
                 _RunningpBase = process.pBase;
             }
 

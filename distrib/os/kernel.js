@@ -214,6 +214,7 @@ var TSOS;
             // clear partion starting from base
             _MemoryManager.clearPartition(_RunningpBase);
             TSOS.Control.removeProcessTable(_RunningPID);
+            // _ActivePIDs.splice(_ActivePIDs.indexOf(_RunningPID,0));
             // move onto next iteration
             _CpuScheduler.currCycle = _CpuScheduler.quantum;
             _CpuScheduler.checkSchedule();
