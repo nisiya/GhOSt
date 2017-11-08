@@ -154,12 +154,11 @@ module TSOS {
 
                     // break
                     case "00":
-                        // stop
+                        // stop and exit current process
                         _Kernel.krnExitProcess();
-                        // reset CPU
-                        // this.init();
                         // disable next button
-                        if(_singleMode) Control.hostBtnNext_onOff();
+                        if(_singleMode)
+                            Control.hostBtnNext_onOff();
                         break;
 
                     // compare a byte in memory to the X reg

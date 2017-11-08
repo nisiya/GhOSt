@@ -139,6 +139,12 @@ module TSOS {
                 "- Displays BSOD when the kernel traps an OS error.");
             this.commandList[this.commandList.length] = sc;
 
+            // run
+            sc = new ShellCommand(this.shellQuantum,
+                "quantum",
+                "- <int> - Sets the Round Robin quantum to this value.");
+            this.commandList[this.commandList.length] = sc;
+
             // prompt <string>
             sc = new ShellCommand(this.shellStatus,
                 "status",
@@ -345,16 +351,12 @@ module TSOS {
 
                     // rot13
                     case "rot13":
-                        _StdOut.putText("Rot13 followed by a string would rotate each letter of the ");
-                        _StdOut.advanceLine();
-                        _StdOut.putText("string by 13 places. E.g. 'ace' would be 'npr'.");
+                        _StdOut.putText("Rot13 followed by a string would rotate each letter of the string by 13 places. E.g. 'ace' would be 'npr'.");
                         break;
 
                     // prompt
                     case "prompt":
-                        _StdOut.putText("Prompt followed by a string would set the prompt as the ");
-                        _StdOut.advanceLine();
-                        _StdOut.putText("string instead of the default >.");
+                        _StdOut.putText("Prompt followed by a string would set the prompt as the string instead of the default >.");
                         break;
 
                     // ps
@@ -402,6 +404,10 @@ module TSOS {
                         _StdOut.putText("Runs all the loaded processes.");
                         break;
 
+                    // quantum <int>
+                    case "quantum":
+                        _StdOut.putText("Sets the Round Robin quantum to <int>.");
+                        break;
                     // welp
                     case "welp":
                         _StdOut.putText("Welp triggers the BSOD, when the kernel traps an OS error.");
@@ -542,7 +548,18 @@ module TSOS {
                 _Kernel.krnExecuteAllProcess();
             } 
         }
-    
+
+        // quantum
+        public shellQuantum(args) {
+            var valText = /^\d*$/;
+            // validate input for integer
+            if (valText.test(args) && args != ""){
+                _CpuScheduler.quantum = args;
+            } else {
+                _StdOut.putText("Please enter an integer for quantum value after quantum command.");
+            }  
+        }
+
         // welp aka BSOD
         public shellWelp(args) {
             // adds element that Interrupt Handler does not know how to handle

@@ -20,11 +20,9 @@ var TSOS;
             TSOS.Control.updateProcessTable(process.pid, process.pState);
             _RunningPID = process.pid;
             _RunningpBase = process.pBase;
-            console.log(_RunningPID + " is running with base " + _RunningpBase);
         };
         CpuScheduler.prototype.checkSchedule = function () {
             this.currCycle++;
-            console.log(this.currCycle + " cycle");
             // if time's up
             if (this.currCycle > this.quantum) {
                 // if there are processes waiting in Ready queue, context switch

@@ -96,13 +96,15 @@ module TSOS {
                 this.krnInterruptHandler(interrupt.irq, interrupt.params);
             } else if (_CPU.isExecuting) { // If there are no interrupts then run one CPU cycle if there is anything being processed. {
                 if(!_singleMode){
-                    // check scheduler to see which process to run
+                    // check scheduler to see which process to run and if quantum expired
                     _CpuScheduler.checkSchedule();
-                    _CPU.cycle();
 
+                    _CPU.cycle();
                     // update display tables
                     Control.updateCPUTable();
-                    if (_CPU.IR!=="00") Control.updateProcessTable(_RunningPID, "Running");
+                    // only update process if it is still running
+                    if (_CPU.IR!=="00") 
+                        Control.updateProcessTable(_RunningPID, "Running");
                 } else {
                     // enable next button in single step mode
                     Control.hostBtnNext_onOff();
@@ -151,7 +153,7 @@ module TSOS {
                 case PROCESS_PRINT_IRQ:  // print result of user program
                     this.processPrint(params);
                     break;
-                case CONTEXT_SWITCH_IRQ: //
+                case CONTEXT_SWITCH_IRQ: // called by scheduler to save current process and load next
                     this.contextSwitch();
                     break;
                 default:
@@ -193,7 +195,6 @@ module TSOS {
             var pidExists:boolean = false;
 
             // extract correct process
-            // console.log("resident size"+_ResidentQueue.getSize());
             for (var i=0; i<_ResidentQueue.getSize(); i++){
                 process = _ResidentQueue.dequeue();
                 if (process.pid == pid){
@@ -204,7 +205,6 @@ module TSOS {
                 // order of process in ready queue was switched
                 switched = !switched;
             }
-            // console.log(_ResidentQueue);
             
             // if process exists, run it
             if (pidExists){
@@ -227,7 +227,6 @@ module TSOS {
             while (_ResidentQueue.getSize() > 0){
                 _ReadyQueue.enqueue(_ResidentQueue.dequeue());
             }
-            console.log(_ReadyQueue.getSize());
             // start CPU and scheduler
             _CpuScheduler.start();
             _CPU.isExecuting = true;
@@ -235,12 +234,11 @@ module TSOS {
 
         public krnExitProcess(){
             // exit process upon completion
-            // clear partion starting from base 0
+            // clear partion starting from base
             _MemoryManager.clearPartition(_RunningpBase);
             Control.removeProcessTable(_RunningPID);
-            // _CPU.init();
+            // move onto next iteration
             _CpuScheduler.currCycle = _CpuScheduler.quantum;
-            console.log("currCycle"+_CpuScheduler.currCycle);
             _CpuScheduler.checkSchedule();            
         }
 
@@ -268,8 +266,6 @@ module TSOS {
                 currProcess.pZflag = _CPU.Zflag;
                 currProcess.pState = "Resident";
                 _ReadyQueue.enqueue(currProcess);
-                console.log(_CPU + " is saved");
-                console.log(_RunningPID + " is saved");
                 Control.updateProcessTable(_RunningPID, currProcess.pState);
             }
 
@@ -282,9 +278,7 @@ module TSOS {
             _CPU.Zflag = nextProcess.pZflag;
             nextProcess.pState = "Running";
             _RunningPID = nextProcess.pid;
-            _RunningpBase = nextProcess.pBase;
-            console.log(_CPU + " is loaded");            
-            console.log(_RunningPID + " is loaded");            
+            _RunningpBase = nextProcess.pBase;           
             Control.updateProcessTable(_RunningPID, nextProcess.pState);            
         }
 

@@ -140,10 +140,8 @@ var TSOS;
                         break;
                     // break
                     case "00":
-                        // stop
+                        // stop and exit current process
                         _Kernel.krnExitProcess();
-                        // reset CPU
-                        // this.init();
                         // disable next button
                         if (_singleMode)
                             TSOS.Control.hostBtnNext_onOff();

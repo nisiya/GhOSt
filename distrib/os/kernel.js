@@ -85,11 +85,12 @@ var TSOS;
             }
             else if (_CPU.isExecuting) {
                 if (!_singleMode) {
-                    // check scheduler to see which process to run
+                    // check scheduler to see which process to run and if quantum expired
                     _CpuScheduler.checkSchedule();
                     _CPU.cycle();
                     // update display tables
                     TSOS.Control.updateCPUTable();
+                    // only update process if it is still running
                     if (_CPU.IR !== "00")
                         TSOS.Control.updateProcessTable(_RunningPID, "Running");
                 }
@@ -137,7 +138,7 @@ var TSOS;
                 case PROCESS_PRINT_IRQ:// print result of user program
                     this.processPrint(params);
                     break;
-                case CONTEXT_SWITCH_IRQ://
+                case CONTEXT_SWITCH_IRQ:// called by scheduler to save current process and load next
                     this.contextSwitch();
                     break;
                 default:
@@ -173,7 +174,6 @@ var TSOS;
             var switched = false;
             var pidExists = false;
             // extract correct process
-            // console.log("resident size"+_ResidentQueue.getSize());
             for (var i = 0; i < _ResidentQueue.getSize(); i++) {
                 process = _ResidentQueue.dequeue();
                 if (process.pid == pid) {
@@ -184,7 +184,6 @@ var TSOS;
                 // order of process in ready queue was switched
                 switched = !switched;
             }
-            // console.log(_ResidentQueue);
             // if process exists, run it
             if (pidExists) {
                 if (switched) {
@@ -206,19 +205,17 @@ var TSOS;
             while (_ResidentQueue.getSize() > 0) {
                 _ReadyQueue.enqueue(_ResidentQueue.dequeue());
             }
-            console.log(_ReadyQueue.getSize());
             // start CPU and scheduler
             _CpuScheduler.start();
             _CPU.isExecuting = true;
         };
         Kernel.prototype.krnExitProcess = function () {
             // exit process upon completion
-            // clear partion starting from base 0
+            // clear partion starting from base
             _MemoryManager.clearPartition(_RunningpBase);
             TSOS.Control.removeProcessTable(_RunningPID);
-            // _CPU.init();
+            // move onto next iteration
             _CpuScheduler.currCycle = _CpuScheduler.quantum;
-            console.log("currCycle" + _CpuScheduler.currCycle);
             _CpuScheduler.checkSchedule();
         };
         Kernel.prototype.userPrgError = function (opCode) {
@@ -243,8 +240,6 @@ var TSOS;
                 currProcess.pZflag = _CPU.Zflag;
                 currProcess.pState = "Resident";
                 _ReadyQueue.enqueue(currProcess);
-                console.log(_CPU + " is saved");
-                console.log(_RunningPID + " is saved");
                 TSOS.Control.updateProcessTable(_RunningPID, currProcess.pState);
             }
             // load next process to CPU
@@ -257,8 +252,6 @@ var TSOS;
             nextProcess.pState = "Running";
             _RunningPID = nextProcess.pid;
             _RunningpBase = nextProcess.pBase;
-            console.log(_CPU + " is loaded");
-            console.log(_RunningPID + " is loaded");
             TSOS.Control.updateProcessTable(_RunningPID, nextProcess.pState);
         };
         // - WaitForProcessToExit

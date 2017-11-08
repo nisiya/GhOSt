@@ -19,12 +19,10 @@
                 Control.updateProcessTable(process.pid, process.pState);
                 _RunningPID = process.pid;
                 _RunningpBase = process.pBase;
-                console.log(_RunningPID + " is running with base " + _RunningpBase);
             }
 
             public checkSchedule(): void {
                 this.currCycle++;
-                console.log(this.currCycle+" cycle");
                 // if time's up
                 if (this.currCycle > this.quantum){
                     
@@ -33,7 +31,6 @@
                         _KernelInterruptQueue.enqueue(new Interrupt(CONTEXT_SWITCH_IRQ, _RunningPID));
                     } else {
                         // if none, check if current process is finishing
-                        console.log("IR" + _CPU.IR);
                         if(_CPU.IR == "00"){
                             _CPU.init();
                         }
