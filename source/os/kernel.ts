@@ -98,7 +98,6 @@ module TSOS {
                 if(!_singleMode){
                     // check scheduler to see which process to run and if quantum expired
                     _CpuScheduler.checkSchedule();
-
                     _CPU.cycle();
                     // update display tables
                     Control.updateCPUTable();
@@ -221,7 +220,7 @@ module TSOS {
                 _CpuScheduler.activePIDs.push(process.pid);                
                 _ReadyQueue.enqueue(process);
                 // start CPU and scheduler
-                _CpuScheduler.start();                
+                _CpuScheduler.start();    
                 _CPU.isExecuting = true;
             } else {
                 _StdOut.putText("No process with id: " + pid); 
@@ -245,7 +244,10 @@ module TSOS {
         public krnExitProcess(){
             // exit process upon completion
             // clear partion starting from base
+            // console.log(_CpuScheduler.totalCycles);  
             var process = _CpuScheduler.runningProcess;
+            console.log("turnaround" +process.turnaroundTime);
+            process.waitTime = _CpuScheduler.totalCycles - process.turnaroundTime; 
             process.turnaroundTime = process.turnaroundTime + process.waitTime;
             _StdOut.advanceLine();
             _StdOut.putText("Process id: " + process.pid + " ended.");
@@ -258,7 +260,9 @@ module TSOS {
             var index = _CpuScheduler.activePIDs.indexOf(_RunningPID);
             _CpuScheduler.activePIDs.splice(index, 1);
             // move onto next iteration
+            console.log(_CpuScheduler.totalCycles);            
             _CpuScheduler.currCycle = _CpuScheduler.quantum;
+            _CpuScheduler.totalCycles--;
             _CPU.init();
             _CpuScheduler.checkSchedule();            
         }
@@ -324,7 +328,6 @@ module TSOS {
                 currProcess.pYreg = _CPU.Yreg;
                 currProcess.pZflag = _CPU.Zflag;
                 currProcess.pState = "Resident";
-                currProcess.waitTime = runningProcess.waitTime;
                 currProcess.turnaroundTime = runningProcess.turnaroundTime;
                 _ReadyQueue.enqueue(currProcess);
                 Control.updateProcessTable(_RunningPID, currProcess.pState);
@@ -338,8 +341,6 @@ module TSOS {
             _CPU.Yreg = nextProcess.pYreg;
             _CPU.Zflag = nextProcess.pZflag;
             nextProcess.pState = "Running";
-            nextProcess.waitTime = _CpuScheduler.totalCycles;
-            console.log(_CpuScheduler.totalCycles);
             _CpuScheduler.runningProcess = nextProcess;
             _RunningPID = nextProcess.pid;
             _RunningpBase = nextProcess.pBase;           

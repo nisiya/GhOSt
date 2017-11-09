@@ -222,7 +222,10 @@ var TSOS;
         Kernel.prototype.krnExitProcess = function () {
             // exit process upon completion
             // clear partion starting from base
+            // console.log(_CpuScheduler.totalCycles);  
             var process = _CpuScheduler.runningProcess;
+            console.log("turnaround" + process.turnaroundTime);
+            process.waitTime = _CpuScheduler.totalCycles - process.turnaroundTime;
             process.turnaroundTime = process.turnaroundTime + process.waitTime;
             _StdOut.advanceLine();
             _StdOut.putText("Process id: " + process.pid + " ended.");
@@ -235,7 +238,9 @@ var TSOS;
             var index = _CpuScheduler.activePIDs.indexOf(_RunningPID);
             _CpuScheduler.activePIDs.splice(index, 1);
             // move onto next iteration
+            console.log(_CpuScheduler.totalCycles);
             _CpuScheduler.currCycle = _CpuScheduler.quantum;
+            _CpuScheduler.totalCycles--;
             _CPU.init();
             _CpuScheduler.checkSchedule();
         };
@@ -299,7 +304,6 @@ var TSOS;
                 currProcess.pYreg = _CPU.Yreg;
                 currProcess.pZflag = _CPU.Zflag;
                 currProcess.pState = "Resident";
-                currProcess.waitTime = runningProcess.waitTime;
                 currProcess.turnaroundTime = runningProcess.turnaroundTime;
                 _ReadyQueue.enqueue(currProcess);
                 TSOS.Control.updateProcessTable(_RunningPID, currProcess.pState);
@@ -312,8 +316,6 @@ var TSOS;
             _CPU.Yreg = nextProcess.pYreg;
             _CPU.Zflag = nextProcess.pZflag;
             nextProcess.pState = "Running";
-            nextProcess.waitTime = _CpuScheduler.totalCycles;
-            console.log(_CpuScheduler.totalCycles);
             _CpuScheduler.runningProcess = nextProcess;
             _RunningPID = nextProcess.pid;
             _RunningpBase = nextProcess.pBase;
