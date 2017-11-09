@@ -20,9 +20,10 @@ const CPU_CLOCK_INTERVAL: number = 100;   // This is in ms (milliseconds) so 100
 const TIMER_IRQ: number = 0;  // Pages 23 (timer), 9 (interrupts), and 561 (interrupt priority).
                               // NOTE: The timer is different from hardware/host clock pulses. Don't confuse these.
 const KEYBOARD_IRQ: number = 1;
-const PROCESS_ERROR_IRQ: number = 2;
-const PROCESS_PRINT_IRQ: number = 3;
-const CONTEXT_SWITCH_IRQ: number = 4;
+const PROCESS_ERROR_IRQ: number = 2; // print error in user program
+const PROCESS_PRINT_IRQ: number = 3; // print text produced by user program
+const CONTEXT_SWITCH_IRQ: number = 4; // save current process and switch to next one
+const KILL_PROCESS_IRQ: number = 5; // kill a process
 
 //
 // Global Variables

@@ -79,18 +79,6 @@ module TSOS {
                                   "<string> - Sets the prompt.");
             this.commandList[this.commandList.length] = sc;
 
-            // ps  - list the running processes and their IDs
-            /*sc = new ShellCommand(this.shellPs,
-                                  "ps",
-                                  "- List the running processes and their IDs.");
-            this.commandList[this.commandList.length] = sc;
-
-            // kill <id> - kills the specified process id.
-            sc = new ShellCommand(this.shellKill,
-                                  "kill",
-                                  "<id> - Kills the specified process id.");
-            this.commandList[this.commandList.length] = sc; */
-
             // date
             sc = new ShellCommand(this.shellDate,
                                   "date",
@@ -121,7 +109,7 @@ module TSOS {
                 "- Validates and loads user program input into memory.");
             this.commandList[this.commandList.length] = sc;
 
-            // run
+            // run <id>
             sc = new ShellCommand(this.shellRun,
                 "run",
                 "- <pid> - Runs the process with the id.");
@@ -133,7 +121,7 @@ module TSOS {
                 "- Runs all loaded process.");
             this.commandList[this.commandList.length] = sc;
 
-            // quantum
+            // quantum <int>
             sc = new ShellCommand(this.shellQuantum,
                 "quantum",
                 "- <int> - Sets the Round Robin quantum to this value.");
@@ -143,6 +131,12 @@ module TSOS {
             sc = new ShellCommand(this.shellPs,
                 "ps",
                 "Outputs pid of active processes.");
+            this.commandList[this.commandList.length] = sc;
+
+            // kill <pid>
+            sc = new ShellCommand(this.shellKill,
+                "kill",
+                "<pid> - Kills the specified process id.");
             this.commandList[this.commandList.length] = sc;
 
 
@@ -367,16 +361,6 @@ module TSOS {
                         _StdOut.putText("Prompt followed by a string would set the prompt as the string instead of the default >.");
                         break;
 
-                    // ps
-                    case "ps":
-                        _StdOut.putText("Ps displays a list of current processes and their IDs.");
-                        break;
-
-                    // kill <id>
-                    case "kill":
-                        _StdOut.putText("Kill followed by the process ID would kill that process.");
-                        break;
-
                     // date
                     case "date":
                         _StdOut.putText("Date displays the current date and time in EST.");
@@ -417,9 +401,15 @@ module TSOS {
                         _StdOut.putText("Sets the Round Robin quantum to <int>.");
                         break;
 
-                    case "ps":
-                        _StdOut.putText("Outputs pid of active processes.");
-                        break;    
+                    // ps
+                     case "ps":
+                     _StdOut.putText("Ps displays a list of current processes and their IDs.");
+                     break;
+
+                    // kill <pid>
+                    case "kill":
+                     _StdOut.putText("Kill followed by the process ID would kill that process.");
+                     break;
                         
                     // welp
                     case "welp":
@@ -578,7 +568,7 @@ module TSOS {
             if (_CpuScheduler.activePIDs.length == 0){
                 _StdOut.putText("No process is active");
             } else {
-                _StdOut.putText("Active process(es): [" + _CpuScheduler.activePIDs.toString() + "]");
+                _StdOut.putText("Active process id(s): [" + _CpuScheduler.activePIDs.toString() + "]");
             }
         }
 
@@ -587,9 +577,9 @@ module TSOS {
             var valText = /^\d*$/;
             // validate input for integer
             if (valText.test(args) && args != ""){
-                _CpuScheduler.quantum = args;
+                _KernelInterruptQueue.enqueue(new Interrupt(KILL_PROCESS_IRQ, args));
             } else {
-                _StdOut.putText("Please enter an integer for quantum value after quantum command.");
+                _StdOut.putText("Please enter an integer for process id after kill command.");
             }  
         }
 

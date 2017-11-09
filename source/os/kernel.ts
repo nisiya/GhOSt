@@ -156,6 +156,9 @@ module TSOS {
                 case CONTEXT_SWITCH_IRQ: // called by scheduler to save current process and load next
                     this.contextSwitch();
                     break;
+                case KILL_PROCESS_IRQ:
+                    this.killProcess(params);
+                    break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
             }
@@ -247,6 +250,45 @@ module TSOS {
             _CpuScheduler.currCycle = _CpuScheduler.quantum;
             _CpuScheduler.checkSchedule();            
         }
+
+        public killProcess(pid){
+            // kill process
+            var process;
+            var index = _CpuScheduler.activePIDs.indexOf(parseInt(pid));
+
+            if (index == -1){
+                // if process with id is not active
+                _StdOut.putText("No process with id: " + pid + " is active"); 
+                _OsShell.putPrompt();
+            } else {
+                if (pid == _RunningPID){
+                    this.krnExitProcess();
+                    _CPU.IR = "00";
+                } else {
+                    for (var i=0; i<_ReadyQueue.getSize(); i++){
+                        process = _ReadyQueue.dequeue();
+                        if (process.pid == pid){
+                            var pBase = process.pBase;
+                            break;
+                        } else {
+                            _ReadyQueue.enqueue(process);
+                        }
+                    }
+                }
+                // remove process from display
+                Control.removeProcessTable(pid);
+                // clear partion starting from base
+                _MemoryManager.clearPartition(pBase);
+                // remove from active PID list
+                _CpuScheduler.activePIDs.splice(index, 1);
+                _StdOut.putText("Process id: " + pid + " has been terminated");
+                _StdOut.advanceLine();
+                // move onto next iteration
+                _CpuScheduler.currCycle = _CpuScheduler.quantum;
+                _CpuScheduler.checkSchedule(); 
+            }
+        }
+
 
         public userPrgError(opCode){
             // When user program entry is not a valid op ocde

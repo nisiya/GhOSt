@@ -49,17 +49,6 @@ var TSOS;
             // prompt <string>
             sc = new TSOS.ShellCommand(this.shellPrompt, "prompt", "<string> - Sets the prompt.");
             this.commandList[this.commandList.length] = sc;
-            // ps  - list the running processes and their IDs
-            /*sc = new ShellCommand(this.shellPs,
-                                  "ps",
-                                  "- List the running processes and their IDs.");
-            this.commandList[this.commandList.length] = sc;
-
-            // kill <id> - kills the specified process id.
-            sc = new ShellCommand(this.shellKill,
-                                  "kill",
-                                  "<id> - Kills the specified process id.");
-            this.commandList[this.commandList.length] = sc; */
             // date
             sc = new TSOS.ShellCommand(this.shellDate, "date", "- Displays the current date and time.");
             this.commandList[this.commandList.length] = sc;
@@ -75,17 +64,20 @@ var TSOS;
             // load
             sc = new TSOS.ShellCommand(this.shellLoad, "load", "- Validates and loads user program input into memory.");
             this.commandList[this.commandList.length] = sc;
-            // run
+            // run <id>
             sc = new TSOS.ShellCommand(this.shellRun, "run", "- <pid> - Runs the process with the id.");
             this.commandList[this.commandList.length] = sc;
             // runall
             sc = new TSOS.ShellCommand(this.shellRunall, "runall", "- Runs all loaded process.");
             this.commandList[this.commandList.length] = sc;
-            // quantum
+            // quantum <int>
             sc = new TSOS.ShellCommand(this.shellQuantum, "quantum", "- <int> - Sets the Round Robin quantum to this value.");
             this.commandList[this.commandList.length] = sc;
             // ps
             sc = new TSOS.ShellCommand(this.shellPs, "ps", "Outputs pid of active processes.");
+            this.commandList[this.commandList.length] = sc;
+            // kill <pid>
+            sc = new TSOS.ShellCommand(this.shellKill, "kill", "<pid> - Kills the specified process id.");
             this.commandList[this.commandList.length] = sc;
             // welp
             sc = new TSOS.ShellCommand(this.shellWelp, "welp", "- Displays BSOD when the kernel traps an OS error.");
@@ -277,14 +269,6 @@ var TSOS;
                     case "prompt":
                         _StdOut.putText("Prompt followed by a string would set the prompt as the string instead of the default >.");
                         break;
-                    // ps
-                    case "ps":
-                        _StdOut.putText("Ps displays a list of current processes and their IDs.");
-                        break;
-                    // kill <id>
-                    case "kill":
-                        _StdOut.putText("Kill followed by the process ID would kill that process.");
-                        break;
                     // date
                     case "date":
                         _StdOut.putText("Date displays the current date and time in EST.");
@@ -317,8 +301,13 @@ var TSOS;
                     case "quantum":
                         _StdOut.putText("Sets the Round Robin quantum to <int>.");
                         break;
+                    // ps
                     case "ps":
-                        _StdOut.putText("Outputs pid of active processes.");
+                        _StdOut.putText("Ps displays a list of current processes and their IDs.");
+                        break;
+                    // kill <pid>
+                    case "kill":
+                        _StdOut.putText("Kill followed by the process ID would kill that process.");
                         break;
                     // welp
                     case "welp":
@@ -475,7 +464,7 @@ var TSOS;
                 _StdOut.putText("No process is active");
             }
             else {
-                _StdOut.putText("Active process(es): [" + _CpuScheduler.activePIDs.toString() + "]");
+                _StdOut.putText("Active process id(s): [" + _CpuScheduler.activePIDs.toString() + "]");
             }
         };
         // kill
@@ -483,10 +472,10 @@ var TSOS;
             var valText = /^\d*$/;
             // validate input for integer
             if (valText.test(args) && args != "") {
-                _CpuScheduler.quantum = args;
+                _KernelInterruptQueue.enqueue(new TSOS.Interrupt(KILL_PROCESS_IRQ, args));
             }
             else {
-                _StdOut.putText("Please enter an integer for quantum value after quantum command.");
+                _StdOut.putText("Please enter an integer for process id after kill command.");
             }
         };
         // welp aka BSOD
