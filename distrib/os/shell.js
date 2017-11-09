@@ -471,14 +471,12 @@ var TSOS;
         };
         // ps
         Shell.prototype.shellPs = function (args) {
-            var activeProcess;
-            var process;
-            for (var i = 0; i < _ReadyQueue.getSize(); i++) {
-                process = _ReadyQueue.dequeue();
-                activeProcess.push(process.pid);
-                _ReadyQueue.enqueue();
+            if (_CpuScheduler.activePIDs.length == 0) {
+                _StdOut.putText("No process is active");
             }
-            _StdOut.putText(activeProcess.toString());
+            else {
+                _StdOut.putText("Active process(es): [" + _CpuScheduler.activePIDs.toString() + "]");
+            }
         };
         // kill
         Shell.prototype.shellKill = function (args) {

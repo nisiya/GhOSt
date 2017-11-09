@@ -212,6 +212,7 @@ module TSOS {
                     _ResidentQueue.enqueue(_ResidentQueue.dequeue());
                 }
                 process.pState = "Ready";
+                _CpuScheduler.activePIDs.push(process.pid);                
                 _ReadyQueue.enqueue(process);
                 // start CPU and scheduler
                 _CpuScheduler.start();                
@@ -224,8 +225,11 @@ module TSOS {
 
         public krnExecuteAllProcess(){
             // bring all process to Ready queue
-            while (_ResidentQueue.getSize() > 0){
-                _ReadyQueue.enqueue(_ResidentQueue.dequeue());
+            var process;
+            while (!_ResidentQueue.isEmpty()){
+                process = _ResidentQueue.dequeue();
+                _CpuScheduler.activePIDs.push(process.pid);
+                _ReadyQueue.enqueue(process);
             }
             // start CPU and scheduler
             _CpuScheduler.start();
@@ -237,7 +241,8 @@ module TSOS {
             // clear partion starting from base
             _MemoryManager.clearPartition(_RunningpBase);
             Control.removeProcessTable(_RunningPID);
-            // _ActivePIDs.splice(_ActivePIDs.indexOf(_RunningPID,0));
+            var index = _CpuScheduler.activePIDs.indexOf(_RunningPID);
+            _CpuScheduler.activePIDs.splice(index, 1);
             // move onto next iteration
             _CpuScheduler.currCycle = _CpuScheduler.quantum;
             _CpuScheduler.checkSchedule();            

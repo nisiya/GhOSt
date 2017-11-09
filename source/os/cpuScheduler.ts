@@ -10,7 +10,8 @@
             public algorithm = "Round Robin";
             public quantum = 6;
             public currCycle = 0;
-
+            public activePIDs = new Array<number>();
+            
             public start(): void {
                 // run first process normally
                 this.currCycle = 0;
@@ -18,7 +19,6 @@
                 process.pState = "Running";
                 Control.updateProcessTable(process.pid, process.pState);
                 _RunningPID = process.pid;
-                _ActivePIDs.push(_RunningPID);
                 _RunningpBase = process.pBase;
             }
 

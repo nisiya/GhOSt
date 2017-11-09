@@ -55,7 +55,7 @@ var TSOS;
             //     Control.updateProcessTable(_RunningPID, process.pState);
             // }
             console.log(_RunningPID);
-            console.log(_ActivePIDs);
+            console.log(_CpuScheduler.activePIDs);
             // fetch instruction from memory
             var opCode = this.fetch(this.PC);
             this.IR = opCode;

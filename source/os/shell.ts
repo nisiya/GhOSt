@@ -575,14 +575,11 @@ module TSOS {
 
         // ps
         public shellPs(args) {
-            var activeProcess:number[];
-            var process;
-            for(var i=0; i<_ReadyQueue.getSize(); i++){
-                process = _ReadyQueue.dequeue();
-                activeProcess.push(process.pid);
-                _ReadyQueue.enqueue();
+            if (_CpuScheduler.activePIDs.length == 0){
+                _StdOut.putText("No process is active");
+            } else {
+                _StdOut.putText("Active process(es): [" + _CpuScheduler.activePIDs.toString() + "]");
             }
-            _StdOut.putText(activeProcess.toString());
         }
 
         // kill
