@@ -178,10 +178,10 @@ var TSOS;
             var row = document.getElementById("pid" + pid);
             row.cells.item(1).innerHTML = _CPU.PC.toString();
             row.cells.item(2).innerHTML = _CPU.IR;
-            row.cells.item(3).innerHTML = _CPU.Acc.toString(16);
-            row.cells.item(4).innerHTML = _CPU.Xreg.toString(16);
-            row.cells.item(5).innerHTML = _CPU.Yreg.toString(16);
-            row.cells.item(6).innerHTML = _CPU.Zflag.toString(16);
+            row.cells.item(3).innerHTML = _CPU.Acc.toString(16).toUpperCase();
+            row.cells.item(4).innerHTML = _CPU.Xreg.toString(16).toUpperCase();
+            row.cells.item(5).innerHTML = _CPU.Yreg.toString(16).toUpperCase();
+            row.cells.item(6).innerHTML = _CPU.Zflag.toString(16).toUpperCase();
             row.cells.item(7).innerHTML = pState;
         };
         Control.removeProcessTable = function (pid) {
@@ -198,10 +198,10 @@ var TSOS;
             var cpuTable = document.getElementById("tbCPU");
             cpuTable.rows[1].cells.namedItem("cPC").innerHTML = _CPU.PC.toString();
             cpuTable.rows[1].cells.namedItem("cIR").innerHTML = _CPU.IR;
-            cpuTable.rows[1].cells.namedItem("cACC").innerHTML = _CPU.Acc.toString(16);
-            cpuTable.rows[1].cells.namedItem("cX").innerHTML = _CPU.Xreg.toString(16);
-            cpuTable.rows[1].cells.namedItem("cY").innerHTML = _CPU.Yreg.toString(16);
-            cpuTable.rows[1].cells.namedItem("cZ").innerHTML = _CPU.Zflag.toString(16);
+            cpuTable.rows[1].cells.namedItem("cACC").innerHTML = _CPU.Acc.toString(16).toUpperCase();
+            cpuTable.rows[1].cells.namedItem("cX").innerHTML = _CPU.Xreg.toString(16).toUpperCase();
+            cpuTable.rows[1].cells.namedItem("cY").innerHTML = _CPU.Yreg.toString(16).toUpperCase();
+            cpuTable.rows[1].cells.namedItem("cZ").innerHTML = _CPU.Zflag.toString(16).toUpperCase();
         };
         //
         // Host Events

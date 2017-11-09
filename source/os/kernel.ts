@@ -154,10 +154,13 @@ module TSOS {
                     this.processPrint(params);
                     break;
                 case CONTEXT_SWITCH_IRQ: // called by scheduler to save current process and load next
-                    this.contextSwitch();
+                    this.contextSwitch(params);
                     break;
                 case KILL_PROCESS_IRQ:
                     this.killProcess(params);
+                    break;
+                case MEMACCESS_ERROR_IRQ:
+                    this.memoryAccessError(params);
                     break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
@@ -242,12 +245,21 @@ module TSOS {
         public krnExitProcess(){
             // exit process upon completion
             // clear partion starting from base
+            var process = _CpuScheduler.runningProcess;
+            process.turnaroundTime = process.turnaroundTime + process.waitTime;
+            _StdOut.advanceLine();
+            _StdOut.putText("Process id: " + process.pid + " ended.");
+            _StdOut.advanceLine();
+            _StdOut.putText("Turnaround time: " + process.turnaroundTime + " cycles. Wait time: " + process.waitTime + " cycles.");
+            _StdOut.advanceLine();
+            _OsShell.putPrompt();
             _MemoryManager.clearPartition(_RunningpBase);
             Control.removeProcessTable(_RunningPID);
             var index = _CpuScheduler.activePIDs.indexOf(_RunningPID);
             _CpuScheduler.activePIDs.splice(index, 1);
             // move onto next iteration
             _CpuScheduler.currCycle = _CpuScheduler.quantum;
+            _CPU.init();
             _CpuScheduler.checkSchedule();            
         }
 
@@ -259,11 +271,11 @@ module TSOS {
             if (index == -1){
                 // if process with id is not active
                 _StdOut.putText("No process with id: " + pid + " is active"); 
+                _StdOut.advanceLine();
                 _OsShell.putPrompt();
             } else {
                 if (pid == _RunningPID){
                     this.krnExitProcess();
-                    _CPU.IR = "00";
                 } else {
                     for (var i=0; i<_ReadyQueue.getSize(); i++){
                         process = _ReadyQueue.dequeue();
@@ -289,7 +301,6 @@ module TSOS {
             }
         }
 
-
         public userPrgError(opCode){
             // When user program entry is not a valid op ocde
             _StdOut.putText("Error. Op code " + opCode + " does not exist.");
@@ -302,32 +313,44 @@ module TSOS {
             _StdOut.putText(text);
         }
 
-        public contextSwitch(){
+        public contextSwitch(runningProcess){
             // save current process to PCB
             // if process finished, dont save it
             if (_CPU.IR != "00"){
-                var currProcess = new PCB(_RunningpBase, _RunningPID);
+                var currProcess = new PCB(runningProcess.pBase, runningProcess.pid);
                 currProcess.pCounter = _CPU.PC;
                 currProcess.pAcc = _CPU.Acc;
                 currProcess.pXreg = _CPU.Xreg;
                 currProcess.pYreg = _CPU.Yreg;
                 currProcess.pZflag = _CPU.Zflag;
                 currProcess.pState = "Resident";
+                currProcess.waitTime = runningProcess.waitTime;
+                currProcess.turnaroundTime = runningProcess.turnaroundTime;
                 _ReadyQueue.enqueue(currProcess);
                 Control.updateProcessTable(_RunningPID, currProcess.pState);
             }
 
             // load next process to CPU
-            var nextProcess = _ReadyQueue.dequeue();
+            var nextProcess = _ReadyQueue.dequeue();            
             _CPU.PC = nextProcess.pCounter;
             _CPU.Acc = nextProcess.pAcc;
             _CPU.Xreg = nextProcess.pXreg;
             _CPU.Yreg = nextProcess.pYreg;
             _CPU.Zflag = nextProcess.pZflag;
             nextProcess.pState = "Running";
+            nextProcess.waitTime = _CpuScheduler.totalCycles;
+            console.log(_CpuScheduler.totalCycles);
+            _CpuScheduler.runningProcess = nextProcess;
             _RunningPID = nextProcess.pid;
             _RunningpBase = nextProcess.pBase;           
             Control.updateProcessTable(_RunningPID, nextProcess.pState);            
+        }
+
+        public memoryAccessError(pid){
+            _StdOut.putText("Memory access error from process id: " + pid);
+            _StdOut.advanceLine();
+            _OsShell.putPrompt();
+            this.krnExitProcess();
         }
 
         // - WaitForProcessToExit

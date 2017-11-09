@@ -8,33 +8,40 @@ var TSOS;
 (function (TSOS) {
     var CpuScheduler = /** @class */ (function () {
         function CpuScheduler() {
-            this.algorithm = "Round Robin";
+            // public algorithm = "Round Robin";
             this.quantum = 6;
             this.currCycle = 0;
             this.activePIDs = new Array();
+            // public turnaroundTime = 0;
+            // public waitTime = 0;
+            this.totalCycles = 0;
         }
         CpuScheduler.prototype.start = function () {
             // run first process normally
             this.currCycle = 0;
-            var process = _ReadyQueue.dequeue();
-            process.pState = "Running";
-            TSOS.Control.updateProcessTable(process.pid, process.pState);
-            _RunningPID = process.pid;
-            _RunningpBase = process.pBase;
+            this.runningProcess = _ReadyQueue.dequeue();
+            this.runningProcess.pState = "Running";
+            TSOS.Control.updateProcessTable(this.runningProcess.pid, this.runningProcess.pState);
+            _RunningPID = this.runningProcess.pid;
+            _RunningpBase = this.runningProcess.pBase;
         };
         CpuScheduler.prototype.checkSchedule = function () {
             this.currCycle++;
+            this.totalCycles++;
+            this.runningProcess.turnaroundTime++;
             // if time's up
             if (this.currCycle > this.quantum) {
+                this.totalCycles--;
                 // if there are processes waiting in Ready queue, context switch
                 if (!_ReadyQueue.isEmpty()) {
-                    _KernelInterruptQueue.enqueue(new TSOS.Interrupt(CONTEXT_SWITCH_IRQ, _RunningPID));
+                    _CPU.isExecuting = true;
+                    _KernelInterruptQueue.enqueue(new TSOS.Interrupt(CONTEXT_SWITCH_IRQ, this.runningProcess));
                 }
                 else {
                     // if none, check if current process is finishing
-                    if (_CPU.IR == "00") {
-                        _CPU.init();
-                    }
+                    // if(_CPU.IR == "00"){
+                    //     _CPU.init();
+                    // }
                 }
                 // for running single process, scheduler just gives another round of executions
                 // for mulitple processes, scheduler number of cycle resets to give next process a round of execution 

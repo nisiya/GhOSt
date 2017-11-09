@@ -24,6 +24,7 @@ const PROCESS_ERROR_IRQ: number = 2; // print error in user program
 const PROCESS_PRINT_IRQ: number = 3; // print text produced by user program
 const CONTEXT_SWITCH_IRQ: number = 4; // save current process and switch to next one
 const KILL_PROCESS_IRQ: number = 5; // kill a process
+const MEMACCESS_ERROR_IRQ: number = 6; // process accessing something out of bound
 
 //
 // Global Variables

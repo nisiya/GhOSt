@@ -26,9 +26,9 @@
                     var limitReg = baseReg + 255;
                     var index: number = parseInt(addr, 16) + baseReg;  
                     if(index > limitReg){
-
+                        _KernelInterruptQueue.enqueue(new Interrupt(MEMACCESS_ERROR_IRQ, _RunningPID));
                     } else {
-                        _Memory.memory[index] = data.toString(16);
+                        _Memory.memory[index] = data.toString(16).toUpperCase();
                         // 0 for now bc only one parition
                         Control.updateMemoryTable(0);
                     }
@@ -36,9 +36,14 @@
 
                 public readMemory(addr){
                     var baseReg = _RunningpBase;
-                    var value = _Memory.memory[baseReg+addr];
-                    return value;
-
+                    var limitReg = baseReg + 255;
+                    var index: number = baseReg + addr;
+                    if (index > limitReg){
+                        _KernelInterruptQueue.enqueue(new Interrupt(MEMACCESS_ERROR_IRQ, _RunningPID));
+                    } else{
+                        var value = _Memory.memory[index];
+                        return value;
+                    }
                 }
 
             }

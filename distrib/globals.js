@@ -21,6 +21,7 @@ var PROCESS_ERROR_IRQ = 2; // print error in user program
 var PROCESS_PRINT_IRQ = 3; // print text produced by user program
 var CONTEXT_SWITCH_IRQ = 4; // save current process and switch to next one
 var KILL_PROCESS_IRQ = 5; // kill a process
+var MEMACCESS_ERROR_IRQ = 6; // process accessing something out of bound
 //
 // Global Variables
 // TODO: Make a global object and use that instead of the "_" naming convention in the global namespace.

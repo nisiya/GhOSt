@@ -24,17 +24,25 @@ var TSOS;
             var limitReg = baseReg + 255;
             var index = parseInt(addr, 16) + baseReg;
             if (index > limitReg) {
+                _KernelInterruptQueue.enqueue(new TSOS.Interrupt(MEMACCESS_ERROR_IRQ, _RunningPID));
             }
             else {
-                _Memory.memory[index] = data.toString(16);
+                _Memory.memory[index] = data.toString(16).toUpperCase();
                 // 0 for now bc only one parition
                 TSOS.Control.updateMemoryTable(0);
             }
         };
         MemoryAccessor.prototype.readMemory = function (addr) {
             var baseReg = _RunningpBase;
-            var value = _Memory.memory[baseReg + addr];
-            return value;
+            var limitReg = baseReg + 255;
+            var index = baseReg + addr;
+            if (index > limitReg) {
+                _KernelInterruptQueue.enqueue(new TSOS.Interrupt(MEMACCESS_ERROR_IRQ, _RunningPID));
+            }
+            else {
+                var value = _Memory.memory[index];
+                return value;
+            }
         };
         return MemoryAccessor;
     }());
