@@ -291,7 +291,7 @@ var TSOS;
                 Control.updateCPUTable();
                 // only update process if it is still running
                 if (_CPU.IR !== "00")
-                    Control.updateProcessTable(_CpuScheduler.runningProcess.pid, "Running");
+                    Control.updateProcessTable(_CpuScheduler.runningProcess.pid, _CpuScheduler.runningProcess.pState);
             }
         };
         // enable next btn if process is executing and disable if not
