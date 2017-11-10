@@ -245,7 +245,6 @@ var TSOS;
             else {
                 _CpuScheduler.currCycle = _CpuScheduler.quantum;
                 _CpuScheduler.totalCycles--;
-                _CpuScheduler.checkSchedule();
             }
         };
         Kernel.prototype.killProcess = function (pid) {

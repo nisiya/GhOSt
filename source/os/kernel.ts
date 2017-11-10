@@ -266,7 +266,6 @@ module TSOS {
             } else {
                 _CpuScheduler.currCycle = _CpuScheduler.quantum;
                 _CpuScheduler.totalCycles--;
-                _CpuScheduler.checkSchedule();
             }
         }
 
