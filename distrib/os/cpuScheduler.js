@@ -25,27 +25,23 @@ var TSOS;
         };
         // check if time is up and if context switch is needed
         CpuScheduler.prototype.checkSchedule = function () {
-            console.log("hit");
-            this.currCycle++;
-            this.runningProcess.turnaroundTime++;
-            this.totalCycles++;
-            // if time's up
-            if (this.currCycle >= this.quantum) {
-                // if there are processes waiting in Ready queue, context switch
-                console.log(_ReadyQueue);
-                if (!_ReadyQueue.isEmpty()) {
-                    console.log("hello");
-                    // if (!_CPU.isExecuting){
-                    //     console.log("hi");
-                    //     _CPU.isExecuting = true;
-                    // }
-                    _KernelInterruptQueue.enqueue(new TSOS.Interrupt(CONTEXT_SWITCH_IRQ, this.runningProcess));
-                    console.log("umm");
+            if (this.activePIDs.length == 0) {
+                _CPU.init();
+            }
+            else {
+                this.currCycle++;
+                this.runningProcess.turnaroundTime++;
+                this.totalCycles++;
+                // if time's up
+                if (this.currCycle >= this.quantum) {
+                    // if there are processes waiting in Ready queue, context switch
+                    console.log(_ReadyQueue);
+                    if (!_ReadyQueue.isEmpty()) {
+                        _KernelInterruptQueue.enqueue(new TSOS.Interrupt(CONTEXT_SWITCH_IRQ, this.runningProcess));
+                    }
+                    // for running single process, scheduler just gives another round of executions
+                    // for mulitple processes, scheduler number of cycle resets to give next process a round of execution 
                 }
-                // for running single process, scheduler just gives another round of executions
-                // for mulitple processes, scheduler number of cycle resets to give next process a round of execution 
-                // this.currCycle = 0;
-                console.log("currrrr " + this.currCycle);
             }
         };
         return CpuScheduler;
