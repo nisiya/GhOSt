@@ -176,7 +176,11 @@ var TSOS;
             // update process display when process is running
             var processTableBody = document.getElementById("processTbody");
             var row = document.getElementById("pid" + pid);
-            row.cells.item(1).innerHTML = _CPU.PC.toString();
+            var pc = _CPU.PC.toString(16).toUpperCase();
+            if (pc.length == 1) {
+                pc = "0" + pc;
+            }
+            row.cells.item(1).innerHTML = pc;
             row.cells.item(2).innerHTML = _CPU.IR;
             row.cells.item(3).innerHTML = _CPU.Acc.toString(16).toUpperCase();
             row.cells.item(4).innerHTML = _CPU.Xreg.toString(16).toUpperCase();
@@ -185,14 +189,15 @@ var TSOS;
             row.cells.item(7).innerHTML = pState;
         };
         Control.removeProcessTable = function (pid) {
-            // remove process from display upon completion
             var processTableBody = document.getElementById("processTbody");
             if (pid == -1) {
+                // remove process for clearmem
                 while (processTableBody.hasChildNodes()) {
                     processTableBody.removeChild(processTableBody.firstChild);
                 }
             }
             else {
+                // remove process from display upon completion
                 var row = document.getElementById("pid" + pid);
                 // processTableBody.deleteRow(0);
                 row.parentNode.removeChild(row);
@@ -203,7 +208,11 @@ var TSOS;
         Control.updateCPUTable = function () {
             // update the CPU display when  process is running
             var cpuTable = document.getElementById("tbCPU");
-            cpuTable.rows[1].cells.namedItem("cPC").innerHTML = _CPU.PC.toString();
+            var pc = _CPU.PC.toString(16).toUpperCase();
+            if (pc.length == 1) {
+                pc = "0" + pc;
+            }
+            cpuTable.rows[1].cells.namedItem("cPC").innerHTML = pc;
             cpuTable.rows[1].cells.namedItem("cIR").innerHTML = _CPU.IR;
             cpuTable.rows[1].cells.namedItem("cACC").innerHTML = _CPU.Acc.toString(16).toUpperCase();
             cpuTable.rows[1].cells.namedItem("cX").innerHTML = _CPU.Xreg.toString(16).toUpperCase();
@@ -234,8 +243,6 @@ var TSOS;
             // ... Create and initialize the Memory (yup part of hardware too)
             _Memory = new TSOS.Memory(); // one memory for now
             _Memory.init();
-            // load table on user interface
-            Control.loadMemoryTable();
             // ... Create and initialize the Memory Accessor
             _MemoryAccessor = new TSOS.MemoryAccessor();
             _MemoryAccessor.init();

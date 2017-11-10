@@ -197,8 +197,12 @@ module TSOS {
         public static updateProcessTable(pid, pState): void{
             // update process display when process is running
             var processTableBody: HTMLTableSectionElement = <HTMLTableSectionElement> document.getElementById("processTbody");                
-            var row: HTMLTableRowElement = <HTMLTableRowElement> document.getElementById("pid"+pid);     
-            row.cells.item(1).innerHTML = _CPU.PC.toString();
+            var row: HTMLTableRowElement = <HTMLTableRowElement> document.getElementById("pid"+pid);
+            var pc = _CPU.PC.toString(16).toUpperCase();
+            if(pc.length == 1){
+                pc = "0" + pc;
+            }     
+            row.cells.item(1).innerHTML = pc;
             row.cells.item(2).innerHTML = _CPU.IR;
             row.cells.item(3).innerHTML = _CPU.Acc.toString(16).toUpperCase();
             row.cells.item(4).innerHTML = _CPU.Xreg.toString(16).toUpperCase();
@@ -208,17 +212,19 @@ module TSOS {
         }
 
         public static removeProcessTable(pid): void{
+            var processTableBody: HTMLTableSectionElement = <HTMLTableSectionElement> document.getElementById("processTbody");    
+            
+            if (pid == -1 ){
+                // remove process for clearmem
+                while(processTableBody.hasChildNodes()){
+                    processTableBody.removeChild(processTableBody.firstChild);
+                }
+            } else {
                 // remove process from display upon completion
-                var processTableBody: HTMLTableSectionElement = <HTMLTableSectionElement> document.getElementById("processTbody");    
-                if (pid == -1 ){
-                   while(processTableBody.hasChildNodes()){
-                       processTableBody.removeChild(processTableBody.firstChild);
-                   }
-                } else {
-                    var row: HTMLTableRowElement = <HTMLTableRowElement> document.getElementById("pid"+pid);     
-                    // processTableBody.deleteRow(0);
-                    row.parentNode.removeChild(row);  
-                }    
+                var row: HTMLTableRowElement = <HTMLTableRowElement> document.getElementById("pid"+pid);     
+                // processTableBody.deleteRow(0);
+                row.parentNode.removeChild(row);  
+            }    
         }
 
 
@@ -227,7 +233,11 @@ module TSOS {
         public static updateCPUTable(): void {
             // update the CPU display when  process is running
             var cpuTable: HTMLTableElement = <HTMLTableElement> document.getElementById("tbCPU");
-            cpuTable.rows[1].cells.namedItem("cPC").innerHTML = _CPU.PC.toString();
+            var pc = _CPU.PC.toString(16).toUpperCase();
+            if(pc.length == 1){
+                pc = "0" + pc;
+            }
+            cpuTable.rows[1].cells.namedItem("cPC").innerHTML = pc;
             cpuTable.rows[1].cells.namedItem("cIR").innerHTML = _CPU.IR;            
             cpuTable.rows[1].cells.namedItem("cACC").innerHTML = _CPU.Acc.toString(16).toUpperCase();            
             cpuTable.rows[1].cells.namedItem("cX").innerHTML = _CPU.Xreg.toString(16).toUpperCase();            
@@ -265,8 +275,6 @@ module TSOS {
             // ... Create and initialize the Memory (yup part of hardware too)
             _Memory = new Memory();  // one memory for now
             _Memory.init();  
-            // load table on user interface
-            Control.loadMemoryTable();
 
             // ... Create and initialize the Memory Accessor
             _MemoryAccessor = new MemoryAccessor();

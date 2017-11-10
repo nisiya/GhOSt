@@ -15,29 +15,30 @@
             export class MemoryAccessor {
 
                 public init(): void {
-                    // all partitions are available
-
                     // load table on user interface
-                    // Control.loadMemoryTable();
+                    Control.loadMemoryTable();
                 }
 
                 public writeMemory(addr, data){
+                    // checks running process base reg and translate incoming address
                     var baseReg = _CpuScheduler.runningProcess.pBase;
                     var limitReg = baseReg + 255;
                     var index: number = parseInt(addr, 16) + baseReg;  
+                    // check if out of bound access
                     if(index > limitReg){
                         _KernelInterruptQueue.enqueue(new Interrupt(MEMACCESS_ERROR_IRQ, _CpuScheduler.runningProcess.pid));
                     } else {
                         _Memory.memory[index] = data.toString(16).toUpperCase();
-                        // 0 for now bc only one parition
-                        Control.updateMemoryTable(0);
+                        Control.updateMemoryTable(baseReg);
                     }
                 }
 
                 public readMemory(addr){
+                    // checks running process base reg and translate incoming address
                     var baseReg = _CpuScheduler.runningProcess.pBase;
                     var limitReg = baseReg + 255;
                     var index: number = baseReg + addr;
+                    // check if out of bound access
                     if (index > limitReg){
                         _KernelInterruptQueue.enqueue(new Interrupt(MEMACCESS_ERROR_IRQ, _CpuScheduler.runningProcess.pid));
                     } else{

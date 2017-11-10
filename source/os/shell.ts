@@ -603,10 +603,14 @@ module TSOS {
 
         // clearmem
         public shellClearmem(args){
-            _MemoryManager.clearMemory();
-            Control.removeProcessTable(-1);
-            while(!_ResidentQueue.isEmpty()){
-                _ResidentQueue.dequeue();
+            if (_CPU.isExecuting){
+                _StdOut.putText("Cannot clear memory. A process is currently running. Use kill command to terminate process.")
+            } else {
+                _MemoryManager.clearMemory();
+                Control.removeProcessTable(-1);
+                while(!_ResidentQueue.isEmpty()){
+                    _ResidentQueue.dequeue();
+                }
             }
         }
     }

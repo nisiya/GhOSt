@@ -142,10 +142,10 @@ var TSOS;
                     this.contextSwitch(params);
                     break;
                 case KILL_PROCESS_IRQ:
-                    this.killProcess(params);
+                    this.killProcess(params); // kill active process
                     break;
                 case MEMACCESS_ERROR_IRQ:
-                    this.memoryAccessError(params);
+                    this.memoryAccessError(params); // print error of invalid memory access
                     break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
@@ -222,9 +222,7 @@ var TSOS;
         Kernel.prototype.krnExitProcess = function () {
             // exit process upon completion
             // clear partion starting from base
-            // console.log(_CpuScheduler.totalCycles);  
             var process = _CpuScheduler.runningProcess;
-            console.log("turnaround" + process.turnaroundTime);
             process.waitTime = _CpuScheduler.totalCycles - process.turnaroundTime;
             process.turnaroundTime = process.turnaroundTime + process.waitTime;
             _StdOut.advanceLine();
@@ -238,10 +236,10 @@ var TSOS;
             var index = _CpuScheduler.activePIDs.indexOf(process.pid);
             _CpuScheduler.activePIDs.splice(index, 1);
             // move onto next iteration
-            console.log(_CpuScheduler.totalCycles);
             _CpuScheduler.currCycle = _CpuScheduler.quantum;
             _CpuScheduler.totalCycles--;
             _CPU.init();
+            // check cpu for next process
             _CpuScheduler.checkSchedule();
         };
         Kernel.prototype.killProcess = function (pid) {
@@ -256,9 +254,11 @@ var TSOS;
             }
             else {
                 if (pid == _CpuScheduler.runningProcess.pid) {
+                    // if current process, exit it
                     this.krnExitProcess();
                 }
                 else {
+                    // else look and remove from Ready queue
                     for (var i = 0; i < _ReadyQueue.getSize(); i++) {
                         process = _ReadyQueue.dequeue();
                         if (process.pid == pid) {
@@ -280,7 +280,6 @@ var TSOS;
                 _StdOut.advanceLine();
                 // move onto next iteration
                 _CpuScheduler.currCycle = _CpuScheduler.quantum;
-                _CpuScheduler.checkSchedule();
             }
         };
         Kernel.prototype.userPrgError = function (opCode) {
@@ -296,6 +295,7 @@ var TSOS;
         Kernel.prototype.contextSwitch = function (runningProcess) {
             // save current process to PCB
             // if process finished, dont save it
+            console.log("IR " + _CPU.IR);
             if (_CPU.IR != "00") {
                 var currProcess = new TSOS.PCB(runningProcess.pBase, runningProcess.pid);
                 currProcess.pCounter = _CPU.PC;
@@ -307,9 +307,11 @@ var TSOS;
                 currProcess.turnaroundTime = runningProcess.turnaroundTime;
                 _ReadyQueue.enqueue(currProcess);
                 TSOS.Control.updateProcessTable(currProcess.pid, currProcess.pState);
+                console.log("saved pid:" + currProcess.pid); // for debugging
             }
             // load next process to CPU
             var nextProcess = _ReadyQueue.dequeue();
+            console.log("loaded pid:" + nextProcess.pid); // for debugging
             _CPU.PC = nextProcess.pCounter;
             _CPU.Acc = nextProcess.pAcc;
             _CPU.Xreg = nextProcess.pXreg;
@@ -318,13 +320,10 @@ var TSOS;
             nextProcess.pState = "Running";
             _CpuScheduler.runningProcess = nextProcess;
             this.krnTrace(_CpuScheduler.algorithm + ": switching to Process id: " + nextProcess.pid);
-            TSOS.Control.updateProcessTable(nextProcess.pid, nextProcess.pState);
-            _Mode = 1;
         };
+        // memory out of bound error
         Kernel.prototype.memoryAccessError = function (pid) {
             _StdOut.putText("Memory access error from process id: " + pid);
-            _StdOut.advanceLine();
-            _OsShell.putPrompt();
             this.krnExitProcess();
         };
         // - WaitForProcessToExit

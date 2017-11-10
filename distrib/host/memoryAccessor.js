@@ -15,27 +15,29 @@ var TSOS;
         function MemoryAccessor() {
         }
         MemoryAccessor.prototype.init = function () {
-            // all partitions are available
             // load table on user interface
-            // Control.loadMemoryTable();
+            TSOS.Control.loadMemoryTable();
         };
         MemoryAccessor.prototype.writeMemory = function (addr, data) {
+            // checks running process base reg and translate incoming address
             var baseReg = _CpuScheduler.runningProcess.pBase;
             var limitReg = baseReg + 255;
             var index = parseInt(addr, 16) + baseReg;
+            // check if out of bound access
             if (index > limitReg) {
                 _KernelInterruptQueue.enqueue(new TSOS.Interrupt(MEMACCESS_ERROR_IRQ, _CpuScheduler.runningProcess.pid));
             }
             else {
                 _Memory.memory[index] = data.toString(16).toUpperCase();
-                // 0 for now bc only one parition
-                TSOS.Control.updateMemoryTable(0);
+                TSOS.Control.updateMemoryTable(baseReg);
             }
         };
         MemoryAccessor.prototype.readMemory = function (addr) {
+            // checks running process base reg and translate incoming address
             var baseReg = _CpuScheduler.runningProcess.pBase;
             var limitReg = baseReg + 255;
             var index = baseReg + addr;
+            // check if out of bound access
             if (index > limitReg) {
                 _KernelInterruptQueue.enqueue(new TSOS.Interrupt(MEMACCESS_ERROR_IRQ, _CpuScheduler.runningProcess.pid));
             }

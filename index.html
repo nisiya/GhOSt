@@ -49,17 +49,11 @@
    <!-- Other Routines -->
    <script type="text/javascript" src="distrib/utils.js"></script>
    <!-- Uncomment the line below to enable GLaDOS testing. -->
-   <!-- <script type="text/javascript" src="http://alanclasses.github.io/TSOS/test/glados-ip2.js"></script> -->
+   <script type="text/javascript" src="http://alanclasses.github.io/TSOS/test/glados-ip3.js"></script>
    
 </head>
 
 <body onload="onDocumentLoad()">
-  <!-- background video for future-->
-  <!-- <div class="fullscreen-bg">
-    <video loop muted autoplay poster="distrib/images/grey.jpg" class="fullscreen-bg__video">
-        <source src="distrib/video/pacmanGame.mp4" type="video/mp4">
-    </video>
-  </div> -->
 
   <!-- title, time and status -->
   <div class="tagline-upper text-center text-heading text-shadow text-white mt-5 d-none d-lg-block">  
@@ -70,68 +64,67 @@
       <text id="usrStatus"> <b>Status: </b> I Lurve Operating Systems </text>
   </div>
 
-  <div id="divMain" style="width:100%;">
-      <div class="navbar-expand-lg navbar-light bg-faded">
-        <div id="divButtonBar" style="margin:4px;">      
-          <table id="headContent">
-            <tr>
-              <th>
-                  <input type="button"
-                        id = "btnStartOS"
-                        name="brnStartOS"
-                        class="normal_button"
-                        value=""
-                        title="Start"
-                        tabindex="0"
-                        onclick="TSOS.Control.hostBtnStartOS_click(this);">
-              </th>
-              <th>
-                  <input type="button"
-                        id = "btnHaltOS"
-                        name="brnHaltOS"
-                        class="normal_button stop_button"
-                        disabled="disabled"
-                        value=""
-                        title="Halt"
-                        tabindex="1"
-                        onclick="TSOS.Control.hostBtnHaltOS_click(this);">
-              </th>
-              <th>     
-                <input type="button"
-                      id = "btnReset"
-                      name="brnReset"
-                      class="normal_button stop_button"
-                      disabled="disabled"
-                      value=""
-                      title="Reset"
-                      tabindex="2"
-                      onclick="TSOS.Control.hostBtnReset_click(this);">
-              </th>
-              <th>                   
-                <input type="button"
-                      id = "btnSingle"
-                      name="btnSingle"
-                      disabled="disabled"
-                      value=""
-                      title="Single"
-                      tabindex="3"
-                      onclick="TSOS.Control.hostBtnSingle_click(this);">
-              </th>
-              <th> 
-                <input type="button"
-                      id = "btnNext"
-                      name="btnNext"
-                      disabled="disabled"
-                      value=""
-                      title="Next"
-                      tabindex="4"
-                      onclick="TSOS.Control.hostBtnNext_click(this);">
-              </th>
-            </tr>
-          </table>
-        </div>
-      </div>
-      
+  <div class="navbar-expand-lg navbar-light bg-faded">
+    <div id="divButtonBar" style="margin:4px;">      
+      <table id="headContent">
+        <tr>
+          <th>
+              <input type="button"
+                    id = "btnStartOS"
+                    name="brnStartOS"
+                    class="normal_button"
+                    value=""
+                    title="Start"
+                    tabindex="0"
+                    onclick="TSOS.Control.hostBtnStartOS_click(this);">
+          </th>
+          <th>
+              <input type="button"
+                    id = "btnHaltOS"
+                    name="brnHaltOS"
+                    class="normal_button stop_button"
+                    disabled="disabled"
+                    value=""
+                    title="Halt"
+                    tabindex="1"
+                    onclick="TSOS.Control.hostBtnHaltOS_click(this);">
+          </th>
+          <th>     
+            <input type="button"
+                  id = "btnReset"
+                  name="brnReset"
+                  class="normal_button stop_button"
+                  disabled="disabled"
+                  value=""
+                  title="Reset"
+                  tabindex="2"
+                  onclick="TSOS.Control.hostBtnReset_click(this);">
+          </th>
+          <th>                   
+            <input type="button"
+                  id = "btnSingle"
+                  name="btnSingle"
+                  disabled="disabled"
+                  value=""
+                  title="Single"
+                  tabindex="3"
+                  onclick="TSOS.Control.hostBtnSingle_click(this);">
+          </th>
+          <th> 
+            <input type="button"
+                  id = "btnNext"
+                  name="btnNext"
+                  disabled="disabled"
+                  value=""
+                  title="Next"
+                  tabindex="4"
+                  onclick="TSOS.Control.hostBtnNext_click(this);">
+          </th>
+        </tr>
+      </table>
+    </div>
+  </div>
+  <div id="divMain" class="table-responsive">        
     <table id="mainContent">    
       <tr>
         <th>

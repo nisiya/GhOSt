@@ -40,7 +40,6 @@ var TSOS;
             if (baseReg != 999) {
                 for (var i = 0; i < inputOpCodes.length; i++) {
                     _Memory.memory[baseReg + i] = inputOpCodes[i];
-                    // _MemoryAccessor.writeMemory(baseReg+i, inputOpCodes[i]);
                 }
                 TSOS.Control.updateMemoryTable(baseReg);
             }

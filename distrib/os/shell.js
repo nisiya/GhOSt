@@ -497,10 +497,15 @@ var TSOS;
         };
         // clearmem
         Shell.prototype.shellClearmem = function (args) {
-            _MemoryManager.clearMemory();
-            TSOS.Control.removeProcessTable(-1);
-            while (!_ResidentQueue.isEmpty()) {
-                _ResidentQueue.dequeue();
+            if (_CPU.isExecuting) {
+                _StdOut.putText("Cannot clear memory. A process is currently running. Use kill command to terminate process.");
+            }
+            else {
+                _MemoryManager.clearMemory();
+                TSOS.Control.removeProcessTable(-1);
+                while (!_ResidentQueue.isEmpty()) {
+                    _ResidentQueue.dequeue();
+                }
             }
         };
         return Shell;
