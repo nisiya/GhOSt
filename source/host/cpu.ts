@@ -142,7 +142,7 @@ module TSOS {
                     // break
                     case "00":
                         // stop and exit current process
-                        _Kernel.krnExitProcess();
+                        _Kernel.krnExitProcess(_CpuScheduler.runningProcess);
                         // disable next button
                         if(_singleMode)
                             Control.hostBtnNext_onOff();
@@ -215,7 +215,7 @@ module TSOS {
                     default:
                         // call Kernel to print error message if op code does not exist
                         _KernelInterruptQueue.enqueue(new Interrupt(PROCESS_ERROR_IRQ, opCode));
-                        _Kernel.krnExitProcess();
+                        _Kernel.krnExitProcess(_CpuScheduler.runningProcess);
                         // reset CPU
                         this.init();
                         break;

@@ -85,14 +85,15 @@ var TSOS;
             }
             else if (_CPU.isExecuting) {
                 if (!_singleMode) {
-                    // check scheduler to see which process to run and if quantum expired
-                    _CpuScheduler.checkSchedule();
                     _CPU.cycle();
                     // update display tables
                     TSOS.Control.updateCPUTable();
                     // only update process if it is still running
-                    if (_CPU.IR !== "00")
+                    if (_CPU.IR !== "00") {
                         TSOS.Control.updateProcessTable(_CpuScheduler.runningProcess.pid, _CpuScheduler.runningProcess.pState);
+                    }
+                    // check scheduler to see which process to run next and if quantum expired
+                    _CpuScheduler.checkSchedule();
                 }
                 else {
                     // enable next button in single step mode
@@ -219,10 +220,9 @@ var TSOS;
             // start CPU and scheduler
             _CpuScheduler.start();
         };
-        Kernel.prototype.krnExitProcess = function () {
+        Kernel.prototype.krnExitProcess = function (process) {
             // exit process upon completion
             // clear partion starting from base
-            var process = _CpuScheduler.runningProcess;
             process.waitTime = _CpuScheduler.totalCycles - process.turnaroundTime;
             process.turnaroundTime = process.turnaroundTime + process.waitTime;
             _StdOut.advanceLine();
@@ -237,14 +237,11 @@ var TSOS;
             _CpuScheduler.activePIDs.splice(index, 1);
             // move onto next iteration
             console.log("exited: " + process.pid);
-            // _CPU.init();
             if (_CpuScheduler.activePIDs.length == 0) {
-                console.log("no more");
-                _CPU.init();
+                _CpuScheduler.checkSchedule();
             }
             else {
                 _CpuScheduler.currCycle = _CpuScheduler.quantum;
-                _CpuScheduler.totalCycles--;
             }
         };
         Kernel.prototype.killProcess = function (pid) {
@@ -260,14 +257,14 @@ var TSOS;
             else {
                 if (pid == _CpuScheduler.runningProcess.pid) {
                     // if current process, exit it
-                    this.krnExitProcess();
+                    this.krnExitProcess(_CpuScheduler.runningProcess);
                 }
                 else {
                     // else look and remove from Ready queue
                     for (var i = 0; i < _ReadyQueue.getSize(); i++) {
                         process = _ReadyQueue.dequeue();
                         if (process.pid == pid) {
-                            var pBase = process.pBase;
+                            this.krnExitProcess(process);
                             break;
                         }
                         else {
@@ -275,16 +272,6 @@ var TSOS;
                         }
                     }
                 }
-                // remove process from display
-                TSOS.Control.removeProcessTable(pid);
-                // clear partion starting from base
-                _MemoryManager.clearPartition(pBase);
-                // remove from active PID list
-                _CpuScheduler.activePIDs.splice(index, 1);
-                _StdOut.putText("Process id: " + pid + " has been terminated");
-                _StdOut.advanceLine();
-                // move onto next iteration
-                _CpuScheduler.currCycle = _CpuScheduler.quantum;
             }
         };
         Kernel.prototype.userPrgError = function (opCode) {
@@ -329,7 +316,7 @@ var TSOS;
         // memory out of bound error
         Kernel.prototype.memoryAccessError = function (pid) {
             _StdOut.putText("Memory access error from process id: " + pid);
-            this.krnExitProcess();
+            this.krnExitProcess(_CpuScheduler.runningProcess);
         };
         // - WaitForProcessToExit
         // - CreateFile

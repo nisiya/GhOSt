@@ -284,14 +284,15 @@ var TSOS;
         // click = 1 CPU cycle
         Control.hostBtnNext_click = function (btn) {
             if (_CPU.isExecuting) {
-                // check scheduler to see which process to run and if quantum expired
-                _CpuScheduler.checkSchedule();
                 _CPU.cycle();
                 // update display tables
                 Control.updateCPUTable();
                 // only update process if it is still running
-                if (_CPU.IR !== "00")
+                if (_CPU.IR !== "00") {
                     Control.updateProcessTable(_CpuScheduler.runningProcess.pid, _CpuScheduler.runningProcess.pState);
+                }
+                // check scheduler to see which process to run next and if quantum expired
+                _CpuScheduler.checkSchedule();
             }
         };
         // enable next btn if process is executing and disable if not

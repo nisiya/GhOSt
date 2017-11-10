@@ -96,14 +96,15 @@ module TSOS {
                 this.krnInterruptHandler(interrupt.irq, interrupt.params);
             } else if (_CPU.isExecuting) { // If there are no interrupts then run one CPU cycle if there is anything being processed. {
                 if(!_singleMode){
-                    // check scheduler to see which process to run and if quantum expired
-                    _CpuScheduler.checkSchedule();
                     _CPU.cycle();
                     // update display tables
                     Control.updateCPUTable();
                     // only update process if it is still running
-                    if (_CPU.IR!=="00") 
+                    if (_CPU.IR!=="00"){
                         Control.updateProcessTable(_CpuScheduler.runningProcess.pid, _CpuScheduler.runningProcess.pState);
+                    }
+                    // check scheduler to see which process to run next and if quantum expired
+                    _CpuScheduler.checkSchedule();                        
                 } else {
                     // enable next button in single step mode
                     Control.hostBtnNext_onOff();
@@ -241,10 +242,9 @@ module TSOS {
             _CpuScheduler.start();
         }
 
-        public krnExitProcess(){
+        public krnExitProcess(process){
             // exit process upon completion
             // clear partion starting from base
-            var process = _CpuScheduler.runningProcess;
             process.waitTime = _CpuScheduler.totalCycles - process.turnaroundTime; 
             process.turnaroundTime = process.turnaroundTime + process.waitTime;
             _StdOut.advanceLine();
@@ -259,13 +259,10 @@ module TSOS {
             _CpuScheduler.activePIDs.splice(index, 1);
             // move onto next iteration
             console.log("exited: " + process.pid);
-            // _CPU.init();
             if ( _CpuScheduler.activePIDs.length == 0){
-                console.log("no more");
-                _CPU.init();
+                _CpuScheduler.checkSchedule();
             } else {
                 _CpuScheduler.currCycle = _CpuScheduler.quantum;
-                _CpuScheduler.totalCycles--;
             }
         }
 
@@ -282,29 +279,19 @@ module TSOS {
             } else {
                 if (pid == _CpuScheduler.runningProcess.pid){
                     // if current process, exit it
-                    this.krnExitProcess();
+                    this.krnExitProcess(_CpuScheduler.runningProcess);
                 } else {
                     // else look and remove from Ready queue
                     for (var i=0; i<_ReadyQueue.getSize(); i++){
                         process = _ReadyQueue.dequeue();
                         if (process.pid == pid){
-                            var pBase = process.pBase;
+                            this.krnExitProcess(process);
                             break;
                         } else {
                             _ReadyQueue.enqueue(process);
                         }
                     }
                 }
-                // remove process from display
-                Control.removeProcessTable(pid);
-                // clear partion starting from base
-                _MemoryManager.clearPartition(pBase);
-                // remove from active PID list
-                _CpuScheduler.activePIDs.splice(index, 1);
-                _StdOut.putText("Process id: " + pid + " has been terminated");
-                _StdOut.advanceLine();
-                // move onto next iteration
-                _CpuScheduler.currCycle = _CpuScheduler.quantum;
             }
         }
 
@@ -354,7 +341,7 @@ module TSOS {
         // memory out of bound error
         public memoryAccessError(pid){
             _StdOut.putText("Memory access error from process id: " + pid);
-            this.krnExitProcess();
+            this.krnExitProcess(_CpuScheduler.runningProcess);
         }
 
         // - WaitForProcessToExit
