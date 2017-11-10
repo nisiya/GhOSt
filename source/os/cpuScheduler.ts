@@ -7,7 +7,7 @@
      ------------ */
      module TSOS {
         export class CpuScheduler {
-            // public algorithm = "Round Robin";
+            public algorithm = "Round Robin";
             public quantum = 6;
             public currCycle = 0;
             public activePIDs = new Array<number>();

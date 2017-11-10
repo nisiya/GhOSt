@@ -317,7 +317,9 @@ var TSOS;
             _CPU.Zflag = nextProcess.pZflag;
             nextProcess.pState = "Running";
             _CpuScheduler.runningProcess = nextProcess;
+            this.krnTrace(_CpuScheduler.algorithm + ": switching to Process id: " + nextProcess.pid);
             TSOS.Control.updateProcessTable(nextProcess.pid, nextProcess.pState);
+            _Mode = 1;
         };
         Kernel.prototype.memoryAccessError = function (pid) {
             _StdOut.putText("Memory access error from process id: " + pid);

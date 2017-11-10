@@ -341,8 +341,10 @@ module TSOS {
             _CPU.Yreg = nextProcess.pYreg;
             _CPU.Zflag = nextProcess.pZflag;
             nextProcess.pState = "Running";
-            _CpuScheduler.runningProcess = nextProcess;         
-            Control.updateProcessTable(nextProcess.pid, nextProcess.pState);            
+            _CpuScheduler.runningProcess = nextProcess; 
+            this.krnTrace(_CpuScheduler.algorithm + ": switching to Process id: " + nextProcess.pid);        
+            Control.updateProcessTable(nextProcess.pid, nextProcess.pState);  
+            _Mode = 1;          
         }
 
         public memoryAccessError(pid){

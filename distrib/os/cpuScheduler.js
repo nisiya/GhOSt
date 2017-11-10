@@ -8,7 +8,7 @@ var TSOS;
 (function (TSOS) {
     var CpuScheduler = /** @class */ (function () {
         function CpuScheduler() {
-            // public algorithm = "Round Robin";
+            this.algorithm = "Round Robin";
             this.quantum = 6;
             this.currCycle = 0;
             this.activePIDs = new Array();
