@@ -103,7 +103,7 @@ module TSOS {
                     Control.updateCPUTable();
                     // only update process if it is still running
                     if (_CPU.IR!=="00") 
-                        Control.updateProcessTable(_CpuScheduler.runningProcess.pid, "Running");
+                        Control.updateProcessTable(_CpuScheduler.runningProcess.pid, _CpuScheduler.runningProcess.pState);
                 } else {
                     // enable next button in single step mode
                     Control.hostBtnNext_onOff();
@@ -185,7 +185,7 @@ module TSOS {
             // pid incremented upon creation
             _PID++;
             var pid = _PID;            
-            var process = new PCB(pBase, pid);
+            var process = new PCB(pBase, pid, "Resident");
             // put process on resident queue
             _ResidentQueue.enqueue(process);
             // update process table
@@ -194,7 +194,6 @@ module TSOS {
         }
 
         public krnExecuteProcess(pid){
-            // only one process in ready queue for now
             var process;
             var switched:boolean = false;
             var pidExists:boolean = false;
@@ -220,8 +219,8 @@ module TSOS {
                 _CpuScheduler.activePIDs.push(process.pid);                
                 _ReadyQueue.enqueue(process);
                 // start CPU and scheduler
+                Control.updateProcessTable(process.pid, process.pState);                
                 _CpuScheduler.start();    
-                _CPU.isExecuting = true;
             } else {
                 _StdOut.putText("No process with id: " + pid); 
                 _StdOut.advanceLine();
@@ -234,11 +233,12 @@ module TSOS {
             while (!_ResidentQueue.isEmpty()){
                 process = _ResidentQueue.dequeue();
                 _CpuScheduler.activePIDs.push(process.pid);
+                process.pState = "Ready";
                 _ReadyQueue.enqueue(process);
+                Control.updateProcessTable(process.pid, process.pState);                
             }
             // start CPU and scheduler
             _CpuScheduler.start();
-            _CPU.isExecuting = true;
         }
 
         public krnExitProcess(){
@@ -266,6 +266,7 @@ module TSOS {
             } else {
                 _CpuScheduler.currCycle = _CpuScheduler.quantum;
                 _CpuScheduler.totalCycles--;
+                _CpuScheduler.checkSchedule();
             }
         }
 
@@ -325,13 +326,12 @@ module TSOS {
             // if process finished, dont save it
             console.log("IR " + _CPU.IR);
             if (_CPU.IR != "00"){
-                var currProcess = new PCB(runningProcess.pBase, runningProcess.pid);
+                var currProcess = new PCB(runningProcess.pBase, runningProcess.pid, "Ready");
                 currProcess.pCounter = _CPU.PC;
                 currProcess.pAcc = _CPU.Acc;
                 currProcess.pXreg = _CPU.Xreg;
                 currProcess.pYreg = _CPU.Yreg;
                 currProcess.pZflag = _CPU.Zflag;
-                currProcess.pState = "Resident";
                 currProcess.turnaroundTime = runningProcess.turnaroundTime;
                 _ReadyQueue.enqueue(currProcess);
                 Control.updateProcessTable(currProcess.pid, currProcess.pState);

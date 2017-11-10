@@ -24,18 +24,18 @@
         public pYreg: number = 0;
         public pZflag: number = 0; 
         public pPriority: number = 0;
-        public pState: string = "New";
+        public pState: string;
         public pLocation: string = "Memory";
         public pBase: number;
         public pLimit: number;
         public turnaroundTime: number = 0;
         public waitTime: number = 0;
 
-        constructor(pBase, pid) {
+        constructor(pBase, pid, pState) {
             this.pid = pid;
             this.pBase = pBase;
             this.pLimit = 255;
-            this.pState = "Resident";
+            this.pState = pState;
         }
     }
 }

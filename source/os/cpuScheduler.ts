@@ -20,6 +20,7 @@
                 this.totalCycles = 0;
                 this.runningProcess = _ReadyQueue.dequeue();
                 this.runningProcess.pState = "Running";
+                _CPU.isExecuting = true;
                 Control.updateProcessTable(this.runningProcess.pid, this.runningProcess.pState);
             }
 

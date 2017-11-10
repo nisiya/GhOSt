@@ -92,7 +92,7 @@ var TSOS;
                     TSOS.Control.updateCPUTable();
                     // only update process if it is still running
                     if (_CPU.IR !== "00")
-                        TSOS.Control.updateProcessTable(_CpuScheduler.runningProcess.pid, "Running");
+                        TSOS.Control.updateProcessTable(_CpuScheduler.runningProcess.pid, _CpuScheduler.runningProcess.pState);
                 }
                 else {
                     // enable next button in single step mode
@@ -167,7 +167,7 @@ var TSOS;
             // pid incremented upon creation
             _PID++;
             var pid = _PID;
-            var process = new TSOS.PCB(pBase, pid);
+            var process = new TSOS.PCB(pBase, pid, "Resident");
             // put process on resident queue
             _ResidentQueue.enqueue(process);
             // update process table
@@ -175,7 +175,6 @@ var TSOS;
             return pid;
         };
         Kernel.prototype.krnExecuteProcess = function (pid) {
-            // only one process in ready queue for now
             var process;
             var switched = false;
             var pidExists = false;
@@ -199,8 +198,8 @@ var TSOS;
                 _CpuScheduler.activePIDs.push(process.pid);
                 _ReadyQueue.enqueue(process);
                 // start CPU and scheduler
+                TSOS.Control.updateProcessTable(process.pid, process.pState);
                 _CpuScheduler.start();
-                _CPU.isExecuting = true;
             }
             else {
                 _StdOut.putText("No process with id: " + pid);
@@ -213,11 +212,12 @@ var TSOS;
             while (!_ResidentQueue.isEmpty()) {
                 process = _ResidentQueue.dequeue();
                 _CpuScheduler.activePIDs.push(process.pid);
+                process.pState = "Ready";
                 _ReadyQueue.enqueue(process);
+                TSOS.Control.updateProcessTable(process.pid, process.pState);
             }
             // start CPU and scheduler
             _CpuScheduler.start();
-            _CPU.isExecuting = true;
         };
         Kernel.prototype.krnExitProcess = function () {
             // exit process upon completion
@@ -245,6 +245,7 @@ var TSOS;
             else {
                 _CpuScheduler.currCycle = _CpuScheduler.quantum;
                 _CpuScheduler.totalCycles--;
+                _CpuScheduler.checkSchedule();
             }
         };
         Kernel.prototype.killProcess = function (pid) {
@@ -302,13 +303,12 @@ var TSOS;
             // if process finished, dont save it
             console.log("IR " + _CPU.IR);
             if (_CPU.IR != "00") {
-                var currProcess = new TSOS.PCB(runningProcess.pBase, runningProcess.pid);
+                var currProcess = new TSOS.PCB(runningProcess.pBase, runningProcess.pid, "Ready");
                 currProcess.pCounter = _CPU.PC;
                 currProcess.pAcc = _CPU.Acc;
                 currProcess.pXreg = _CPU.Xreg;
                 currProcess.pYreg = _CPU.Yreg;
                 currProcess.pZflag = _CPU.Zflag;
-                currProcess.pState = "Resident";
                 currProcess.turnaroundTime = runningProcess.turnaroundTime;
                 _ReadyQueue.enqueue(currProcess);
                 TSOS.Control.updateProcessTable(currProcess.pid, currProcess.pState);

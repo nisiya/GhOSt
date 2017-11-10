@@ -20,6 +20,7 @@ var TSOS;
             this.totalCycles = 0;
             this.runningProcess = _ReadyQueue.dequeue();
             this.runningProcess.pState = "Running";
+            _CPU.isExecuting = true;
             TSOS.Control.updateProcessTable(this.runningProcess.pid, this.runningProcess.pState);
         };
         // check if time is up and if context switch is needed
