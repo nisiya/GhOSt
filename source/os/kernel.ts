@@ -103,7 +103,7 @@ module TSOS {
                     Control.updateCPUTable();
                     // only update process if it is still running
                     if (_CPU.IR!=="00") 
-                        Control.updateProcessTable(_RunningPID, "Running");
+                        Control.updateProcessTable(_CpuScheduler.runningProcess.pid, "Running");
                 } else {
                     // enable next button in single step mode
                     Control.hostBtnNext_onOff();
@@ -255,9 +255,9 @@ module TSOS {
             _StdOut.putText("Turnaround time: " + process.turnaroundTime + " cycles. Wait time: " + process.waitTime + " cycles.");
             _StdOut.advanceLine();
             _OsShell.putPrompt();
-            _MemoryManager.clearPartition(_RunningpBase);
-            Control.removeProcessTable(_RunningPID);
-            var index = _CpuScheduler.activePIDs.indexOf(_RunningPID);
+            _MemoryManager.clearPartition(process.pBase);
+            Control.removeProcessTable(process.pid);
+            var index = _CpuScheduler.activePIDs.indexOf(process.pid);
             _CpuScheduler.activePIDs.splice(index, 1);
             // move onto next iteration
             console.log(_CpuScheduler.totalCycles);            
@@ -278,7 +278,7 @@ module TSOS {
                 _StdOut.advanceLine();
                 _OsShell.putPrompt();
             } else {
-                if (pid == _RunningPID){
+                if (pid == _CpuScheduler.runningProcess.pid){
                     this.krnExitProcess();
                 } else {
                     for (var i=0; i<_ReadyQueue.getSize(); i++){
@@ -330,7 +330,7 @@ module TSOS {
                 currProcess.pState = "Resident";
                 currProcess.turnaroundTime = runningProcess.turnaroundTime;
                 _ReadyQueue.enqueue(currProcess);
-                Control.updateProcessTable(_RunningPID, currProcess.pState);
+                Control.updateProcessTable(currProcess.pid, currProcess.pState);
             }
 
             // load next process to CPU
@@ -341,10 +341,8 @@ module TSOS {
             _CPU.Yreg = nextProcess.pYreg;
             _CPU.Zflag = nextProcess.pZflag;
             nextProcess.pState = "Running";
-            _CpuScheduler.runningProcess = nextProcess;
-            _RunningPID = nextProcess.pid;
-            _RunningpBase = nextProcess.pBase;           
-            Control.updateProcessTable(_RunningPID, nextProcess.pState);            
+            _CpuScheduler.runningProcess = nextProcess;         
+            Control.updateProcessTable(nextProcess.pid, nextProcess.pState);            
         }
 
         public memoryAccessError(pid){

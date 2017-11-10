@@ -208,11 +208,17 @@ module TSOS {
         }
 
         public static removeProcessTable(pid): void{
-            // remove process from display upon completion
-            var processTableBody: HTMLTableSectionElement = <HTMLTableSectionElement> document.getElementById("processTbody");    
-            var row: HTMLTableRowElement = <HTMLTableRowElement> document.getElementById("pid"+pid);     
-            // processTableBody.deleteRow(0);
-            row.parentNode.removeChild(row);      
+                // remove process from display upon completion
+                var processTableBody: HTMLTableSectionElement = <HTMLTableSectionElement> document.getElementById("processTbody");    
+                if (pid == -1 ){
+                   while(processTableBody.hasChildNodes()){
+                       processTableBody.removeChild(processTableBody.firstChild);
+                   }
+                } else {
+                    var row: HTMLTableRowElement = <HTMLTableRowElement> document.getElementById("pid"+pid);     
+                    // processTableBody.deleteRow(0);
+                    row.parentNode.removeChild(row);  
+                }    
         }
 
 
@@ -309,7 +315,7 @@ module TSOS {
             if(_CPU.isExecuting){
                 _CPU.cycle();
                 Control.updateCPUTable();
-                Control.updateProcessTable(_RunningPID, "Running");
+                Control.updateProcessTable(_CpuScheduler.runningProcess.pid, "Running");
             }
         }
 

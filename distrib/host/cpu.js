@@ -51,10 +51,6 @@ var TSOS;
             this.IR = opCode;
             // decode then execute the op codes
             this.decodeExecute(this.IR);
-            // update display tables
-            // if(this.isExecuting){
-            //     Control.updateProcessTable(_RunningPID, "Running");
-            // }
         };
         Cpu.prototype.fetch = function (PC) {
             return _MemoryAccessor.readMemory(PC);

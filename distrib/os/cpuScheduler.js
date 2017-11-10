@@ -21,8 +21,6 @@ var TSOS;
             this.runningProcess = _ReadyQueue.dequeue();
             this.runningProcess.pState = "Running";
             TSOS.Control.updateProcessTable(this.runningProcess.pid, this.runningProcess.pState);
-            _RunningPID = this.runningProcess.pid;
-            _RunningpBase = this.runningProcess.pBase;
         };
         CpuScheduler.prototype.checkSchedule = function () {
             this.currCycle++;

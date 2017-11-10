@@ -20,11 +20,11 @@ var TSOS;
             // Control.loadMemoryTable();
         };
         MemoryAccessor.prototype.writeMemory = function (addr, data) {
-            var baseReg = _RunningpBase;
+            var baseReg = _CpuScheduler.runningProcess.pBase;
             var limitReg = baseReg + 255;
             var index = parseInt(addr, 16) + baseReg;
             if (index > limitReg) {
-                _KernelInterruptQueue.enqueue(new TSOS.Interrupt(MEMACCESS_ERROR_IRQ, _RunningPID));
+                _KernelInterruptQueue.enqueue(new TSOS.Interrupt(MEMACCESS_ERROR_IRQ, _CpuScheduler.runningProcess.pid));
             }
             else {
                 _Memory.memory[index] = data.toString(16).toUpperCase();
@@ -33,11 +33,11 @@ var TSOS;
             }
         };
         MemoryAccessor.prototype.readMemory = function (addr) {
-            var baseReg = _RunningpBase;
+            var baseReg = _CpuScheduler.runningProcess.pBase;
             var limitReg = baseReg + 255;
             var index = baseReg + addr;
             if (index > limitReg) {
-                _KernelInterruptQueue.enqueue(new TSOS.Interrupt(MEMACCESS_ERROR_IRQ, _RunningPID));
+                _KernelInterruptQueue.enqueue(new TSOS.Interrupt(MEMACCESS_ERROR_IRQ, _CpuScheduler.runningProcess.pid));
             }
             else {
                 var value = _Memory.memory[index];

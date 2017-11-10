@@ -187,9 +187,16 @@ var TSOS;
         Control.removeProcessTable = function (pid) {
             // remove process from display upon completion
             var processTableBody = document.getElementById("processTbody");
-            var row = document.getElementById("pid" + pid);
-            // processTableBody.deleteRow(0);
-            row.parentNode.removeChild(row);
+            if (pid == -1) {
+                while (processTableBody.hasChildNodes()) {
+                    processTableBody.removeChild(processTableBody.firstChild);
+                }
+            }
+            else {
+                var row = document.getElementById("pid" + pid);
+                // processTableBody.deleteRow(0);
+                row.parentNode.removeChild(row);
+            }
         };
         //
         // updating the CPU display
@@ -272,7 +279,7 @@ var TSOS;
             if (_CPU.isExecuting) {
                 _CPU.cycle();
                 Control.updateCPUTable();
-                Control.updateProcessTable(_RunningPID, "Running");
+                Control.updateProcessTable(_CpuScheduler.runningProcess.pid, "Running");
             }
         };
         // enable next btn if process is executing and disable if not

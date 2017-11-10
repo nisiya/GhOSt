@@ -50,11 +50,6 @@ module TSOS {
 
             // decode then execute the op codes
             this.decodeExecute(this.IR);   
-
-            // update display tables
-            // if(this.isExecuting){
-            //     Control.updateProcessTable(_RunningPID, "Running");
-            // }
         }
 
         public fetch(PC) {

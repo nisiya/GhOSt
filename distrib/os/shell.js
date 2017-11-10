@@ -498,6 +498,10 @@ var TSOS;
         // clearmem
         Shell.prototype.shellClearmem = function (args) {
             _MemoryManager.clearMemory();
+            TSOS.Control.removeProcessTable(-1);
+            while (!_ResidentQueue.isEmpty()) {
+                _ResidentQueue.dequeue();
+            }
         };
         return Shell;
     }());

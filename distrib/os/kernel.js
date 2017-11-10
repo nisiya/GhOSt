@@ -92,7 +92,7 @@ var TSOS;
                     TSOS.Control.updateCPUTable();
                     // only update process if it is still running
                     if (_CPU.IR !== "00")
-                        TSOS.Control.updateProcessTable(_RunningPID, "Running");
+                        TSOS.Control.updateProcessTable(_CpuScheduler.runningProcess.pid, "Running");
                 }
                 else {
                     // enable next button in single step mode
@@ -233,9 +233,9 @@ var TSOS;
             _StdOut.putText("Turnaround time: " + process.turnaroundTime + " cycles. Wait time: " + process.waitTime + " cycles.");
             _StdOut.advanceLine();
             _OsShell.putPrompt();
-            _MemoryManager.clearPartition(_RunningpBase);
-            TSOS.Control.removeProcessTable(_RunningPID);
-            var index = _CpuScheduler.activePIDs.indexOf(_RunningPID);
+            _MemoryManager.clearPartition(process.pBase);
+            TSOS.Control.removeProcessTable(process.pid);
+            var index = _CpuScheduler.activePIDs.indexOf(process.pid);
             _CpuScheduler.activePIDs.splice(index, 1);
             // move onto next iteration
             console.log(_CpuScheduler.totalCycles);
@@ -255,7 +255,7 @@ var TSOS;
                 _OsShell.putPrompt();
             }
             else {
-                if (pid == _RunningPID) {
+                if (pid == _CpuScheduler.runningProcess.pid) {
                     this.krnExitProcess();
                 }
                 else {
@@ -306,7 +306,7 @@ var TSOS;
                 currProcess.pState = "Resident";
                 currProcess.turnaroundTime = runningProcess.turnaroundTime;
                 _ReadyQueue.enqueue(currProcess);
-                TSOS.Control.updateProcessTable(_RunningPID, currProcess.pState);
+                TSOS.Control.updateProcessTable(currProcess.pid, currProcess.pState);
             }
             // load next process to CPU
             var nextProcess = _ReadyQueue.dequeue();
@@ -317,9 +317,7 @@ var TSOS;
             _CPU.Zflag = nextProcess.pZflag;
             nextProcess.pState = "Running";
             _CpuScheduler.runningProcess = nextProcess;
-            _RunningPID = nextProcess.pid;
-            _RunningpBase = nextProcess.pBase;
-            TSOS.Control.updateProcessTable(_RunningPID, nextProcess.pState);
+            TSOS.Control.updateProcessTable(nextProcess.pid, nextProcess.pState);
         };
         Kernel.prototype.memoryAccessError = function (pid) {
             _StdOut.putText("Memory access error from process id: " + pid);

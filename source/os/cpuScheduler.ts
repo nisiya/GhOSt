@@ -21,8 +21,6 @@
                 this.runningProcess = _ReadyQueue.dequeue();
                 this.runningProcess.pState = "Running";
                 Control.updateProcessTable(this.runningProcess.pid, this.runningProcess.pState);
-                _RunningPID = this.runningProcess.pid;
-                _RunningpBase = this.runningProcess.pBase;
             }
 
             public checkSchedule(): void {

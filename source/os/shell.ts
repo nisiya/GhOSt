@@ -604,6 +604,10 @@ module TSOS {
         // clearmem
         public shellClearmem(args){
             _MemoryManager.clearMemory();
+            Control.removeProcessTable(-1);
+            while(!_ResidentQueue.isEmpty()){
+                _ResidentQueue.dequeue();
+            }
         }
     }
 }

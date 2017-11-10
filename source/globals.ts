@@ -56,9 +56,7 @@ var _KernelBuffers: any[] = null;   // when clearly 'any' is not what we want. T
 var _ResidentQueue;
 var _ReadyQueue;
 var _RunningQueue;
-var _PID: number = -1; // keep track of process idsvar _RunningPID: number = 0; 
-var _RunningPID: number;// current running pid
-var _RunningpBase: number = 0; // base reg of running process
+var _PID: number = -1; // keep track of process ids
 var _singleMode = false;
 
 // Standard input and output
