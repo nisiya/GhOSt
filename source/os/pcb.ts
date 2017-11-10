@@ -28,11 +28,13 @@
         public pLocation: string = "Memory";
         public pBase: number;
         public pLimit: number;
+        public turnaroundTime: number = 0;
+        public waitTime: number = 0;
 
         constructor(pBase, pid) {
             this.pid = pid;
             this.pBase = pBase;
-            this.pLimit = pBase + 255;
+            this.pLimit = 255;
             this.pState = "Resident";
         }
     }

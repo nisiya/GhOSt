@@ -17,8 +17,11 @@ var CPU_CLOCK_INTERVAL = 100; // This is in ms (milliseconds) so 1000 = 1 second
 var TIMER_IRQ = 0; // Pages 23 (timer), 9 (interrupts), and 561 (interrupt priority).
 // NOTE: The timer is different from hardware/host clock pulses. Don't confuse these.
 var KEYBOARD_IRQ = 1;
-var PROCESS_ERROR_IRQ = 2;
-var PROCESS_PRINT_IRQ = 3;
+var PROCESS_ERROR_IRQ = 2; // print error in user program
+var PROCESS_PRINT_IRQ = 3; // print text produced by user program
+var CONTEXT_SWITCH_IRQ = 4; // save current process and switch to next one
+var KILL_PROCESS_IRQ = 5; // kill a process
+var MEMACCESS_ERROR_IRQ = 6; // process accessing something out of bound
 //
 // Global Variables
 // TODO: Make a global object and use that instead of the "_" naming convention in the global namespace.
@@ -27,6 +30,7 @@ var _CPU; // Utilize TypeScript's type annotation system to ensure that _CPU is 
 var _Memory; // same with Memory
 var _MemoryAccessor; // and Memory Accessor
 var _MemoryManager; // and Memory Manager
+var _CpuScheduler; // and CPU Scheduler
 var _OSclock = 0; // Page 23.
 var _Mode = 0; // (currently unused)  0 = Kernel Mode, 1 = User Mode.  See page 21.
 var _Canvas; // Initialized in Control.hostInit().
@@ -42,6 +46,7 @@ var _KernelInputQueue = null; // Is this better? I don't like uninitialized vari
 var _KernelBuffers = null; // when clearly 'any' is not what we want. There is likely a better way, but what is it?
 var _ResidentQueue;
 var _ReadyQueue;
+var _RunningQueue;
 var _PID = -1; // keep track of process ids
 var _singleMode = false;
 // Standard input and output

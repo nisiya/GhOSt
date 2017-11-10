@@ -13,18 +13,38 @@ var TSOS;
     // please ignore for project 2
     var MemoryAccessor = /** @class */ (function () {
         function MemoryAccessor() {
-            // checks if memory partition is loaded
-            this.memoryS1 = false;
-            this.memoryS2 = false;
-            this.memoryS3 = false;
         }
         MemoryAccessor.prototype.init = function () {
-            // all partitions are available
-            this.memoryS1 = false;
-            this.memoryS2 = false;
-            this.memoryS3 = false;
             // load table on user interface
-            // Control.loadMemoryTable();
+            TSOS.Control.loadMemoryTable();
+        };
+        MemoryAccessor.prototype.writeMemory = function (addr, data) {
+            // checks running process base reg and translate incoming address
+            var baseReg = _CpuScheduler.runningProcess.pBase;
+            var limitReg = baseReg + 255;
+            var index = parseInt(addr, 16) + baseReg;
+            // check if out of bound access
+            if (index > limitReg) {
+                _KernelInterruptQueue.enqueue(new TSOS.Interrupt(MEMACCESS_ERROR_IRQ, _CpuScheduler.runningProcess.pid));
+            }
+            else {
+                _Memory.memory[index] = data.toString(16).toUpperCase();
+                TSOS.Control.updateMemoryTable(baseReg);
+            }
+        };
+        MemoryAccessor.prototype.readMemory = function (addr) {
+            // checks running process base reg and translate incoming address
+            var baseReg = _CpuScheduler.runningProcess.pBase;
+            var limitReg = baseReg + 255;
+            var index = baseReg + addr;
+            // check if out of bound access
+            if (index > limitReg) {
+                _KernelInterruptQueue.enqueue(new TSOS.Interrupt(MEMACCESS_ERROR_IRQ, _CpuScheduler.runningProcess.pid));
+            }
+            else {
+                var value = _Memory.memory[index];
+                return value;
+            }
         };
         return MemoryAccessor;
     }());

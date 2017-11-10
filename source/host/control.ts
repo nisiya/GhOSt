@@ -125,13 +125,13 @@ module TSOS {
             var rowId: string;
             var index: number;                    
             var cellId: string;
-            var limitReg: number = baseReg + 256;
-            for (var i = baseReg; i < limitReg/8 ; i++){
-                rowId = "memoryRow-" + (8*i);
+
+            for (var i = 0; i < 32 ; i++){
+                rowId = "memoryRow-" + ((8*i)+baseReg);
                 for (var j = 0; j < 8; j ++){
-                    index = j + (8 * i);
+                    index = j + ((8 * i)+baseReg);
                     var id: string = "000" + index.toString(16).toUpperCase();                            
-                    cellId = id.slice(-4);                            
+                    cellId = id.slice(-4);      
                     memoryTable.rows.namedItem(rowId).cells.namedItem(cellId).innerHTML = _Memory.memory[index];
                 }
             }
@@ -146,7 +146,7 @@ module TSOS {
             var row: HTMLTableRowElement = <HTMLTableRowElement> document.createElement("tr");
             row.id = "pid" + process.pid;
             var cell: HTMLTableCellElement = <HTMLTableCellElement> document.createElement("td");
-            cell.id = process.id;
+            // cell.id = process.id;
             // PID
             var cellText = document.createTextNode(process.pid);
             cell.appendChild(cellText);
@@ -194,39 +194,55 @@ module TSOS {
             processTableBody.appendChild(row);
         } 
 
-        public static updateProcessTable(pCounter, pIR, pAcc, pXreg, pYreg, pZflag): void{
+        public static updateProcessTable(pid, pState): void{
             // update process display when process is running
             var processTableBody: HTMLTableSectionElement = <HTMLTableSectionElement> document.getElementById("processTbody");                
-            var row = processTableBody.rows.item(0);
-            row.cells.item(1).innerHTML = pCounter;
-            row.cells.item(2).innerHTML = pIR;
-            row.cells.item(3).innerHTML = pAcc;
-            row.cells.item(4).innerHTML = pXreg;
-            row.cells.item(5).innerHTML = pYreg;
-            row.cells.item(6).innerHTML = pZflag;
-            row.cells.item(7).innerHTML = "Running";
+            var row: HTMLTableRowElement = <HTMLTableRowElement> document.getElementById("pid"+pid);
+            var pc = _CPU.PC.toString(16).toUpperCase();
+            if(pc.length == 1){
+                pc = "0" + pc;
+            }     
+            row.cells.item(1).innerHTML = pc;
+            row.cells.item(2).innerHTML = _CPU.IR;
+            row.cells.item(3).innerHTML = _CPU.Acc.toString(16).toUpperCase();
+            row.cells.item(4).innerHTML = _CPU.Xreg.toString(16).toUpperCase();
+            row.cells.item(5).innerHTML = _CPU.Yreg.toString(16).toUpperCase();
+            row.cells.item(6).innerHTML = _CPU.Zflag.toString(16).toUpperCase();
+            row.cells.item(7).innerHTML = pState;
         }
 
-        public static removeProcessTable(): void{
-            // remove process from display upon completion
+        public static removeProcessTable(pid): void{
             var processTableBody: HTMLTableSectionElement = <HTMLTableSectionElement> document.getElementById("processTbody");    
-            // var row: HTMLTableRowElement = <HTMLTableRowElement> document.getElementById("pid"+pid);     
-            processTableBody.deleteRow(0);
-            // row.parentNode.removeChild(row);      
+            
+            if (pid == -1 ){
+                // remove process for clearmem
+                while(processTableBody.hasChildNodes()){
+                    processTableBody.removeChild(processTableBody.firstChild);
+                }
+            } else {
+                // remove process from display upon completion
+                var row: HTMLTableRowElement = <HTMLTableRowElement> document.getElementById("pid"+pid);     
+                // processTableBody.deleteRow(0);
+                row.parentNode.removeChild(row);  
+            }    
         }
 
 
         //
         // updating the CPU display
-        public static updateCPUTable(cpu): void {
+        public static updateCPUTable(): void {
             // update the CPU display when  process is running
             var cpuTable: HTMLTableElement = <HTMLTableElement> document.getElementById("tbCPU");
-            cpuTable.rows[1].cells.namedItem("cPC").innerHTML = cpu.PC.toString();
-            cpuTable.rows[1].cells.namedItem("cIR").innerHTML = cpu.IR.toString();            
-            cpuTable.rows[1].cells.namedItem("cACC").innerHTML = cpu.Acc.toString();            
-            cpuTable.rows[1].cells.namedItem("cX").innerHTML = cpu.Xreg.toString();            
-            cpuTable.rows[1].cells.namedItem("cY").innerHTML = cpu.Yreg.toString();            
-            cpuTable.rows[1].cells.namedItem("cZ").innerHTML = cpu.Zflag.toString();                        
+            var pc = _CPU.PC.toString(16).toUpperCase();
+            if(pc.length == 1){
+                pc = "0" + pc;
+            }
+            cpuTable.rows[1].cells.namedItem("cPC").innerHTML = pc;
+            cpuTable.rows[1].cells.namedItem("cIR").innerHTML = _CPU.IR;            
+            cpuTable.rows[1].cells.namedItem("cACC").innerHTML = _CPU.Acc.toString(16).toUpperCase();            
+            cpuTable.rows[1].cells.namedItem("cX").innerHTML = _CPU.Xreg.toString(16).toUpperCase();            
+            cpuTable.rows[1].cells.namedItem("cY").innerHTML = _CPU.Yreg.toString(16).toUpperCase();            
+            cpuTable.rows[1].cells.namedItem("cZ").innerHTML = _CPU.Zflag.toString(16).toUpperCase();                        
         } 
 
 
@@ -305,7 +321,14 @@ module TSOS {
         // click = 1 CPU cycle
         public static hostBtnNext_click(btn): void {
             if(_CPU.isExecuting){
+                // check scheduler to see which process to run and if quantum expired
+                _CpuScheduler.checkSchedule();
                 _CPU.cycle();
+                // update display tables
+                Control.updateCPUTable();
+                // only update process if it is still running
+                if (_CPU.IR!=="00") 
+                    Control.updateProcessTable(_CpuScheduler.runningProcess.pid, "Running");
             }
         }
 

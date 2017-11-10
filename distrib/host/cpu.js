@@ -46,24 +46,14 @@ var TSOS;
             _Kernel.krnTrace('CPU cycle');
             // TODO: Accumulate CPU usage and profiling statistics here.
             // Do the real work here. Be sure to set this.isExecuting appropriately.
-            if (this.PC == 0) {
-                // move pcb from ready queue to running
-                var process = _ReadyQueue.dequeue();
-                TSOS.Control.updateProcessTable(this.PC, this.IR, this.Acc, this.Xreg, this.Yreg, this.Zflag);
-            }
             // fetch instruction from memory
             var opCode = this.fetch(this.PC);
             this.IR = opCode;
             // decode then execute the op codes
             this.decodeExecute(this.IR);
-            // update display tables
-            TSOS.Control.updateCPUTable(this);
-            if (this.isExecuting) {
-                TSOS.Control.updateProcessTable(this.PC, this.IR, this.Acc, this.Xreg, this.Yreg, this.Zflag);
-            }
         };
         Cpu.prototype.fetch = function (PC) {
-            return _MemoryManager.readMemory(PC);
+            return _MemoryAccessor.readMemory(PC);
         };
         Cpu.prototype.decodeExecute = function (opCode) {
             if (opCode.length > 0) {
@@ -91,7 +81,7 @@ var TSOS;
                     case "8D":
                         data = this.Acc;
                         addr = this.fetch(this.PC + 2) + this.fetch(this.PC + 1);
-                        _MemoryManager.updateMemory(addr, data);
+                        _MemoryAccessor.writeMemory(addr, data);
                         this.PC += 3;
                         break;
                     // add with carry
@@ -138,13 +128,11 @@ var TSOS;
                         break;
                     // break
                     case "00":
-                        // stop
+                        // stop and exit current process
                         _Kernel.krnExitProcess();
-                        // reset CPU
-                        this.init();
-                        TSOS.Control.updateCPUTable(this);
                         // disable next button
-                        TSOS.Control.hostBtnNext_onOff();
+                        if (_singleMode)
+                            TSOS.Control.hostBtnNext_onOff();
                         break;
                     // compare a byte in memory to the X reg
                     // if equal, set z flag 
@@ -182,7 +170,7 @@ var TSOS;
                         index = parseInt(addr, 16);
                         data = parseInt(this.fetch(index), 16);
                         data++;
-                        _MemoryManager.updateMemory(addr, data);
+                        _MemoryAccessor.writeMemory(addr, data);
                         this.PC += 3;
                         break;
                     // system call
@@ -216,7 +204,6 @@ var TSOS;
                         _Kernel.krnExitProcess();
                         // reset CPU
                         this.init();
-                        TSOS.Control.updateCPUTable(this);
                         break;
                 }
             }

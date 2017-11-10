@@ -50,6 +50,8 @@ module TSOS {
             // Launch memory manager
             _MemoryManager = new MemoryManager();
 
+            // Launch CPU scheduler
+            _CpuScheduler = new CpuScheduler();
             // Enable the OS Interrupts.  (Not the CPU clock interrupt, as that is done in the hardware sim.)
             this.krnTrace("Enabling the interrupts.");
             this.krnEnableInterrupts();
@@ -94,7 +96,14 @@ module TSOS {
                 this.krnInterruptHandler(interrupt.irq, interrupt.params);
             } else if (_CPU.isExecuting) { // If there are no interrupts then run one CPU cycle if there is anything being processed. {
                 if(!_singleMode){
+                    // check scheduler to see which process to run and if quantum expired
+                    _CpuScheduler.checkSchedule();
                     _CPU.cycle();
+                    // update display tables
+                    Control.updateCPUTable();
+                    // only update process if it is still running
+                    if (_CPU.IR!=="00") 
+                        Control.updateProcessTable(_CpuScheduler.runningProcess.pid, "Running");
                 } else {
                     // enable next button in single step mode
                     Control.hostBtnNext_onOff();
@@ -137,11 +146,20 @@ module TSOS {
                     _krnKeyboardDriver.isr(params);   // Kernel mode device driver
                     _StdIn.handleInput();
                     break;
-                case PROCESS_ERROR_IRQ:
+                case PROCESS_ERROR_IRQ:  // print error message of user program
                     this.userPrgError(params);
                     break;
-                case PROCESS_PRINT_IRQ:
+                case PROCESS_PRINT_IRQ:  // print result of user program
                     this.processPrint(params);
+                    break;
+                case CONTEXT_SWITCH_IRQ: // called by scheduler to save current process and load next
+                    this.contextSwitch(params);
+                    break;
+                case KILL_PROCESS_IRQ:
+                    this.killProcess(params); // kill active process
+                    break;
+                case MEMACCESS_ERROR_IRQ:
+                    this.memoryAccessError(params); // print error of invalid memory access
                     break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
@@ -168,25 +186,122 @@ module TSOS {
             _PID++;
             var pid = _PID;            
             var process = new PCB(pBase, pid);
-            // put process on ready queue
+            // put process on resident queue
             _ResidentQueue.enqueue(process);
             // update process table
             Control.addProcessTable(process);
             return pid;
         }
 
-        public krnExecuteProcess(){
+        public krnExecuteProcess(pid){
             // only one process in ready queue for now
-            _ReadyQueue.enqueue(_ResidentQueue.dequeue());
-            // start CPU
+            var process;
+            var switched:boolean = false;
+            var pidExists:boolean = false;
+
+            // extract correct process
+            for (var i=0; i<_ResidentQueue.getSize(); i++){
+                process = _ResidentQueue.dequeue();
+                if (process.pid == pid){
+                    pidExists = true;
+                    break;
+                }
+                _ResidentQueue.enqueue(process);
+                // order of process in ready queue was switched
+                switched = !switched;
+            }
+            
+            // if process exists, run it
+            if (pidExists){
+                if (switched){
+                    _ResidentQueue.enqueue(_ResidentQueue.dequeue());
+                }
+                process.pState = "Ready";
+                _CpuScheduler.activePIDs.push(process.pid);                
+                _ReadyQueue.enqueue(process);
+                // start CPU and scheduler
+                _CpuScheduler.start();    
+                _CPU.isExecuting = true;
+            } else {
+                _StdOut.putText("No process with id: " + pid); 
+                _StdOut.advanceLine();
+            }
+        }
+
+        public krnExecuteAllProcess(){
+            // bring all process to Ready queue
+            var process;
+            while (!_ResidentQueue.isEmpty()){
+                process = _ResidentQueue.dequeue();
+                _CpuScheduler.activePIDs.push(process.pid);
+                _ReadyQueue.enqueue(process);
+            }
+            // start CPU and scheduler
+            _CpuScheduler.start();
             _CPU.isExecuting = true;
         }
 
         public krnExitProcess(){
             // exit process upon completion
-            // clear partion starting from base 0
-            _MemoryManager.clearPartition(0);
-            Control.removeProcessTable();
+            // clear partion starting from base
+            var process = _CpuScheduler.runningProcess;
+            process.waitTime = _CpuScheduler.totalCycles - process.turnaroundTime; 
+            process.turnaroundTime = process.turnaroundTime + process.waitTime;
+            _StdOut.advanceLine();
+            _StdOut.putText("Process id: " + process.pid + " ended.");
+            _StdOut.advanceLine();
+            _StdOut.putText("Turnaround time: " + process.turnaroundTime + " cycles. Wait time: " + process.waitTime + " cycles.");
+            _StdOut.advanceLine();
+            _OsShell.putPrompt();
+            _MemoryManager.clearPartition(process.pBase);
+            Control.removeProcessTable(process.pid);
+            var index = _CpuScheduler.activePIDs.indexOf(process.pid);
+            _CpuScheduler.activePIDs.splice(index, 1);
+            // move onto next iteration
+            _CpuScheduler.currCycle = _CpuScheduler.quantum;
+            _CpuScheduler.totalCycles--;
+            _CPU.init();
+            // check cpu for next process
+            _CpuScheduler.checkSchedule();           
+        }
+
+        public killProcess(pid){
+            // kill process
+            var process;
+            var index = _CpuScheduler.activePIDs.indexOf(parseInt(pid));
+
+            if (index == -1){
+                // if process with id is not active
+                _StdOut.putText("No process with id: " + pid + " is active"); 
+                _StdOut.advanceLine();
+                _OsShell.putPrompt();
+            } else {
+                if (pid == _CpuScheduler.runningProcess.pid){
+                    // if current process, exit it
+                    this.krnExitProcess();
+                } else {
+                    // else look and remove from Ready queue
+                    for (var i=0; i<_ReadyQueue.getSize(); i++){
+                        process = _ReadyQueue.dequeue();
+                        if (process.pid == pid){
+                            var pBase = process.pBase;
+                            break;
+                        } else {
+                            _ReadyQueue.enqueue(process);
+                        }
+                    }
+                }
+                // remove process from display
+                Control.removeProcessTable(pid);
+                // clear partion starting from base
+                _MemoryManager.clearPartition(pBase);
+                // remove from active PID list
+                _CpuScheduler.activePIDs.splice(index, 1);
+                _StdOut.putText("Process id: " + pid + " has been terminated");
+                _StdOut.advanceLine();
+                // move onto next iteration
+                _CpuScheduler.currCycle = _CpuScheduler.quantum;
+            }
         }
 
         public userPrgError(opCode){
@@ -199,6 +314,43 @@ module TSOS {
         public processPrint(text){
             // When user program makes system call to print to canvas
             _StdOut.putText(text);
+        }
+
+        public contextSwitch(runningProcess){
+            // save current process to PCB
+            // if process finished, dont save it
+            console.log("IR " + _CPU.IR);
+            if (_CPU.IR != "00"){
+                var currProcess = new PCB(runningProcess.pBase, runningProcess.pid);
+                currProcess.pCounter = _CPU.PC;
+                currProcess.pAcc = _CPU.Acc;
+                currProcess.pXreg = _CPU.Xreg;
+                currProcess.pYreg = _CPU.Yreg;
+                currProcess.pZflag = _CPU.Zflag;
+                currProcess.pState = "Resident";
+                currProcess.turnaroundTime = runningProcess.turnaroundTime;
+                _ReadyQueue.enqueue(currProcess);
+                Control.updateProcessTable(currProcess.pid, currProcess.pState);
+                console.log("saved pid:" + currProcess.pid); // for debugging
+            }
+
+            // load next process to CPU
+            var nextProcess = _ReadyQueue.dequeue();   
+            console.log("loaded pid:" + nextProcess.pid); // for debugging
+            _CPU.PC = nextProcess.pCounter;
+            _CPU.Acc = nextProcess.pAcc;
+            _CPU.Xreg = nextProcess.pXreg;
+            _CPU.Yreg = nextProcess.pYreg;
+            _CPU.Zflag = nextProcess.pZflag;
+            nextProcess.pState = "Running";
+            _CpuScheduler.runningProcess = nextProcess; 
+            this.krnTrace(_CpuScheduler.algorithm + ": switching to Process id: " + nextProcess.pid);        
+        }
+
+        // memory out of bound error
+        public memoryAccessError(pid){
+            _StdOut.putText("Memory access error from process id: " + pid);
+            this.krnExitProcess();
         }
 
         // - WaitForProcessToExit

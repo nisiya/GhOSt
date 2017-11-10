@@ -49,17 +49,6 @@ var TSOS;
             // prompt <string>
             sc = new TSOS.ShellCommand(this.shellPrompt, "prompt", "<string> - Sets the prompt.");
             this.commandList[this.commandList.length] = sc;
-            // ps  - list the running processes and their IDs
-            /*sc = new ShellCommand(this.shellPs,
-                                  "ps",
-                                  "- List the running processes and their IDs.");
-            this.commandList[this.commandList.length] = sc;
-
-            // kill <id> - kills the specified process id.
-            sc = new ShellCommand(this.shellKill,
-                                  "kill",
-                                  "<id> - Kills the specified process id.");
-            this.commandList[this.commandList.length] = sc; */
             // date
             sc = new TSOS.ShellCommand(this.shellDate, "date", "- Displays the current date and time.");
             this.commandList[this.commandList.length] = sc;
@@ -75,14 +64,29 @@ var TSOS;
             // load
             sc = new TSOS.ShellCommand(this.shellLoad, "load", "- Validates and loads user program input into memory.");
             this.commandList[this.commandList.length] = sc;
-            // run
+            // run <id>
             sc = new TSOS.ShellCommand(this.shellRun, "run", "- <pid> - Runs the process with the id.");
+            this.commandList[this.commandList.length] = sc;
+            // runall
+            sc = new TSOS.ShellCommand(this.shellRunall, "runall", "- Runs all loaded process.");
+            this.commandList[this.commandList.length] = sc;
+            // quantum <int>
+            sc = new TSOS.ShellCommand(this.shellQuantum, "quantum", "- <int> - Sets the Round Robin quantum to this value.");
+            this.commandList[this.commandList.length] = sc;
+            // ps
+            sc = new TSOS.ShellCommand(this.shellPs, "ps", "Outputs pid of active processes.");
+            this.commandList[this.commandList.length] = sc;
+            // kill <pid>
+            sc = new TSOS.ShellCommand(this.shellKill, "kill", "<pid> - Kills the specified process id.");
             this.commandList[this.commandList.length] = sc;
             // welp
             sc = new TSOS.ShellCommand(this.shellWelp, "welp", "- Displays BSOD when the kernel traps an OS error.");
             this.commandList[this.commandList.length] = sc;
             // prompt <string>
             sc = new TSOS.ShellCommand(this.shellStatus, "status", "<string> - Sets the user status.");
+            this.commandList[this.commandList.length] = sc;
+            // clearmem
+            sc = new TSOS.ShellCommand(this.shellClearmem, "clearmem", "clear all memory partition");
             this.commandList[this.commandList.length] = sc;
             //
             // Display the initial prompt.
@@ -259,23 +263,11 @@ var TSOS;
                         break;
                     // rot13
                     case "rot13":
-                        _StdOut.putText("Rot13 followed by a string would rotate each letter of the ");
-                        _StdOut.advanceLine();
-                        _StdOut.putText("string by 13 places. E.g. 'ace' would be 'npr'.");
+                        _StdOut.putText("Rot13 followed by a string would rotate each letter of the string by 13 places. E.g. 'ace' would be 'npr'.");
                         break;
                     // prompt
                     case "prompt":
-                        _StdOut.putText("Prompt followed by a string would set the prompt as the ");
-                        _StdOut.advanceLine();
-                        _StdOut.putText("string instead of the default >.");
-                        break;
-                    // ps
-                    case "ps":
-                        _StdOut.putText("Ps displays a list of current processes and their IDs.");
-                        break;
-                    // kill <id>
-                    case "kill":
-                        _StdOut.putText("Kill followed by the process ID would kill that process.");
+                        _StdOut.putText("Prompt followed by a string would set the prompt as the string instead of the default >.");
                         break;
                     // date
                     case "date":
@@ -301,13 +293,33 @@ var TSOS;
                     case "run":
                         _StdOut.putText("Runs the process with id <pid>.");
                         break;
+                    // runall
+                    case "runall":
+                        _StdOut.putText("Runs all the loaded processes.");
+                        break;
+                    // quantum <int>
+                    case "quantum":
+                        _StdOut.putText("Sets the Round Robin quantum to <int>.");
+                        break;
+                    // ps
+                    case "ps":
+                        _StdOut.putText("Ps displays a list of current processes and their IDs.");
+                        break;
+                    // kill <pid>
+                    case "kill":
+                        _StdOut.putText("Kill followed by the process ID would kill that process.");
+                        break;
                     // welp
                     case "welp":
                         _StdOut.putText("Welp triggers the BSOD, when the kernel traps an OS error.");
                         break;
-                    // prompt
+                    // status
                     case "status":
                         _StdOut.putText("Status followed by a string would set the user status as the string.");
+                        break;
+                    // clearmem
+                    case "clearmem":
+                        _StdOut.putText("Clears all memory partitions.");
                         break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
@@ -395,7 +407,7 @@ var TSOS;
                     // base register value from when memory was loaded
                     var baseReg = _MemoryManager.loadMemory(inputOpCodes);
                     if (baseReg == 999) {
-                        _StdOut.putText("Memory is full. Please run the current process then load more.");
+                        _StdOut.putText("Memory is full. Please run process to free up space.");
                     }
                     else {
                         var pid = _Kernel.krnCreateProcess(baseReg);
@@ -415,20 +427,55 @@ var TSOS;
             var valText = /^\d*$/;
             // validate input for integer
             if (valText.test(args) && args != "") {
-                // check if there are processes to be run
                 if (_ResidentQueue.isEmpty()) {
                     _StdOut.putText("No process is loaded in memory.");
                 }
-                else if (args != _PID) {
-                    // check if value matches current pid
-                    _StdOut.putText("No process with id: " + args);
-                }
                 else {
-                    _Kernel.krnExecuteProcess();
+                    _Kernel.krnExecuteProcess(args);
                 }
             }
             else {
                 _StdOut.putText("Please enter an integer for process id after run command.");
+            }
+        };
+        // runall
+        Shell.prototype.shellRunall = function (args) {
+            if (_ResidentQueue.isEmpty()) {
+                _StdOut.putText("No process is loaded in memory.");
+            }
+            else {
+                _Kernel.krnExecuteAllProcess();
+            }
+        };
+        // quantum
+        Shell.prototype.shellQuantum = function (args) {
+            var valText = /^\d*$/;
+            // validate input for integer
+            if (valText.test(args) && args != "") {
+                _CpuScheduler.quantum = args;
+            }
+            else {
+                _StdOut.putText("Please enter an integer for quantum value after quantum command.");
+            }
+        };
+        // ps
+        Shell.prototype.shellPs = function (args) {
+            if (_CpuScheduler.activePIDs.length == 0) {
+                _StdOut.putText("No process is active");
+            }
+            else {
+                _StdOut.putText("Active process id(s): [" + _CpuScheduler.activePIDs.toString() + "]");
+            }
+        };
+        // kill
+        Shell.prototype.shellKill = function (args) {
+            var valText = /^\d*$/;
+            // validate input for integer
+            if (valText.test(args) && args != "") {
+                _KernelInterruptQueue.enqueue(new TSOS.Interrupt(KILL_PROCESS_IRQ, args));
+            }
+            else {
+                _StdOut.putText("Please enter an integer for process id after kill command.");
             }
         };
         // welp aka BSOD
@@ -446,6 +493,19 @@ var TSOS;
             }
             else {
                 _StdOut.putText("Usage: status <string>  Please supply a string.");
+            }
+        };
+        // clearmem
+        Shell.prototype.shellClearmem = function (args) {
+            if (_CPU.isExecuting) {
+                _StdOut.putText("Cannot clear memory. A process is currently running. Use kill command to terminate process.");
+            }
+            else {
+                _MemoryManager.clearMemory();
+                TSOS.Control.removeProcessTable(-1);
+                while (!_ResidentQueue.isEmpty()) {
+                    _ResidentQueue.dequeue();
+                }
             }
         };
         return Shell;

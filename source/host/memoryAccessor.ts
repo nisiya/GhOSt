@@ -14,19 +14,37 @@
             // please ignore for project 2
             export class MemoryAccessor {
 
-                // checks if memory partition is loaded
-                public memoryS1: boolean = false;
-                public memoryS2: boolean = false;
-                public memoryS3: boolean = false;
-
                 public init(): void {
-                    // all partitions are available
-                    this.memoryS1 = false;
-                    this.memoryS2 = false;
-                    this.memoryS3 = false;
-
                     // load table on user interface
-                    // Control.loadMemoryTable();
+                    Control.loadMemoryTable();
+                }
+
+                public writeMemory(addr, data){
+                    // checks running process base reg and translate incoming address
+                    var baseReg = _CpuScheduler.runningProcess.pBase;
+                    var limitReg = baseReg + 255;
+                    var index: number = parseInt(addr, 16) + baseReg;  
+                    // check if out of bound access
+                    if(index > limitReg){
+                        _KernelInterruptQueue.enqueue(new Interrupt(MEMACCESS_ERROR_IRQ, _CpuScheduler.runningProcess.pid));
+                    } else {
+                        _Memory.memory[index] = data.toString(16).toUpperCase();
+                        Control.updateMemoryTable(baseReg);
+                    }
+                }
+
+                public readMemory(addr){
+                    // checks running process base reg and translate incoming address
+                    var baseReg = _CpuScheduler.runningProcess.pBase;
+                    var limitReg = baseReg + 255;
+                    var index: number = baseReg + addr;
+                    // check if out of bound access
+                    if (index > limitReg){
+                        _KernelInterruptQueue.enqueue(new Interrupt(MEMACCESS_ERROR_IRQ, _CpuScheduler.runningProcess.pid));
+                    } else{
+                        var value = _Memory.memory[index];
+                        return value;
+                    }
                 }
 
             }

@@ -7,61 +7,66 @@
      ------------ */
     module TSOS {
         export class MemoryManager {
+            // checks if memory partition is loaded
+            public memoryS1: boolean = false;
+            public memoryS2: boolean = false;
+            public memoryS3: boolean = false;
 
             public loadMemory(inputOpCodes){               
                 var baseReg: number;
                 // check if memory is full and return the base of free partition
-                if (_Memory.memoryS1){
-                    // memory is full
-                    baseReg = 999;
-                        // for iPj3
-                    // if(_Memory.memoryS2){
-                    //     if(_Memory.memoryS3){
-                    //         _StdOut.putText("Memory is full. Please wait to load");
-                    //     } else{
-                    //         _Memory.memoryS3 = true;
-                    //         baseReg = 512;
-                    //     }
-                    // } else{
-                    //     _Memory.memoryS2 = true; 
-                    //     baseReg = 256;
-                    // }
+                if (this.memoryS1){
+                    if(this.memoryS2){
+                        if(this.memoryS3){
+                            // memory is full
+                            baseReg = 999;
+                        } else{
+                            this.memoryS3 = true;
+                            baseReg = 512;
+                        }
+                    } else{
+                        this.memoryS2 = true; 
+                        baseReg = 256;
+                    }
                 } else{
-                    _Memory.memoryS1 = true;
+                    this.memoryS1 = true;
                     baseReg = 0;
                 }
-                
                 // load user program into memory
-                for (var i = baseReg; i <inputOpCodes.length; i++){
-                    _Memory.memory[i] = inputOpCodes[i];
+                if(baseReg!=999){
+                    for (var i = 0; i <inputOpCodes.length; i++){
+                        _Memory.memory[baseReg+i] = inputOpCodes[i];
+                    }
+                    Control.updateMemoryTable(baseReg);               
                 }
-                Control.updateMemoryTable(baseReg);
                 return baseReg;
             }
             
-            public readMemory(index){
-                // retrieve from Memory
-                var opCode: string = _Memory.memory[index];
-                return opCode;
-            }
-
-            public updateMemory(addr, data) : void{
-                var index: number = parseInt(addr, 16);  
-                _Memory.memory[index] = data.toString(16);
-                
-                // 0 for now bc only one parition
-                Control.updateMemoryTable(0);
-            }
-
             public clearPartition(baseReg) : void{
                 // free up memory when process completes
                 for (var i = baseReg; i <= baseReg+255; i++){
                     _Memory.memory[i] = "00";
                 } 
                 if(baseReg==0){
-                    _Memory.memoryS1 = false;
-                } // add other partitions later
+                    this.memoryS1 = false;
+                } else if(baseReg==256){
+                    this.memoryS2 = false;
+                } else {
+                    this.memoryS3 = false;
+                }
                 Control.updateMemoryTable(baseReg);
+            }
+
+            public clearMemory(): void{
+                // clear all memory partitions
+                this.clearPartition(0);
+                this.memoryS1 = false;
+
+                this.clearPartition(256);
+                this.memoryS2 = false;
+
+                this.clearPartition(512);
+                this.memoryS3 = false;
             }
         }
     }
