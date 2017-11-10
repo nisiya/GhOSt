@@ -258,11 +258,15 @@ module TSOS {
             var index = _CpuScheduler.activePIDs.indexOf(process.pid);
             _CpuScheduler.activePIDs.splice(index, 1);
             // move onto next iteration
-            _CpuScheduler.currCycle = _CpuScheduler.quantum;
-            _CpuScheduler.totalCycles--;
-            _CPU.init();
-            // check cpu for next process
-            _CpuScheduler.checkSchedule();           
+            console.log("exited: " + process.pid);
+            // _CPU.init();
+            if ( _CpuScheduler.activePIDs.length == 0){
+                console.log("no more");
+                _CPU.init();
+            } else {
+                _CpuScheduler.currCycle = _CpuScheduler.quantum;
+                _CpuScheduler.totalCycles--;
+            }
         }
 
         public killProcess(pid){
@@ -344,7 +348,8 @@ module TSOS {
             _CPU.Zflag = nextProcess.pZflag;
             nextProcess.pState = "Running";
             _CpuScheduler.runningProcess = nextProcess; 
-            this.krnTrace(_CpuScheduler.algorithm + ": switching to Process id: " + nextProcess.pid);        
+            this.krnTrace(_CpuScheduler.algorithm + ": switching to Process id: " + nextProcess.pid);  
+            _CpuScheduler.currCycle = 0;      
         }
 
         // memory out of bound error
