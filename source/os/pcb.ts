@@ -31,11 +31,12 @@
         public turnaroundTime: number = 0;
         public waitTime: number = 0;
 
-        constructor(pBase, pid, pState) {
+        constructor(pBase, pid, pState, pPriority) {
             this.pid = pid;
             this.pBase = pBase;
             this.pLimit = 255;
             this.pState = pState;
+            this.pPriority = pPriority;
         }
     }
 }

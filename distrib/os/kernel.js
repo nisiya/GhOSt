@@ -40,6 +40,11 @@ var TSOS;
             _krnKeyboardDriver = new TSOS.DeviceDriverKeyboard(); // Construct it.
             _krnKeyboardDriver.driverEntry(); // Call the driverEntry() initialization routine.
             this.krnTrace(_krnKeyboardDriver.status);
+            // Load the File System Device Driver
+            this.krnTrace("Loading the file system device driver");
+            _krnFileSystemDriver = new TSOS.DeviceDriverFileSystem();
+            _krnFileSystemDriver.driverEntry();
+            this.krnTrace(_krnFileSystemDriver.status);
             //
             // ... more?
             // Launch memory manager
@@ -168,7 +173,7 @@ var TSOS;
             // pid incremented upon creation
             _PID++;
             var pid = _PID;
-            var process = new TSOS.PCB(pBase, pid, "Resident");
+            var process = new TSOS.PCB(pBase, pid, "Resident", 1);
             // put process on resident queue
             _ResidentQueue.enqueue(process);
             // update process table
@@ -289,7 +294,7 @@ var TSOS;
             // if process finished, dont save it
             console.log("IR " + _CPU.IR);
             if (_CPU.IR != "00") {
-                var currProcess = new TSOS.PCB(runningProcess.pBase, runningProcess.pid, "Ready");
+                var currProcess = new TSOS.PCB(runningProcess.pBase, runningProcess.pid, "Ready", 1);
                 currProcess.pCounter = _CPU.PC;
                 currProcess.pAcc = _CPU.Acc;
                 currProcess.pXreg = _CPU.Xreg;
@@ -310,7 +315,7 @@ var TSOS;
             _CPU.Zflag = nextProcess.pZflag;
             nextProcess.pState = "Running";
             _CpuScheduler.runningProcess = nextProcess;
-            this.krnTrace(_CpuScheduler.algorithm + ": switching to Process id: " + nextProcess.pid);
+            this.krnTrace(_CpuScheduler.schedule + ": switching to Process id: " + nextProcess.pid);
             _CpuScheduler.currCycle = 0;
         };
         // memory out of bound error

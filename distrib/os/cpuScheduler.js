@@ -8,7 +8,7 @@ var TSOS;
 (function (TSOS) {
     var CpuScheduler = /** @class */ (function () {
         function CpuScheduler() {
-            this.algorithm = "Round Robin";
+            this.schedule = "Round Robin";
             this.quantum = 6;
             this.currCycle = 0; // track run time
             this.activePIDs = new Array(); // for listing
@@ -42,6 +42,24 @@ var TSOS;
                     // for running single process, scheduler just gives another round of executions
                     // for mulitple processes, scheduler number of cycle resets to give next process a round of execution 
                 }
+            }
+        };
+        CpuScheduler.prototype.setSchedule = function (schedule) {
+            switch (schedule) {
+                case "rr":
+                    this.schedule = "Round Robin";
+                    this.quantum = 6;
+                    break;
+                case "fcfs":
+                    this.schedule = "First-come, First-serve";
+                    this.quantum = 30;
+                    break;
+                case "priority":
+                    this.schedule = "Non-preemptive Priority";
+                    this.quantum = 30;
+                default:
+                    this.quantum = 6;
+                    break;
             }
         };
         return CpuScheduler;

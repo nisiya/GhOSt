@@ -45,6 +45,11 @@ module TSOS {
             _krnKeyboardDriver.driverEntry();                    // Call the driverEntry() initialization routine.
             this.krnTrace(_krnKeyboardDriver.status);
 
+            // Load the File System Device Driver
+            this.krnTrace("Loading the file system device driver");
+            _krnFileSystemDriver = new DeviceDriverFileSystem();
+            _krnFileSystemDriver.driverEntry();
+            this.krnTrace(_krnFileSystemDriver.status);
             //
             // ... more?
             // Launch memory manager
@@ -186,7 +191,7 @@ module TSOS {
             // pid incremented upon creation
             _PID++;
             var pid = _PID;            
-            var process = new PCB(pBase, pid, "Resident");
+            var process = new PCB(pBase, pid, "Resident", 1);
             // put process on resident queue
             _ResidentQueue.enqueue(process);
             // update process table
@@ -312,7 +317,7 @@ module TSOS {
             // if process finished, dont save it
             console.log("IR " + _CPU.IR);
             if (_CPU.IR != "00"){
-                var currProcess = new PCB(runningProcess.pBase, runningProcess.pid, "Ready");
+                var currProcess = new PCB(runningProcess.pBase, runningProcess.pid, "Ready", 1);
                 currProcess.pCounter = _CPU.PC;
                 currProcess.pAcc = _CPU.Acc;
                 currProcess.pXreg = _CPU.Xreg;
@@ -334,7 +339,7 @@ module TSOS {
             _CPU.Zflag = nextProcess.pZflag;
             nextProcess.pState = "Running";
             _CpuScheduler.runningProcess = nextProcess; 
-            this.krnTrace(_CpuScheduler.algorithm + ": switching to Process id: " + nextProcess.pid);  
+            this.krnTrace(_CpuScheduler.schedule + ": switching to Process id: " + nextProcess.pid);  
             _CpuScheduler.currCycle = 0;      
         }
 
