@@ -351,11 +351,27 @@ module TSOS {
 
         // - WaitForProcessToExit
         // - CreateFile
-        // - OpenFile
+        public krnCreateFile(filename){
+            var file = _krnFileSystemDriver.createFile();
+            if(file){
+                _StdOut.putText("Created file:" + "filename");
+            } else{
+                _StdOut.putText("Disk out of storage space");
+            }
+        }
         // - ReadFile
-        // - WriteFile
-        // - CloseFile
+        public krnReadFile(filename){
 
+        }
+        // - WriteFile
+        public krnWriteFile(filename){
+
+        }
+        // - DeleteFile
+        public krnDeleteFile(filename){
+
+        }
+        
 
         //
         // OS Utility Routines

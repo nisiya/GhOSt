@@ -325,10 +325,24 @@ var TSOS;
         };
         // - WaitForProcessToExit
         // - CreateFile
-        // - OpenFile
+        Kernel.prototype.krnCreateFile = function (filename) {
+            var file = _krnFileSystemDriver.createFile();
+            if (file) {
+                _StdOut.putText("Created file:" + "filename");
+            }
+            else {
+                _StdOut.putText("Disk out of storage space");
+            }
+        };
         // - ReadFile
+        Kernel.prototype.krnReadFile = function (filename) {
+        };
         // - WriteFile
-        // - CloseFile
+        Kernel.prototype.krnWriteFile = function (filename) {
+        };
+        // - DeleteFile
+        Kernel.prototype.krnDeleteFile = function (filename) {
+        };
         //
         // OS Utility Routines
         //

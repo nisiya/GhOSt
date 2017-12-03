@@ -159,6 +159,42 @@ module TSOS {
                 "clear all memory partition");
             this.commandList[this.commandList.length] = sc;
 
+            // create <string>
+            sc = new ShellCommand(this.shellCreate,
+                "create",
+                "<string> - Creates a filename with that name");
+            this.commandList[this.commandList.length] = sc;
+        
+            // write <string> "string"
+            sc = new ShellCommand(this.shellWrite,
+                "write",
+                "<string> \"string\" - Writes content in \"\" to file with that name");
+            this.commandList[this.commandList.length] = sc;
+
+            // read <filename>
+            sc = new ShellCommand(this.shellRead,
+                "read",
+                "<string> - Reads content of file with that name");
+            this.commandList[this.commandList.length] = sc;
+
+            // delete <filename>
+            sc = new ShellCommand(this.shellDelete,
+                "delete",
+                "<string> - deletes file with that name");
+            this.commandList[this.commandList.length] = sc;
+
+            // ls
+            sc = new ShellCommand(this.shellLs,
+                "ls",
+                "list the files currently stored on the disk");
+            this.commandList[this.commandList.length] = sc;
+            
+            // format
+            sc = new ShellCommand(this.shellFormat,
+                "format",
+                "quick formats the drive");
+            this.commandList[this.commandList.length] = sc;
+
             //
             // Display the initial prompt.
             this.putPrompt();
@@ -423,9 +459,39 @@ module TSOS {
 
                     // clearmem
                     case "clearmem":
-                    _StdOut.putText("Clears all memory partitions.");
-                    break;
+                        _StdOut.putText("Clears all memory partitions.");
+                        break;
                     
+                    // create
+                    case "create":
+                        _StdOut.putText("Create followed by a string for filename would create a file with that name.");
+                        break;
+
+                    // write
+                    case "write":
+                        _StdOut.putText("Write followed by a string for filename and another string in double quotes for file contents would write the contents to the file with that name.");
+                        break;
+                    
+                    // read
+                    case "read":
+                        _StdOut.putText("Read followed by a string for filename would print the contents of the file with that name.");
+                        break;
+
+                    // delete
+                    case "delete":
+                    _StdOut.putText("Delete followed by a string for filename would delete the file with that name.");
+                    break;
+                
+                    // ls
+                    case "ls":
+                        _StdOut.putText("Ls would list the files currently stored on the disk.");
+                        break;
+                    
+                    // format
+                    case "format":
+                    _StdOut.putText("Format would quick format the disk, deleting just the pointers.");
+                    break;
+
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
 
@@ -611,6 +677,65 @@ module TSOS {
                 while(!_ResidentQueue.isEmpty()){
                     _ResidentQueue.dequeue();
                 }
+            }
+        }
+
+        // create
+        public shellCreate(args){
+            var valText = /^[a-z\d\s]+$/i;
+            var filename: string;
+            if(valText.test(args)){
+                filename = args;
+
+            } else{
+                _StdOut.putText("Please only use letters and numbers for filename")
+            }
+        }
+
+        // write
+        public shellWrite(args){
+            var valText = /^[a-z\d\s\"]+$/i;
+            var filename: string;
+            if(valText.test(args)){
+                filename = args;
+            } else{
+                _StdOut.putText("Please only use letters and numbers for filename")
+            }
+        }
+
+        // read
+        public shellRead(args){
+            var valText = /^[a-z\d\s]+$/i;
+            var filename: string;
+            if(valText.test(args)){
+                filename = args;
+            } else{
+                _StdOut.putText("Please only use letters and numbers for filename")
+            }
+        }
+
+        // delete
+        public shellDelete(args){
+            var valText = /^[a-z\d\s]+$/i;
+            var filename: string;
+            if(valText.test(args)){
+                filename = args;
+            } else{
+                _StdOut.putText("Please only use letters and numbers for filename")
+            }
+        }
+
+        // ls
+        public shellLs(args){
+
+        }
+
+        // format
+        public shellFormat(args){
+            if(_CPU.isExecuting){
+                _StdOut.putText("Cannot format disk. A process is currently running. Use kill command to terminate process.");
+            } else{
+                _krnFileSystemDriver.formatDisk();
             }
         }
     }
