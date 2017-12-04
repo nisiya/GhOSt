@@ -326,9 +326,9 @@ var TSOS;
         // - WaitForProcessToExit
         // - CreateFile
         Kernel.prototype.krnCreateFile = function (filename) {
-            var file = _krnFileSystemDriver.createFile();
-            if (file) {
-                _StdOut.putText("Created file:" + "filename");
+            var fileCreated = _krnFileSystemDriver.createFile(filename);
+            if (fileCreated) {
+                _StdOut.putText("Created file:" + filename);
             }
             else {
                 _StdOut.putText("Disk out of storage space");

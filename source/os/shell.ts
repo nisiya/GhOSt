@@ -686,7 +686,7 @@ module TSOS {
             var filename: string;
             if(valText.test(args)){
                 filename = args;
-
+                _Kernel.krnCreateFile(args);
             } else{
                 _StdOut.putText("Please only use letters and numbers for filename")
             }
