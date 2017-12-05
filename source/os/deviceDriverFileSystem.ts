@@ -29,7 +29,6 @@
                         // create file system
                         var tsb: string;
                         var value = new Array<string>();
-                        // var value: string = "0";
                         while (value.length<65){
                             value.push("00");
                         }
@@ -67,26 +66,50 @@
 
             public createFile(filename): boolean{
                 var createdFile:boolean = false;
-                var tsb: string;
+                var dirTSB: string;
                 var value = new Array<string>();
                 var asciiFilename: string;
                 var sessionLength = sessionStorage.length;
                 console.log(sessionLength.toString());
-                for (var i=0; i<sessionLength;i++){
-                    var tsb = sessionStorage.key(i);
-                    value = JSON.parse(sessionStorage.getItem(tsb));
+                // 000 is master boot rec
+                // 77 is index of last DIR block sector
+                for (var i=1; i<78; i++){
+                    var dirTSB = sessionStorage.key(i);
+                    value = JSON.parse(sessionStorage.getItem(dirTSB));
                     if(value[0]=="00"){
-                        value[0] = "01";
-                        asciiFilename = filename.toString()
-                        for (var j=0; j<asciiFilename.length; j++){
-                            value[j+1] = asciiFilename.charCodeAt(j).toString();
+                        var dataTSB = this.findDataTSB();
+                        if(dataTSB != null){
+                            value[0] = "01";
+                            for (var k=1; k<4; k++){
+                                value[k] = "0" + dataTSB.charAt(k-1);
+                            }
+                            asciiFilename = filename.toString();
+                            for (var j=0; j<asciiFilename.length; j++){
+                                value[j+4] = asciiFilename.charCodeAt(j).toString(16);
+                            }
+                            sessionStorage.setItem(dirTSB, JSON.stringify(value));
+                            return true;
+                        } else {
+                            return false;
                         }
-                        sessionStorage.setItem(tsb, JSON.stringify(value));
-                        return true;
                     }
                 }
                 return false;
-                 
+            }
+
+            public findDataTSB():string {
+                var dataTSB: string;
+                var value = new Array<string>();
+                for (var i=78; i<sessionStorage.length; i++){
+                    dataTSB = sessionStorage.key(i);
+                    value = JSON.parse(sessionStorage.getItem(dataTSB));
+                    if(value[0]=="00"){
+                        value[0] = "01";
+                        sessionStorage.setItem(dataTSB, JSON.stringify(value));
+                        return dataTSB; 
+                    }
+                }
+                return dataTSB;
             }
     
         }

@@ -69,7 +69,7 @@
     <div id="divButtonBar" style="margin:4px;">      
       <table id="headContent">
         <tr>
-          <th>
+          <td>
               <input type="button"
                     id = "btnStartOS"
                     name="brnStartOS"
@@ -78,8 +78,8 @@
                     title="Start"
                     tabindex="0"
                     onclick="TSOS.Control.hostBtnStartOS_click(this);">
-          </th>
-          <th>
+          </td>
+          <td>
               <input type="button"
                     id = "btnHaltOS"
                     name="brnHaltOS"
@@ -89,8 +89,8 @@
                     title="Halt"
                     tabindex="1"
                     onclick="TSOS.Control.hostBtnHaltOS_click(this);">
-          </th>
-          <th>     
+          </td>
+          <td>     
             <input type="button"
                   id = "btnReset"
                   name="brnReset"
@@ -100,8 +100,8 @@
                   title="Reset"
                   tabindex="2"
                   onclick="TSOS.Control.hostBtnReset_click(this);">
-          </th>
-          <th>                   
+          </td>
+          <td>                   
             <input type="button"
                   id = "btnSingle"
                   name="btnSingle"
@@ -110,8 +110,8 @@
                   title="Single"
                   tabindex="3"
                   onclick="TSOS.Control.hostBtnSingle_click(this);">
-          </th>
-          <th> 
+          </td>
+          <td> 
             <input type="button"
                   id = "btnNext"
                   name="btnNext"
@@ -120,7 +120,7 @@
                   title="Next"
                   tabindex="4"
                   onclick="TSOS.Control.hostBtnNext_click(this);">
-          </th>
+          </td>
         </tr>
       </table>
     </div>
@@ -128,7 +128,7 @@
   <div id="divMain" class="table-responsive">        
     <table id="mainContent">    
       <tr>
-        <th>
+        <td>
             <div id="divConsole" class="bg-faded p-3 my-4">
               <label>
                 Console
@@ -142,8 +142,8 @@
                 </canvas>
               </label>
             </div>                              
-        </th>
-        <th>
+        </td>
+        <td>
           <div id="divLog" class="bg-faded p-3 my-4">
             <label>
                 Host Log
@@ -155,47 +155,16 @@
                 ></textarea>
             </label>
           </div>
-          <div id="divCPU" class="bg-faded p-3 my-4">
-              <label>
-                CPU 
+          <div id="divMemory" class="bg-faded p-3 my-4">
+            <label>
+                Memory
                 <br>
-                <div id="cpuContainer">
-                  <table name = "tbCPU"
-                        id   = "tbCPU">
-                    <thead>
-                      <tr style="border-bottom: 1px solid #666666;">
-                        <th> PC </th>
-                        <th> IR </th>
-                        <th> ACC </th>
-                        <th> X </th>
-                        <th> Y </th>
-                        <th> Z </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td id="cPC"> 0 </td>
-                        <td id="cIR"> 0 </td>
-                        <td id="cACC"> 0 </td>
-                        <td id="cX"> 0 </td>
-                        <td id="cY"> 0 </td>
-                        <td id="cZ"> 0 </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>                
-              </label>
-            </div>
-            <div id="divMemory" class="bg-faded p-3 my-4">
-              <label>
-                  Memory
-                  <br>
-                  <div class="tableContainer" id="memoryContainer">
-                  </div>
-              </label>
-            </div>
-        </th>
-        <th>
+                <div class="tableContainer" id="memoryContainer">
+                </div>
+            </label>
+          </div>
+        </td>
+        <td>
           <div id="divUserProgramInput" class="bg-faded p-3 my-4">
             <label>
                 User Program Input
@@ -233,8 +202,51 @@
                 </div>
             </label>
           </div>
-        </th>
+          <div id="divCPU" class="bg-faded p-3 my-4">
+            <label>
+              CPU 
+              <br>
+              <div id="cpuContainer">
+                <table name = "tbCPU"
+                      id   = "tbCPU">
+                  <thead>
+                    <tr style="border-bottom: 1px solid #666666;">
+                      <th> PC </th>
+                      <th> IR </th>
+                      <th> ACC </th>
+                      <th> X </th>
+                      <th> Y </th>
+                      <th> Z </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td id="cPC"> 0 </td>
+                      <td id="cIR"> 0 </td>
+                      <td id="cACC"> 0 </td>
+                      <td id="cX"> 0 </td>
+                      <td id="cY"> 0 </td>
+                      <td id="cZ"> 0 </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>                
+            </label>
+        </div>
+        </td>
       </tr>
+      <tfoot>
+          <td>
+            <div id="divFileSystem" class="bg-faded p-3 my-4">
+                <label>
+                    Disk
+                    <br>
+                    <div class="tableContainer" id="fsContainer">
+                    </div>
+                </label>
+              </div>
+          </td>
+      </tfoot>
     </table>
   </div>
 
@@ -254,7 +266,6 @@
 <script src="style/vendor/jquery/jquery.min.js"></script>
 <script src="style/vendor/popper/popper.min.js"></script>
 <script src="style/vendor/bootstrap/js/bootstrap.min.js"></script>
-
 
 </body>
 </html>

@@ -119,7 +119,7 @@ table {
 }
 
 #cpuContainer {
-  width: 327px;
+  width: 400px;
   height: 60px;
   border: 2px solid black;
   background-color: white;  
@@ -127,12 +127,12 @@ table {
 
 #memoryContainer {
   width: 330px;
-  height: 140px;
+  height: 288px;
 }
 
 #pcbContainer{
   width: 400px;
-  height: 115px;
+  height: 140px;
 }
 
 #tbMemory{
