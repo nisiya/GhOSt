@@ -340,6 +340,8 @@ var TSOS;
         };
         // - DeleteFile
         Kernel.prototype.krnDeleteFile = function (filename) {
+            var returnMsg = _krnFileSystemDriver.deleteFile(filename);
+            _StdOut.putText(returnMsg);
         };
         //
         // OS Utility Routines

@@ -735,6 +735,7 @@ module TSOS {
             var filename: string;
             if(valText.test(args)){
                 filename = args;
+                console.log("filename " + filename);
                 _Kernel.krnReadFile(filename);
             } else{
                 _StdOut.putText("Please only use letters for filename")
@@ -743,12 +744,13 @@ module TSOS {
 
         // delete
         public shellDelete(args){
-            var valText = /^[a-z\d\s]+$/i;
+            var valText = /^[a-z]+$/i;
             var filename: string;
             if(valText.test(args)){
                 filename = args;
+                _Kernel.krnDeleteFile(filename);
             } else{
-                _StdOut.putText("Please only use letters for filename");
+                _StdOut.putText("Please only use letters for filename")
             }
         }
 

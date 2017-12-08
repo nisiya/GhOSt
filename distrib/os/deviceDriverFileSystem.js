@@ -83,6 +83,8 @@ var TSOS;
             for (var j = 4; j < value.length; j++) {
                 value[j] = "00";
             }
+            sessionStorage.setItem(tsb, JSON.stringify(value));
+            TSOS.Control.updateDiskTable(tsb);
         };
         DeviceDriverFileSystem.prototype.createFile = function (filename) {
             var createdFile = false;
@@ -101,10 +103,13 @@ var TSOS;
                     var dirTSB = sessionStorage.key(i);
                     value = JSON.parse(sessionStorage.getItem(dirTSB));
                     if (value[0] == "0") {
+                        this.zeroFill(dirTSB);
+                        value = JSON.parse(sessionStorage.getItem(dirTSB));
                         var dataTSB = this.findDataTSB();
                         if (dataTSB != null) {
                             value[0] = "1";
                             for (var k = 1; k < 4; k++) {
+                                // pointer in dir 
                                 value[k] = dataTSB.charAt(k - 1);
                             }
                             asciiFilename = filename.toString();
@@ -130,9 +135,12 @@ var TSOS;
                 dataTSB = sessionStorage.key(i);
                 value = JSON.parse(sessionStorage.getItem(dataTSB));
                 if (value[0] == "0") {
+                    this.zeroFill(dataTSB);
+                    value = JSON.parse(sessionStorage.getItem(dataTSB));
                     value[0] = "1";
                     sessionStorage.setItem(dataTSB, JSON.stringify(value));
                     TSOS.Control.updateDiskTable(dataTSB);
+                    console.log(dataTSB);
                     return dataTSB;
                 }
             }
@@ -154,8 +162,11 @@ var TSOS;
                         dirFilename = dirFilename + letter;
                         index++;
                     }
+                    console.log(dirFilename);
+                    console.log(filename);
                     if (dirFilename == filename) {
                         dataTSB = value.splice(1, 3).toString().replace(/,/g, "");
+                        value = JSON.parse(sessionStorage.getItem(dataTSB));
                         return dataTSB;
                     }
                     dirFilename = "";
@@ -167,6 +178,7 @@ var TSOS;
             // look in dir for data tsb with filename
             var tsbUsed = new Array();
             var dataTSB = this.lookupDataTSB(filename);
+            var firstTSB = dataTSB;
             var value = new Array();
             var charCode;
             // if found
@@ -175,24 +187,23 @@ var TSOS;
                 // modify the value
                 value = JSON.parse(sessionStorage.getItem(dataTSB));
                 var contentIndex = 0;
-                var valueIndex = 0;
+                var valueIndex;
+                var firstIndex;
                 var pointer = value[1] + value[2] + value[3];
                 if (pointer == "000") {
                     valueIndex = 4;
-                    tsbUsed.push(dataTSB);
                 }
                 else {
-                    if (pointer == "-1-1-1") {
+                    // if(pointer == "-1-1-1"){
+                    //     tsbUsed.push(dataTSB);
+                    // } else{
+                    while (pointer != "-1-1-1") {
+                        dataTSB = pointer;
                         tsbUsed.push(dataTSB);
+                        value = JSON.parse(sessionStorage.getItem(dataTSB));
+                        pointer = value[1] + value[2] + value[3];
                     }
-                    else {
-                        while (pointer != "-1-1-1") {
-                            dataTSB = pointer;
-                            tsbUsed.push(dataTSB);
-                            value = JSON.parse(sessionStorage.getItem(dataTSB));
-                            pointer = value[1] + value[2] + value[3];
-                        }
-                    }
+                    // }
                     for (var i = 4; i < value.length; i++) {
                         if (value[i] == "00") {
                             valueIndex = i;
@@ -200,6 +211,7 @@ var TSOS;
                         }
                     }
                 }
+                firstIndex = valueIndex;
                 // add hex value of ascii value of fileContent
                 while (contentIndex < fileContent.length) {
                     // if more than one block needed...
@@ -223,11 +235,17 @@ var TSOS;
                         }
                         else {
                             // no free block available
-                            // undo a file modifications
+                            // undo all file modifications
                             for (var dataTSB in tsbUsed) {
                                 this.zeroFill(dataTSB);
                             }
-                            return "ERROR_DISK_FULL";
+                            for (var m = firstIndex; m < 64; m++) {
+                                value = JSON.parse(sessionStorage.getItem(firstTSB));
+                                value[m] = "00";
+                                sessionStorage.setItem(firstTSB, JSON.stringify(value));
+                                TSOS.Control.updateDiskTable(firstTSB);
+                            }
+                            return "File content was not written - ERROR_DISK_FULL";
                         }
                     }
                     else {
@@ -251,7 +269,7 @@ var TSOS;
             }
         };
         DeviceDriverFileSystem.prototype.readFile = function (filename) {
-            var fileContent = "";
+            var fileContent = filename + ": ";
             var dataTSB = this.lookupDataTSB(filename);
             var value = new Array();
             var pointer;
@@ -275,6 +293,45 @@ var TSOS;
                     }
                 }
                 return fileContent;
+            }
+            else {
+                return "ERROR_FILE_NOT_FOUND";
+            }
+        };
+        DeviceDriverFileSystem.prototype.deleteFile = function (filename) {
+            var dataTSB = this.lookupDataTSB(filename);
+            var dirTSB;
+            var value = new Array();
+            var pointer;
+            if (dataTSB != null) {
+                // delete directory first
+                for (var i = 0; i < 78; i++) {
+                    dirTSB = sessionStorage.key(i);
+                    value = JSON.parse(sessionStorage.getItem(dirTSB));
+                    pointer = value[1] + value[2] + value[3];
+                    if (pointer == dataTSB) {
+                        value[0] = "0";
+                        sessionStorage.setItem(dirTSB, JSON.stringify(value));
+                        break;
+                    }
+                }
+                //
+                value = JSON.parse(sessionStorage.getItem(dataTSB));
+                value[0] = "0";
+                sessionStorage.setItem(dataTSB, JSON.stringify(value));
+                TSOS.Control.updateDiskTable(dataTSB);
+                pointer = value[1] + value[2] + value[3];
+                if (pointer != "000") {
+                    while (pointer != "-1-1-1") {
+                        dataTSB = pointer;
+                        value = JSON.parse(sessionStorage.getItem(dataTSB));
+                        value[0] = "0";
+                        sessionStorage.setItem(dataTSB, JSON.stringify(value));
+                        TSOS.Control.updateDiskTable(dataTSB);
+                        pointer = value[1] + value[2] + value[3];
+                    }
+                }
+                return "SUCCESS_FILE_DELETED";
             }
             else {
                 return "ERROR_FILE_NOT_FOUND";

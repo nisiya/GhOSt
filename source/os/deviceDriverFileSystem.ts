@@ -72,10 +72,11 @@
                 for (var i=0; i<4; i++){
                     value[i] = "0";
                 }
-
                 for (var j=4; j<value.length; j++){
                     value[j] = "00";
                 }
+                sessionStorage.setItem(tsb, JSON.stringify(value));
+                Control.updateDiskTable(tsb);
             }
 
             public createFile(filename): string{
@@ -94,10 +95,13 @@
                         var dirTSB = sessionStorage.key(i);
                         value = JSON.parse(sessionStorage.getItem(dirTSB));
                         if(value[0]=="0"){
+                            this.zeroFill(dirTSB);
+                            value = JSON.parse(sessionStorage.getItem(dirTSB));
                             var dataTSB = this.findDataTSB();
                             if(dataTSB != null){
                                 value[0] = "1";
                                 for (var k=1; k<4; k++){
+                                    // pointer in dir 
                                     value[k] = dataTSB.charAt(k-1);
                                 }
                                 asciiFilename = filename.toString();
@@ -123,9 +127,12 @@
                     dataTSB = sessionStorage.key(i);
                     value = JSON.parse(sessionStorage.getItem(dataTSB));
                     if(value[0]=="0"){
-                        value[0] = "1";
+                        this.zeroFill(dataTSB);
+                        value = JSON.parse(sessionStorage.getItem(dataTSB));
+                        value[0]="1";
                         sessionStorage.setItem(dataTSB, JSON.stringify(value));
                         Control.updateDiskTable(dataTSB);
+                        console.log(dataTSB);
                         return dataTSB; 
                     }
                 }
@@ -148,8 +155,11 @@
                             dirFilename = dirFilename + letter;
                             index++;
                         }
+                        console.log(dirFilename);
+                        console.log(filename);
                         if (dirFilename == filename){
                             dataTSB = value.splice(1,3).toString().replace(/,/g,"");
+                            value = JSON.parse(sessionStorage.getItem(dataTSB));
                             return dataTSB;
                         }
                         dirFilename = "";
@@ -162,6 +172,7 @@
                 // look in dir for data tsb with filename
                 var tsbUsed: string[] = new Array<string>();
                 var dataTSB: string = this.lookupDataTSB(filename);
+                var firstTSB: string = dataTSB;
                 var value = new Array<string>();
                 var charCode;
                 // if found
@@ -169,23 +180,23 @@
                     console.log("exist");
                     // modify the value
                     value = JSON.parse(sessionStorage.getItem(dataTSB));
-                    var contentIndex = 0;
-                    var valueIndex = 0;
+                    var contentIndex: number = 0;
+                    var valueIndex: number;
+                    var firstIndex: number;
                     var pointer = value[1] + value[2] + value[3];
                     if (pointer == "000"){
                         valueIndex = 4;
-                        tsbUsed.push(dataTSB);                        
                     } else {
-                        if(pointer == "-1-1-1"){
+                        // if(pointer == "-1-1-1"){
+                        //     tsbUsed.push(dataTSB);
+                        // } else{
+                        while(pointer!="-1-1-1"){
+                            dataTSB = pointer;
                             tsbUsed.push(dataTSB);
-                        } else{
-                            while(pointer!="-1-1-1"){
-                                dataTSB = pointer;
-                                tsbUsed.push(dataTSB);
-                                value = JSON.parse(sessionStorage.getItem(dataTSB));      
-                                pointer = value[1] + value[2] + value[3];                          
-                            }
+                            value = JSON.parse(sessionStorage.getItem(dataTSB));      
+                            pointer = value[1] + value[2] + value[3];                          
                         }
+                            // }
                         for(var i=4; i<value.length; i++){
                             if(value[i]=="00"){
                                 valueIndex = i;
@@ -193,12 +204,13 @@
                             }
                         }
                     }
+                    firstIndex = valueIndex;
                     // add hex value of ascii value of fileContent
                     while(contentIndex<fileContent.length){
                         // if more than one block needed...
                         if(valueIndex == 64){
                             // get new free data block
-                            var oldDataTSB = dataTSB;
+                            var oldDataTSB: string = dataTSB;
                             dataTSB = this.findDataTSB();
                             tsbUsed.push(dataTSB);
                             // free block obtained
@@ -215,11 +227,17 @@
                                 valueIndex = 4;
                             } else{
                                 // no free block available
-                                // undo a file modifications
+                                // undo all file modifications
                                 for (var dataTSB in tsbUsed){
                                     this.zeroFill(dataTSB);
                                 }
-                                return "ERROR_DISK_FULL";
+                                for (var m=firstIndex; m<64; m++){
+                                    value = JSON.parse(sessionStorage.getItem(firstTSB));
+                                    value[m] = "00";
+                                    sessionStorage.setItem(firstTSB, JSON.stringify(value));
+                                    Control.updateDiskTable(firstTSB);
+                                }
+                                return "File content was not written - ERROR_DISK_FULL";
                             }
                         } else{
                             // current block has space
@@ -242,7 +260,7 @@
             }
 
             public readFile(filename): string{
-                var fileContent:string = "";
+                var fileContent:string = filename + ": ";
                 var dataTSB: string = this.lookupDataTSB(filename);
                 var value = new Array<string>();
                 var pointer: string;
@@ -268,7 +286,47 @@
                     }
                     return fileContent;
                 } else{
-                    return "ERROR_FILE_NOT_FOUND"
+                    return "ERROR_FILE_NOT_FOUND";
+                }
+            }
+
+            public deleteFile(filename): string{
+                var dataTSB: string = this.lookupDataTSB(filename);
+                var dirTSB: string;
+                var value = new Array<string>();
+                var pointer: string;
+
+                if (dataTSB!=null){
+                    // delete directory first
+                    for(var i=0; i<78; i++){
+                        dirTSB = sessionStorage.key(i);
+                        value = JSON.parse(sessionStorage.getItem(dirTSB));
+                        pointer = value[1] + value[2] + value[3];
+                        if(pointer == dataTSB){
+                            value[0] = "0";
+                            sessionStorage.setItem(dirTSB, JSON.stringify(value));
+                            break;
+                        }
+                    }
+                    //
+                    value = JSON.parse(sessionStorage.getItem(dataTSB));
+                    value[0]="0";
+                    sessionStorage.setItem(dataTSB, JSON.stringify(value));
+                    Control.updateDiskTable(dataTSB);
+                    pointer = value[1] + value[2] + value[3];
+                    if(pointer != "000"){
+                        while(pointer != "-1-1-1"){
+                            dataTSB = pointer;
+                            value = JSON.parse(sessionStorage.getItem(dataTSB));
+                            value[0]="0";
+                            sessionStorage.setItem(dataTSB, JSON.stringify(value));
+                            Control.updateDiskTable(dataTSB);
+                            pointer = value[1] + value[2] + value[3];
+                        }
+                    }
+                    return "SUCCESS_FILE_DELETED";
+                } else {
+                    return "ERROR_FILE_NOT_FOUND";
                 }
             }
         }
