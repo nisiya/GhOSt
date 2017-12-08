@@ -35,7 +35,6 @@
                     // if time's up
                     if (this.currCycle >= this.quantum){
                         // if there are processes waiting in Ready queue, context switch
-                        console.log(_ReadyQueue);
                         if (!_ReadyQueue.isEmpty()){
                             _KernelInterruptQueue.enqueue(new Interrupt(CONTEXT_SWITCH_IRQ, this.runningProcess));
                         }

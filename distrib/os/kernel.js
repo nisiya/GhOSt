@@ -292,7 +292,6 @@ var TSOS;
         Kernel.prototype.contextSwitch = function (runningProcess) {
             // save current process to PCB
             // if process finished, dont save it
-            console.log("IR " + _CPU.IR);
             if (_CPU.IR != "00") {
                 var currProcess = new TSOS.PCB(runningProcess.pBase, runningProcess.pid, "Ready", 1);
                 currProcess.pCounter = _CPU.PC;

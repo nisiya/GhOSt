@@ -160,7 +160,8 @@ table {
 }
 
 table#tbFS td:last-child{
-  width: 90%;
+  width: 80%;
+  padding-right: 10px;
 }
 
 table.tableStyle tr:nth-child(even) {

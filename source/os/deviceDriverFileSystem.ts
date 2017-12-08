@@ -36,7 +36,6 @@
                         while (value.length<65){
                             value.push("00");
                         }
-                        console.log(value);
                         for (var i=0; i<8; i++){
                             for (var j=0; j<78; j++){
                                 tsb = j.toString();
@@ -49,7 +48,6 @@
                         }
                         Control.loadDiskTable();
                         var sessionLength = sessionStorage.length;
-                        console.log(sessionLength.toString());
                     }
                 } else{
                     alert("Sorry, your browser do not support session storage.");
@@ -60,7 +58,6 @@
                 var tsb: string;
                 var value = new Array<string>();
                 var sessionLength = sessionStorage.length;
-                console.log(sessionLength.toString());
                 for (var i=0; i<sessionLength;i++){
                     var tsb = sessionStorage.key(i);
                     value = JSON.parse(sessionStorage.getItem(tsb));
@@ -76,7 +73,6 @@
                 var value = new Array<string>();
                 var asciiFilename: string;
                 var sessionLength = sessionStorage.length;
-                console.log(sessionLength.toString());
                 // 000 is master boot rec
                 // 77 is index of last DIR block sector
                 for (var i=1; i<78; i++){
@@ -109,7 +105,6 @@
                 var value = new Array<string>();
                 for (var i=78; i<sessionStorage.length; i++){
                     dataTSB = sessionStorage.key(i);
-                    console.log(dataTSB);
                     value = JSON.parse(sessionStorage.getItem(dataTSB));
                     if(value[0]=="0"){
                         value[0] = "1";
@@ -128,24 +123,20 @@
                 var dirFilename: string = "";
                 for (var i=1; i<78; i++){
                     dirTSB = sessionStorage.key(i);
-                    console.log("lookup dir " + dirTSB);
                     value = JSON.parse(sessionStorage.getItem(dirTSB));
                     if(value[0]=="1"){
                         var index = 4;
                         var letter;
                         while(value[index]!="00"){
-                            console.log("lookup index " + index);
                             letter = String.fromCharCode(parseInt(value[index],16));
-                            console.log("lookup letter " + letter);
                             dirFilename = dirFilename + letter;
                             index++;
                         }
-                        console.log("lookup file " + dirFilename);
                         if (dirFilename == filename){
                             dataTSB = value.splice(1,3).toString().replace(/,/g,"");
-                            console.log("lookup data " + dataTSB);
                             return dataTSB;
                         }
+                        dirFilename = "";
                     }
                 }
                 return null;
@@ -159,40 +150,48 @@
                 // if found
                 if(dataTSB != null){
                     console.log("exist");
+                    console.log("write data " + dataTSB);
                     // modify the value
                     value = JSON.parse(sessionStorage.getItem(dataTSB));
                     var contentIndex = 0;
                     var valueIndex = 4;
                     // add hex value of ascii value of fileContent
+                    console.log("content " + fileContent + " len " + fileContent.length);
                     while(contentIndex<fileContent.length){
                         // if more than one block needed...
-                        if(valueIndex == 63){
+                        if(valueIndex == 64){
                             // get new free data block
+                            var oldDataTSB = dataTSB;
                             dataTSB = this.findDataTSB();
+                            console.log("write new data " + dataTSB);
                             // add pointer to new block in current block
                             for (var k=1; k<4; k++){
                                 value[k] = dataTSB.charAt(k-1);
                             }
                             // save current block
-                            sessionStorage.setItem(dataTSB, JSON.stringify(value));
-                            Control.updateDiskTable(dataTSB);
+                            console.log("old val " + value);
+                            sessionStorage.setItem(oldDataTSB, JSON.stringify(value));
+                            Control.updateDiskTable(oldDataTSB);
                             // set working block to new block
                             value = JSON.parse(sessionStorage.getItem(dataTSB));
+                            console.log("new val " + value);
                             valueIndex = 4;
                         } else{
                             // current block has space
+                            console.log("cont in " + contentIndex);
                             charCode = fileContent.charCodeAt(contentIndex);
+                            console.log("value in " + valueIndex);
                             value[valueIndex] = charCode.toString(16).toUpperCase();
                             contentIndex++;
                             valueIndex++;
                         }
-                        // save last block
-                        for (var k=1; k<4; k++){
-                            value[k] = "-1"; // last block indicator
-                        }
-                        sessionStorage.setItem(dataTSB, JSON.stringify(value));
-                        Control.updateDiskTable(dataTSB);
                     }
+                    // save last block
+                    for (var k=1; k<4; k++){
+                        value[k] = "-1"; // last block indicator
+                    }
+                    sessionStorage.setItem(dataTSB, JSON.stringify(value));
+                    Control.updateDiskTable(dataTSB);
                     return true;
                 } else{
                     return false;

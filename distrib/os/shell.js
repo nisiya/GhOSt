@@ -573,11 +573,13 @@ var TSOS;
             var valText = /^[a-z\d\s\"]+$/i;
             var filename;
             var fileContent;
-            console.log(args[0]);
             if (valName.test(args[0])) {
                 filename = args[0];
                 _StdOut.putText(filename);
                 fileContent = args[1];
+                for (var i = 2; i < args.length; i++) {
+                    fileContent = fileContent + " " + args[i];
+                }
                 if (fileContent.charAt(0) != '"' && fileContent.charAt(fileContent.length - 1) != '"') {
                     _StdOut.putText("File content must be in double quotes");
                 }
