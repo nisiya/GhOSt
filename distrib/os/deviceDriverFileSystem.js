@@ -38,8 +38,9 @@ var TSOS;
                     // create file system
                     var tsb;
                     var value = new Array();
+                    value.push("0");
                     while (value.length < 65) {
-                        value.push("0");
+                        value.push("00");
                     }
                     console.log(value);
                     for (var i = 0; i < 8; i++) {
@@ -52,6 +53,7 @@ var TSOS;
                             sessionStorage.setItem(tsb, JSON.stringify(value));
                         }
                     }
+                    TSOS.Control.loadDiskTable();
                     var sessionLength = sessionStorage.length;
                     console.log(sessionLength.toString());
                 }
@@ -68,8 +70,9 @@ var TSOS;
             for (var i = 0; i < sessionLength; i++) {
                 var tsb = sessionStorage.key(i);
                 value = JSON.parse(sessionStorage.getItem(tsb));
-                value[0] = "0";
+                value[0] = "1";
                 sessionStorage.setItem(tsb, JSON.stringify(value));
+                TSOS.Control.updateDiskTable(tsb);
             }
         };
         DeviceDriverFileSystem.prototype.createFile = function (filename) {
@@ -96,6 +99,7 @@ var TSOS;
                             value[j + 4] = asciiFilename.charCodeAt(j).toString(16).toUpperCase();
                         }
                         sessionStorage.setItem(dirTSB, JSON.stringify(value));
+                        TSOS.Control.updateDiskTable(dirTSB);
                         return true;
                     }
                     else {
@@ -110,10 +114,12 @@ var TSOS;
             var value = new Array();
             for (var i = 78; i < sessionStorage.length; i++) {
                 dataTSB = sessionStorage.key(i);
+                console.log(dataTSB);
                 value = JSON.parse(sessionStorage.getItem(dataTSB));
-                if (value[0] == "00") {
-                    value[0] = "01";
+                if (value[0] == "0") {
+                    value[0] = "1";
                     sessionStorage.setItem(dataTSB, JSON.stringify(value));
+                    TSOS.Control.updateDiskTable(dataTSB);
                     return dataTSB;
                 }
             }

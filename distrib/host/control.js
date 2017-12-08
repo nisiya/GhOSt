@@ -119,6 +119,18 @@ var TSOS;
             }
         };
         //
+        Control.breakdownBlock = function (tsb) {
+            var dataBlock = new Array();
+            var value = JSON.parse(sessionStorage.getItem(tsb));
+            var dataBytes = value.splice(4, 60).toString().replace(/,/g, "");
+            dataBlock.push(dataBytes);
+            var pointerByte = value.splice(1, 3).toString().replace(/,/g, "");
+            var pointer = pointerByte.charAt(1) + pointerByte.charAt(3) + pointerByte.charAt(5);
+            dataBlock.push(pointer);
+            var firstByte = value.splice(0, 1).toString();
+            dataBlock.push(firstByte);
+            return dataBlock;
+        };
         Control.loadDiskTable = function () {
             // load Disk table at start up
             var diskContainer = document.getElementById("fsContainer");
@@ -127,12 +139,13 @@ var TSOS;
             diskTable.id = "tbFS";
             diskTable.className = "tableStyle";
             var diskTableBody = document.createElement("tbody");
+            var tsb;
             // creating cells for "bytes"
             for (var i = 0; i < sessionStorage.length; i++) {
                 // create rows
                 var row = document.createElement("tr");
-                var tsb = sessionStorage.key(i).toString();
-                var value = new Array();
+                tsb = sessionStorage.key(i).toString();
+                var dataBlock = this.breakdownBlock(tsb);
                 row.id = tsb;
                 var cell = document.createElement("td");
                 // row label
@@ -140,29 +153,35 @@ var TSOS;
                 // cell.id = 
                 cell.appendChild(cellText);
                 row.appendChild(cell);
-                value = JSON.parse(sessionStorage.getItem(tsb));
                 // first byte
-                var firstByte = value[0];
                 cell = document.createElement("td");
-                cellText = document.createTextNode(firstByte);
+                cellText = document.createTextNode(dataBlock.pop());
                 cell.appendChild(cellText);
                 row.appendChild(cell);
                 // data pointer byte
-                var pointerByte = value.splice(1, 3).toString().replace(/,/g, "");
                 cell = document.createElement("td");
-                cellText = document.createTextNode(pointerByte);
+                cellText = document.createTextNode(dataBlock.pop());
                 cell.appendChild(cellText);
                 row.appendChild(cell);
                 // rest of bytes
-                var dataBytes = value.toString().replace(/,/g, "");
                 cell = document.createElement("td");
-                cellText = document.createTextNode(dataBytes);
+                cellText = document.createTextNode(dataBlock.pop());
                 cell.appendChild(cellText);
                 row.appendChild(cell);
                 diskTableBody.appendChild(row);
             }
             diskTable.appendChild(diskTableBody);
             diskContainer.appendChild(diskTable);
+        };
+        Control.updateDiskTable = function (tsb) {
+            // update Memory table after new process is loaded
+            var diskTable = document.getElementById("tbFS");
+            var dataBlock = this.breakdownBlock(tsb);
+            diskTable.rows.namedItem(tsb).cells[1].innerHTML = dataBlock.pop();
+            // data pointer byte
+            diskTable.rows.namedItem(tsb).cells[2].innerHTML = dataBlock.pop();
+            // rest of bytes
+            diskTable.rows.namedItem(tsb).cells[3].innerHTML = dataBlock.pop();
         };
         //
         // updating process display

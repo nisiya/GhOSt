@@ -139,6 +139,18 @@ module TSOS {
         }
         
         //
+        public static breakdownBlock(tsb): string[]{
+            var dataBlock = new Array<string>();
+            var value: string[] = JSON.parse(sessionStorage.getItem(tsb));
+            var dataBytes: string = value.splice(4,60).toString().replace(/,/g,"");
+            dataBlock.push(dataBytes);
+            var pointerByte: string = value.splice(1,3).toString().replace(/,/g,"");
+            var pointer:string = pointerByte.charAt(1) + pointerByte.charAt(3) + pointerByte.charAt(5);
+            dataBlock.push(pointer);
+            var firstByte: string = value.splice(0,1).toString();
+            dataBlock.push(firstByte);
+            return dataBlock;       
+        }
         public static loadDiskTable(): void {
             // load Disk table at start up
             var diskContainer: HTMLDivElement = <HTMLDivElement> document.getElementById("fsContainer");
@@ -147,13 +159,14 @@ module TSOS {
             diskTable.id = "tbFS";
             diskTable.className = "tableStyle";
             var diskTableBody: HTMLTableSectionElement = <HTMLTableSectionElement> document.createElement("tbody");
-            
+            var tsb:string;
+
             // creating cells for "bytes"
             for (var i = 0; i < sessionStorage.length; i++){
                 // create rows
                 var row: HTMLTableRowElement = <HTMLTableRowElement> document.createElement("tr");
-                var tsb:string = sessionStorage.key(i).toString();
-                var value = new Array<string>();
+                tsb = sessionStorage.key(i).toString();
+                var dataBlock = this.breakdownBlock(tsb);
                 row.id = tsb;
                 var cell: HTMLTableCellElement = <HTMLTableCellElement> document.createElement("td");
 
@@ -163,36 +176,42 @@ module TSOS {
                 cell.appendChild(cellText);
                 row.appendChild(cell);        
                 
-                value = JSON.parse(sessionStorage.getItem(tsb));
-                
                 // first byte
-                var firstByte: string = value[0];                
                 cell = document.createElement("td");
-                cellText = document.createTextNode(firstByte);
+                cellText = document.createTextNode(dataBlock.pop());
                 cell.appendChild(cellText);
                 row.appendChild(cell);  
 
                 // data pointer byte
-                var pointerByte: string = value.splice(1,3).toString().replace(/,/g,""); 
                 cell = document.createElement("td");
-                cellText = document.createTextNode(pointerByte);
+                cellText = document.createTextNode(dataBlock.pop());
                 cell.appendChild(cellText);
                 row.appendChild(cell); 
 
                 // rest of bytes
-                var dataBytes: string = value.toString().replace(/,/g,"");  
                 cell = document.createElement("td");
-                cellText = document.createTextNode(dataBytes);
+                cellText = document.createTextNode(dataBlock.pop());
                 cell.appendChild(cellText);
                 row.appendChild(cell);            
-
                 diskTableBody.appendChild(row);
             }
-
             diskTable.appendChild(diskTableBody);
             diskContainer.appendChild(diskTable);
         }
 
+        public static updateDiskTable(tsb): void {
+            // update Memory table after new process is loaded
+            var diskTable: HTMLTableElement = <HTMLTableElement> document.getElementById("tbFS");
+
+            var dataBlock = this.breakdownBlock(tsb);            
+            diskTable.rows.namedItem(tsb).cells[1].innerHTML = dataBlock.pop();             
+
+            // data pointer byte
+            diskTable.rows.namedItem(tsb).cells[2].innerHTML = dataBlock.pop(); 
+
+            // rest of bytes
+            diskTable.rows.namedItem(tsb).cells[3].innerHTML = dataBlock.pop();
+        }
 
         //
         // updating process display

@@ -126,7 +126,7 @@ table {
 }
 
 #memoryContainer {
-  width: 330px;
+  width: 350px;
   height: 288px;
 }
 
@@ -146,11 +146,12 @@ table {
 }
 
 #fsContainer {
-  width: 800px;
+  width: 1350px;
   height: 100px;
 }
 
 #tbFS{
+  text-align: center;
   color: black;
   font-weight: normal;
   font-family: Courier New, Courier, monospace;  
@@ -158,17 +159,8 @@ table {
   text-align: center; 
 }
 
-table#tbFS td:first-child{
-  width: 9%;
-}
-table#tbFS td:second-child{
-  width: 2%;
-}
-table#tbFS td:third-child{
-  width: 9%;
-}
 table#tbFS td:last-child{
-  width: 80%;
+  width: 90%;
 }
 
 table.tableStyle tr:nth-child(even) {

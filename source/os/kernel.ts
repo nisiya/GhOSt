@@ -354,7 +354,7 @@ module TSOS {
         public krnCreateFile(filename){
             var fileCreated = _krnFileSystemDriver.createFile(filename);
             if(fileCreated){
-                _StdOut.putText("Created file:" + filename);
+                _StdOut.putText("Created file: " + filename);
             } else{
                 _StdOut.putText("Disk out of storage space");
             }

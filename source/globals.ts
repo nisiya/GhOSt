@@ -128,5 +128,12 @@ var _SaveX = 0; // use for backspace and line wrapping for now, will improve
 var onDocumentLoad = function() {
     TSOS.Control.hostInit();
     updateTime();
-    TSOS.Control.loadDiskTable();
+    if(sessionStorage){
+        if(sessionStorage.length != 0){ // load new file system driver only if new window
+            // create file system
+            TSOS.Control.loadDiskTable();
+        }
+    } else{
+        alert("Sorry, your browser do not support session storage.");
+    }
 };
