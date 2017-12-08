@@ -363,7 +363,8 @@ module TSOS {
 
         // - ReadFile
         public krnReadFile(filename){
-            
+            var returnMsg = _krnFileSystemDriver.readFile(filename);
+            _StdOut.putText(returnMsg);
         }
 
         // - DeleteFile

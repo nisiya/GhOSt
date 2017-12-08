@@ -605,10 +605,11 @@ var TSOS;
         };
         // read
         Shell.prototype.shellRead = function (args) {
-            var valText = /^[a-z\d\s]+$/i;
+            var valText = /^[a-z]+$/i;
             var filename;
             if (valText.test(args)) {
                 filename = args;
+                _Kernel.krnReadFile(filename);
             }
             else {
                 _StdOut.putText("Please only use letters for filename");

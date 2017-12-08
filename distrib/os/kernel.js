@@ -335,6 +335,8 @@ var TSOS;
         };
         // - ReadFile
         Kernel.prototype.krnReadFile = function (filename) {
+            var returnMsg = _krnFileSystemDriver.readFile(filename);
+            _StdOut.putText(returnMsg);
         };
         // - DeleteFile
         Kernel.prototype.krnDeleteFile = function (filename) {

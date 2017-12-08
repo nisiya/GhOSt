@@ -731,12 +731,13 @@ module TSOS {
 
         // read
         public shellRead(args){
-            var valText = /^[a-z\d\s]+$/i;
+            var valText = /^[a-z]+$/i;
             var filename: string;
             if(valText.test(args)){
                 filename = args;
+                _Kernel.krnReadFile(filename);
             } else{
-                _StdOut.putText("Please only use letters for filename");
+                _StdOut.putText("Please only use letters for filename")
             }
         }
 
