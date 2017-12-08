@@ -257,14 +257,17 @@ var TSOS;
             var pointer;
             var index;
             var charCode;
+            // check if file exist
             if (dataTSB != null) {
                 value = JSON.parse(sessionStorage.getItem(dataTSB));
                 pointer = value[1] + value[2] + value[3];
                 index = 4;
                 while (index < 64 && value[index] != "00") {
+                    // append letters to fileContent
                     charCode = parseInt(value[index], 16);
                     fileContent = fileContent + String.fromCharCode(charCode);
                     index++;
+                    // if need to read more than one block
                     if (index == 64 && pointer != "-1-1-1") {
                         value = JSON.parse(sessionStorage.getItem(pointer));
                         pointer = value[1] + value[2] + value[3];
