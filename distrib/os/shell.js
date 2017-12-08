@@ -575,21 +575,28 @@ var TSOS;
             var fileContent;
             if (valName.test(args[0])) {
                 filename = args[0];
-                _StdOut.putText(filename);
-                fileContent = args[1];
-                for (var i = 2; i < args.length; i++) {
-                    fileContent = fileContent + " " + args[i];
-                }
-                if (fileContent.charAt(0) != '"' && fileContent.charAt(fileContent.length - 1) != '"') {
-                    _StdOut.putText("File content must be in double quotes");
-                }
-                else if (!valText.test(fileContent)) {
-                    _StdOut.putText("Please only use letters, numbers, and spaces for file content");
+                if (args.length < 2) {
+                    _StdOut.putText("Missing argument: Please enter the content to be written in double quotes");
                 }
                 else {
-                    fileContent = fileContent.slice(1, fileContent.length - 1);
-                    _StdOut.putText(" " + fileContent);
-                    _Kernel.krnWriteFile(filename, fileContent);
+                    fileContent = args[1];
+                    for (var i = 2; i < args.length; i++) {
+                        fileContent = fileContent + " " + args[i];
+                    }
+                    console.log("content " + fileContent);
+                    console.log("first " + fileContent.charAt(0) + "last " + fileContent.charAt(fileContent.length - 1));
+                    console.log(fileContent.charAt(0) != '"');
+                    console.log(fileContent.charAt(fileContent.length - 1) != '"');
+                    if (fileContent.charAt(0) != '"' || fileContent.charAt(fileContent.length - 1) != '"') {
+                        _StdOut.putText("File content must be in double quotes");
+                    }
+                    else if (!valText.test(fileContent)) {
+                        _StdOut.putText("Please only use letters, numbers, and spaces for file content");
+                    }
+                    else {
+                        fileContent = fileContent.slice(1, fileContent.length - 1);
+                        _Kernel.krnWriteFile(filename, fileContent);
+                    }
                 }
             }
             else {
