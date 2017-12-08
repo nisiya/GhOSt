@@ -364,8 +364,13 @@ module TSOS {
 
         }
         // - WriteFile
-        public krnWriteFile(filename){
-
+        public krnWriteFile(filename, fileContent){
+            var fileWritten = _krnFileSystemDriver.writeFile(filename, fileContent);
+            if(fileWritten){
+                _StdOut.putText("Wrote to file:" + filename);
+            } else{
+                _StdOut.putText("ERROR");
+            }
         }
         // - DeleteFile
         public krnDeleteFile(filename){

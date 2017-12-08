@@ -51,7 +51,6 @@
    <script type="text/javascript" src="distrib/utils.js"></script>
    <!-- Uncomment the line below to enable GLaDOS testing. -->
    <!-- <script type="text/javascript" src="http://alanclasses.github.io/TSOS/test/glados-ip3.js"></script> -->
-   
 </head>
 
 <body onload="onDocumentLoad()">
@@ -125,7 +124,7 @@
       </table>
     </div>
   </div>
-  <div id="divMain" class="table-responsive">        
+  <div id="divMain" class="table-responsive" >        
     <table id="mainContent">    
       <tr>
         <td>
@@ -182,7 +181,8 @@
                 <br>
                 <div class="tableContainer" id="pcbContainer">
                     <table name = "tbProcess"
-                          id   = "tbProcess">
+                          id   = "tbProcess"
+                          class = "tableStyle">
                     <thead>
                       <tr style="border-bottom: 1px solid #666666;">
                         <th width="10%"> PID </th>                            
@@ -235,9 +235,9 @@
         </div>
         </td>
       </tr>
-      <tfoot>
-          <td>
-            <div id="divFileSystem" class="bg-faded p-3 my-4">
+      <tr>
+          <th colspan="3">
+            <div id="divFileSystem" class="bg-faded p-3">
                 <label>
                     Disk
                     <br>
@@ -245,8 +245,8 @@
                     </div>
                 </label>
               </div>
-          </td>
-      </tfoot>
+            </th>
+      </tr>
     </table>
   </div>
 
@@ -262,7 +262,10 @@
     </div>
   </footer>
 
-<!-- Bootstrap core JavaScript -->
+<!-- <script>document.getElementsByTagName("body").onload = function() {Control.loadDiskTable()}; </script> -->
+
+  
+  <!-- Bootstrap core JavaScript -->
 <script src="style/vendor/jquery/jquery.min.js"></script>
 <script src="style/vendor/popper/popper.min.js"></script>
 <script src="style/vendor/bootstrap/js/bootstrap.min.js"></script>

@@ -338,7 +338,14 @@ var TSOS;
         Kernel.prototype.krnReadFile = function (filename) {
         };
         // - WriteFile
-        Kernel.prototype.krnWriteFile = function (filename) {
+        Kernel.prototype.krnWriteFile = function (filename, fileContent) {
+            var fileWritten = _krnFileSystemDriver.writeFile(filename, fileContent);
+            if (fileWritten) {
+                _StdOut.putText("Wrote to file:" + filename);
+            }
+            else {
+                _StdOut.putText("ERROR");
+            }
         };
         // - DeleteFile
         Kernel.prototype.krnDeleteFile = function (filename) {

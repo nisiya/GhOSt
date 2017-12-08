@@ -70,6 +70,7 @@ var TSOS;
             var memoryTable = document.createElement("table");
             memoryTable.className = "tbMemory";
             memoryTable.id = "tbMemory";
+            memoryTable.className = "tableStyle";
             var memoryTableBody = document.createElement("tbody");
             // creating cells for "bytes"
             for (var i = 0; i < 96; i++) {
@@ -116,6 +117,52 @@ var TSOS;
                     memoryTable.rows.namedItem(rowId).cells.namedItem(cellId).innerHTML = _Memory.memory[index];
                 }
             }
+        };
+        //
+        Control.loadDiskTable = function () {
+            // load Disk table at start up
+            var diskContainer = document.getElementById("fsContainer");
+            var diskTable = document.createElement("table");
+            diskTable.className = "tbFS";
+            diskTable.id = "tbFS";
+            diskTable.className = "tableStyle";
+            var diskTableBody = document.createElement("tbody");
+            // creating cells for "bytes"
+            for (var i = 0; i < sessionStorage.length; i++) {
+                // create rows
+                var row = document.createElement("tr");
+                var tsb = sessionStorage.key(i).toString();
+                var value = new Array();
+                row.id = tsb;
+                var cell = document.createElement("td");
+                // row label
+                var cellText = document.createTextNode(tsb.charAt(0) + ":" + tsb.charAt(1) + ":" + tsb.charAt(2));
+                // cell.id = 
+                cell.appendChild(cellText);
+                row.appendChild(cell);
+                value = JSON.parse(sessionStorage.getItem(tsb));
+                // first byte
+                var firstByte = value[0];
+                cell = document.createElement("td");
+                cellText = document.createTextNode(firstByte);
+                cell.appendChild(cellText);
+                row.appendChild(cell);
+                // data pointer byte
+                var pointerByte = value.splice(1, 3).toString().replace(/,/g, "");
+                cell = document.createElement("td");
+                cellText = document.createTextNode(pointerByte);
+                cell.appendChild(cellText);
+                row.appendChild(cell);
+                // rest of bytes
+                var dataBytes = value.toString().replace(/,/g, "");
+                cell = document.createElement("td");
+                cellText = document.createTextNode(dataBytes);
+                cell.appendChild(cellText);
+                row.appendChild(cell);
+                diskTableBody.appendChild(row);
+            }
+            diskTable.appendChild(diskTableBody);
+            diskContainer.appendChild(diskTable);
         };
         //
         // updating process display
@@ -229,6 +276,7 @@ var TSOS;
             document.getElementById("pcbContainer").style.border = "5px solid #0101FF";
             document.getElementById("memoryContainer").style.border = "5px solid #0101FF";
             document.getElementById("cpuContainer").style.border = "5px solid #0101FF";
+            document.getElementById("fsContainer").style.border = "5px solid #0101FF";
             // Disable the (passed-in) start button...
             btn.disabled = true;
             // .. enable the Halt, Reset, and single step buttons ...

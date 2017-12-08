@@ -143,14 +143,35 @@ table {
   text-align: center; 
   border-collapse: collapse;
   padding: 5px; 
-  /* border-bottom: 1px solid #666666;   */
 }
 
-table#tbMemory tr:nth-child(even) {
-  background-color: #f2f2f2;
+#fsContainer {
+  width: 800px;
+  height: 100px;
 }
 
-table#tbProcess tr:nth-child(even) {
+#tbFS{
+  color: black;
+  font-weight: normal;
+  font-family: Courier New, Courier, monospace;  
+  width: 100%;
+  text-align: center; 
+}
+
+table#tbFS td:first-child{
+  width: 9%;
+}
+table#tbFS td:second-child{
+  width: 2%;
+}
+table#tbFS td:third-child{
+  width: 9%;
+}
+table#tbFS td:last-child{
+  width: 80%;
+}
+
+table.tableStyle tr:nth-child(even) {
   background-color: #f2f2f2;
 }
 

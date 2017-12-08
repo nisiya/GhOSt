@@ -82,6 +82,7 @@ module TSOS {
             var memoryTable: HTMLTableElement = <HTMLTableElement> document.createElement("table");
             memoryTable.className = "tbMemory";
             memoryTable.id = "tbMemory";
+            memoryTable.className = "tableStyle";
             var memoryTableBody: HTMLTableSectionElement = <HTMLTableSectionElement> document.createElement("tbody");
             
             // creating cells for "bytes"
@@ -137,6 +138,61 @@ module TSOS {
             }
         }
         
+        //
+        public static loadDiskTable(): void {
+            // load Disk table at start up
+            var diskContainer: HTMLDivElement = <HTMLDivElement> document.getElementById("fsContainer");
+            var diskTable: HTMLTableElement = <HTMLTableElement> document.createElement("table");
+            diskTable.className = "tbFS";
+            diskTable.id = "tbFS";
+            diskTable.className = "tableStyle";
+            var diskTableBody: HTMLTableSectionElement = <HTMLTableSectionElement> document.createElement("tbody");
+            
+            // creating cells for "bytes"
+            for (var i = 0; i < sessionStorage.length; i++){
+                // create rows
+                var row: HTMLTableRowElement = <HTMLTableRowElement> document.createElement("tr");
+                var tsb:string = sessionStorage.key(i).toString();
+                var value = new Array<string>();
+                row.id = tsb;
+                var cell: HTMLTableCellElement = <HTMLTableCellElement> document.createElement("td");
+
+                // row label
+                var cellText = document.createTextNode(tsb.charAt(0) + ":" + tsb.charAt(1) + ":" +tsb.charAt(2));
+                // cell.id = 
+                cell.appendChild(cellText);
+                row.appendChild(cell);        
+                
+                value = JSON.parse(sessionStorage.getItem(tsb));
+                
+                // first byte
+                var firstByte: string = value[0];                
+                cell = document.createElement("td");
+                cellText = document.createTextNode(firstByte);
+                cell.appendChild(cellText);
+                row.appendChild(cell);  
+
+                // data pointer byte
+                var pointerByte: string = value.splice(1,3).toString().replace(/,/g,""); 
+                cell = document.createElement("td");
+                cellText = document.createTextNode(pointerByte);
+                cell.appendChild(cellText);
+                row.appendChild(cell); 
+
+                // rest of bytes
+                var dataBytes: string = value.toString().replace(/,/g,"");  
+                cell = document.createElement("td");
+                cellText = document.createTextNode(dataBytes);
+                cell.appendChild(cellText);
+                row.appendChild(cell);            
+
+                diskTableBody.appendChild(row);
+            }
+
+            diskTable.appendChild(diskTableBody);
+            diskContainer.appendChild(diskTable);
+        }
+
 
         //
         // updating process display
@@ -255,7 +311,9 @@ module TSOS {
             document.getElementById("taProgramInput").style.border = "5px solid #0101FF";            
             document.getElementById("pcbContainer").style.border = "5px solid #0101FF";
             document.getElementById("memoryContainer").style.border = "5px solid #0101FF";                        
-            document.getElementById("cpuContainer").style.border = "5px solid #0101FF";                       
+            document.getElementById("cpuContainer").style.border = "5px solid #0101FF";
+            document.getElementById("fsContainer").style.border = "5px solid #0101FF";            
+            
             
             // Disable the (passed-in) start button...
             btn.disabled = true;

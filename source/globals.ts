@@ -126,7 +126,7 @@ var _KeyToChr = {
 var _SaveX = 0; // use for backspace and line wrapping for now, will improve
 
 var onDocumentLoad = function() {
-
     TSOS.Control.hostInit();
     updateTime();
+    TSOS.Control.loadDiskTable();
 };

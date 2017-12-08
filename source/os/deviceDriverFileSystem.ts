@@ -30,7 +30,7 @@
                         var tsb: string;
                         var value = new Array<string>();
                         while (value.length<65){
-                            value.push("00");
+                            value.push("0");
                         }
                         console.log(value);
                         for (var i=0; i<8; i++){
@@ -59,7 +59,7 @@
                 for (var i=0; i<sessionLength;i++){
                     var tsb = sessionStorage.key(i);
                     value = JSON.parse(sessionStorage.getItem(tsb));
-                    value[0] = "00"
+                    value[0] = "0"
                     sessionStorage.setItem(tsb,JSON.stringify(value));
                 }
             }
@@ -76,16 +76,16 @@
                 for (var i=1; i<78; i++){
                     var dirTSB = sessionStorage.key(i);
                     value = JSON.parse(sessionStorage.getItem(dirTSB));
-                    if(value[0]=="00"){
+                    if(value[0]=="0"){
                         var dataTSB = this.findDataTSB();
                         if(dataTSB != null){
-                            value[0] = "01";
+                            value[0] = "1";
                             for (var k=1; k<4; k++){
                                 value[k] = "0" + dataTSB.charAt(k-1);
                             }
                             asciiFilename = filename.toString();
                             for (var j=0; j<asciiFilename.length; j++){
-                                value[j+4] = asciiFilename.charCodeAt(j).toString(16);
+                                value[j+4] = asciiFilename.charCodeAt(j).toString(16).toUpperCase();
                             }
                             sessionStorage.setItem(dirTSB, JSON.stringify(value));
                             return true;
@@ -93,7 +93,7 @@
                             return false;
                         }
                     }
-                }
+                }   
                 return false;
             }
 
@@ -111,7 +111,7 @@
                 }
                 return dataTSB;
             }
-    
+
         }
     }
     

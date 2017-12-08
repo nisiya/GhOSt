@@ -552,25 +552,46 @@ var TSOS;
         };
         // create
         Shell.prototype.shellCreate = function (args) {
-            var valText = /^[a-z\d\s]+$/i;
+            var valText = /^[a-z]+$/i;
             var filename;
             if (valText.test(args)) {
                 filename = args;
-                _Kernel.krnCreateFile(args);
+                if (filename.length < 60) {
+                    _Kernel.krnCreateFile(filename);
+                }
+                else {
+                    _StdOut.putText("Maximum length for filename: 60");
+                }
             }
             else {
-                _StdOut.putText("Please only use letters and numbers for filename");
+                _StdOut.putText("Please only use letters for filename");
             }
         };
         // write
         Shell.prototype.shellWrite = function (args) {
+            var valName = /^[a-z\d]+$/i;
             var valText = /^[a-z\d\s\"]+$/i;
             var filename;
-            if (valText.test(args)) {
-                filename = args;
+            var fileContent;
+            console.log(args[0]);
+            if (valName.test(args[0])) {
+                filename = args[0];
+                _StdOut.putText(filename);
+                fileContent = args[1];
+                if (fileContent.charAt(0) != '"' && fileContent.charAt(fileContent.length - 1) != '"') {
+                    _StdOut.putText("File content must be in double quotes");
+                }
+                else if (!valText.test(fileContent)) {
+                    _StdOut.putText("Please only use letters, numbers, and spaces for file content");
+                }
+                else {
+                    fileContent = fileContent.slice(1, fileContent.length - 1);
+                    _StdOut.putText(" " + fileContent);
+                    _Kernel.krnWriteFile(filename, fileContent);
+                }
             }
             else {
-                _StdOut.putText("Please only use letters and numbers for filename");
+                _StdOut.putText("Please only use letters for filename");
             }
         };
         // read
@@ -581,7 +602,7 @@ var TSOS;
                 filename = args;
             }
             else {
-                _StdOut.putText("Please only use letters and numbers for filename");
+                _StdOut.putText("Please only use letters for filename");
             }
         };
         // delete
@@ -592,7 +613,7 @@ var TSOS;
                 filename = args;
             }
             else {
-                _StdOut.putText("Please only use letters and numbers for filename");
+                _StdOut.putText("Please only use letters for filename");
             }
         };
         // ls
