@@ -145,8 +145,7 @@ module TSOS {
             var dataBytes: string = value.splice(4,60).toString().replace(/,/g,"");
             dataBlock.push(dataBytes);
             var pointerByte: string = value.splice(1,3).toString().replace(/,/g,"");
-            var pointer:string = pointerByte.charAt(1) + pointerByte.charAt(3) + pointerByte.charAt(5);
-            dataBlock.push(pointer);
+            dataBlock.push(pointerByte);
             var firstByte: string = value.splice(0,1).toString();
             dataBlock.push(firstByte);
             return dataBlock;       

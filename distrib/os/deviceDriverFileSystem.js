@@ -38,7 +38,10 @@ var TSOS;
                     // create file system
                     var tsb;
                     var value = new Array();
-                    value.push("0");
+                    for (var i = 0; i < 4; i++) {
+                        //first byte and pointer
+                        value.push("0");
+                    }
                     while (value.length < 65) {
                         value.push("00");
                     }
@@ -92,7 +95,7 @@ var TSOS;
                     if (dataTSB != null) {
                         value[0] = "1";
                         for (var k = 1; k < 4; k++) {
-                            value[k] = "0" + dataTSB.charAt(k - 1);
+                            value[k] = dataTSB.charAt(k - 1);
                         }
                         asciiFilename = filename.toString();
                         for (var j = 0; j < asciiFilename.length; j++) {
@@ -124,6 +127,84 @@ var TSOS;
                 }
             }
             return dataTSB;
+        };
+        DeviceDriverFileSystem.prototype.lookupDataTSB = function (filename) {
+            var dirTSB;
+            var dataTSB;
+            var value = new Array();
+            var dirFilename = "";
+            for (var i = 1; i < 78; i++) {
+                dirTSB = sessionStorage.key(i);
+                console.log("lookup dir " + dirTSB);
+                value = JSON.parse(sessionStorage.getItem(dirTSB));
+                if (value[0] == "1") {
+                    var index = 4;
+                    var letter;
+                    while (value[index] != "00") {
+                        console.log("lookup index " + index);
+                        letter = String.fromCharCode(parseInt(value[index], 16));
+                        console.log("lookup letter " + letter);
+                        dirFilename = dirFilename + letter;
+                        index++;
+                    }
+                    console.log("lookup file " + dirFilename);
+                    if (dirFilename == filename) {
+                        dataTSB = value.splice(1, 3).toString().replace(/,/g, "");
+                        console.log("lookup data " + dataTSB);
+                        return dataTSB;
+                    }
+                }
+            }
+            return null;
+        };
+        DeviceDriverFileSystem.prototype.writeFile = function (filename, fileContent) {
+            // look in dir for data tsb with filename
+            var dataTSB = this.lookupDataTSB(filename);
+            var value = new Array();
+            var charCode;
+            // if found
+            if (dataTSB != null) {
+                console.log("exist");
+                // modify the value
+                value = JSON.parse(sessionStorage.getItem(dataTSB));
+                var contentIndex = 0;
+                var valueIndex = 4;
+                // add hex value of ascii value of fileContent
+                while (contentIndex < fileContent.length) {
+                    // if more than one block needed...
+                    if (valueIndex == 63) {
+                        // get new free data block
+                        dataTSB = this.findDataTSB();
+                        // add pointer to new block in current block
+                        for (var k = 1; k < 4; k++) {
+                            value[k] = dataTSB.charAt(k - 1);
+                        }
+                        // save current block
+                        sessionStorage.setItem(dataTSB, JSON.stringify(value));
+                        TSOS.Control.updateDiskTable(dataTSB);
+                        // set working block to new block
+                        value = JSON.parse(sessionStorage.getItem(dataTSB));
+                        valueIndex = 4;
+                    }
+                    else {
+                        // current block has space
+                        charCode = fileContent.charCodeAt(contentIndex);
+                        value[valueIndex] = charCode.toString(16).toUpperCase();
+                        contentIndex++;
+                        valueIndex++;
+                    }
+                    // save last block
+                    for (var k = 1; k < 4; k++) {
+                        value[k] = "-1"; // last block indicator
+                    }
+                    sessionStorage.setItem(dataTSB, JSON.stringify(value));
+                    TSOS.Control.updateDiskTable(dataTSB);
+                }
+                return true;
+            }
+            else {
+                return false;
+            }
         };
         return DeviceDriverFileSystem;
     }(TSOS.DeviceDriver));

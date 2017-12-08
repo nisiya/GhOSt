@@ -334,9 +334,6 @@ var TSOS;
                 _StdOut.putText("Disk out of storage space");
             }
         };
-        // - ReadFile
-        Kernel.prototype.krnReadFile = function (filename) {
-        };
         // - WriteFile
         Kernel.prototype.krnWriteFile = function (filename, fileContent) {
             var fileWritten = _krnFileSystemDriver.writeFile(filename, fileContent);
@@ -346,6 +343,9 @@ var TSOS;
             else {
                 _StdOut.putText("ERROR");
             }
+        };
+        // - ReadFile
+        Kernel.prototype.krnReadFile = function (filename) {
         };
         // - DeleteFile
         Kernel.prototype.krnDeleteFile = function (filename) {

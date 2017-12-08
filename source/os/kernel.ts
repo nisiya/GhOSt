@@ -359,10 +359,7 @@ module TSOS {
                 _StdOut.putText("Disk out of storage space");
             }
         }
-        // - ReadFile
-        public krnReadFile(filename){
 
-        }
         // - WriteFile
         public krnWriteFile(filename, fileContent){
             var fileWritten = _krnFileSystemDriver.writeFile(filename, fileContent);
@@ -372,6 +369,12 @@ module TSOS {
                 _StdOut.putText("ERROR");
             }
         }
+
+        // - ReadFile
+        public krnReadFile(filename){
+            
+        }
+
         // - DeleteFile
         public krnDeleteFile(filename){
 
