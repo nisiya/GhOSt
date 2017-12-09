@@ -699,7 +699,7 @@ module TSOS {
         // write
         public shellWrite(args){
             var valName = /^[a-z\d]+$/i;
-            var valText = /^[a-z\d\s\"]+$/i;
+            // var valText = /^[a-z\d\s\"]+$/i;
             var filename: string;
             var fileContent: string;
             if(valName.test(args[0])){
@@ -717,8 +717,8 @@ module TSOS {
                     console.log(fileContent.charAt(fileContent.length-1)!='"');
                     if(fileContent.charAt(0)!='"' || fileContent.charAt(fileContent.length-1)!='"'){
                         _StdOut.putText("File content must be in double quotes");
-                    } else if(!valText.test(fileContent)){
-                        _StdOut.putText("Please only use letters, numbers, and spaces for file content");
+                    // } else if(!valText.test(fileContent)){
+                    //     _StdOut.putText("Please only use letters, numbers, and spaces for file content");
                     } else{
                         fileContent = fileContent.slice(1,fileContent.length-1);
                         _Kernel.krnWriteFile(filename, fileContent);
@@ -735,7 +735,6 @@ module TSOS {
             var filename: string;
             if(valText.test(args)){
                 filename = args;
-                console.log("filename " + filename);
                 _Kernel.krnReadFile(filename);
             } else{
                 _StdOut.putText("Please only use letters for filename")
@@ -756,7 +755,11 @@ module TSOS {
 
         // ls
         public shellLs(args){
-
+            var files: string[] = _krnFileSystemDriver.listFiles();
+            _StdOut.putText("Files: ");
+            for(var file in files){
+                _StdOut.putText(files[file] + "   ");
+            }
         }
 
         // format
@@ -764,7 +767,7 @@ module TSOS {
             if(_CPU.isExecuting){
                 _StdOut.putText("Cannot format disk. A process is currently running. Use kill command to terminate process.");
             } else{
-                _krnFileSystemDriver.formatDisk();
+                _StdOut.putText(_krnFileSystemDriver.formatDisk());
             }
         }
     }

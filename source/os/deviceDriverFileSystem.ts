@@ -54,17 +54,26 @@
                 }
             }
 
-            public formatDisk(){
+            // public stringToAsciiHex(string): string{
+            //     var asciiHex: string;
+                
+            // }
+            public updateTSB(tsb, value){
+                sessionStorage.setItem(tsb,JSON.stringify(value));
+                Control.updateDiskTable(tsb);
+            }
+
+            public formatDisk(): string{
                 var tsb: string;
                 var value = new Array<string>();
                 var sessionLength = sessionStorage.length;
                 for (var i=0; i<sessionLength;i++){
                     var tsb = sessionStorage.key(i);
                     value = JSON.parse(sessionStorage.getItem(tsb));
-                    value[0] = "1"
-                    sessionStorage.setItem(tsb,JSON.stringify(value));
-                    Control.updateDiskTable(tsb);
+                    value[0] = "0"
+                    this.updateTSB(tsb,value);
                 }
+                return "SUCCESS_DISK_FORMATTED";
             }
 
             public zeroFill(tsb){
@@ -75,8 +84,7 @@
                 for (var j=4; j<value.length; j++){
                     value[j] = "00";
                 }
-                sessionStorage.setItem(tsb, JSON.stringify(value));
-                Control.updateDiskTable(tsb);
+                this.updateTSB(tsb,value);
             }
 
             public createFile(filename): string{
@@ -86,7 +94,7 @@
                 var asciiFilename: string;
                 // make sure no duplicate filename
                 var existFilename = this.lookupDataTSB(filename);
-                if (existFilename){
+                if (existFilename != null){
                     return "ERROR_DUPLICATE_FILENAME";
                 } else{
                     // 000 is master boot rec
@@ -108,8 +116,7 @@
                                 for (var j=0; j<asciiFilename.length; j++){
                                     value[j+4] = asciiFilename.charCodeAt(j).toString(16).toUpperCase();
                                 }
-                                sessionStorage.setItem(dirTSB, JSON.stringify(value));
-                                Control.updateDiskTable(dirTSB);
+                                this.updateTSB(dirTSB,value);
                                 return filename + " - SUCCESS_FILE_CREATED";
                             } else {
                                 return "ERROR_DISK_FULL";
@@ -120,6 +127,10 @@
                 }   
             }
 
+            public getPointer(value): string{
+                var pointer: string = value[1] + value[2] + value[3];
+                return pointer;
+            }
             public findDataTSB():string {
                 var dataTSB: string;
                 var value = new Array<string>();
@@ -130,33 +141,37 @@
                         this.zeroFill(dataTSB);
                         value = JSON.parse(sessionStorage.getItem(dataTSB));
                         value[0]="1";
-                        sessionStorage.setItem(dataTSB, JSON.stringify(value));
-                        Control.updateDiskTable(dataTSB);
-                        console.log(dataTSB);
+                        this.updateTSB(dataTSB,value);
                         return dataTSB; 
                     }
                 }
-                return dataTSB;
+                return null;
             }
         
-            public lookupDataTSB(filename):string {
+            public getFilename(value): string{
+                console.log(value);
+                var index = 4;
+                var letter;
+                var dirFilename:string = "";
+                while(value[index]!="00" && index<64){
+                    letter = String.fromCharCode(parseInt(value[index],16));
+                    dirFilename = dirFilename + letter;
+                    index++;
+                }
+                return dirFilename;
+            }
+
+            public lookupDataTSB(filename): string{
                 var dirTSB: string;
                 var dataTSB: string;
                 var value = new Array<string>();
-                var dirFilename: string = "";
+                var dirFilename: string;
                 for (var i=1; i<78; i++){
                     dirTSB = sessionStorage.key(i);
                     value = JSON.parse(sessionStorage.getItem(dirTSB));
                     if(value[0]=="1"){
-                        var index = 4;
-                        var letter;
-                        while(value[index]!="00"){
-                            letter = String.fromCharCode(parseInt(value[index],16));
-                            dirFilename = dirFilename + letter;
-                            index++;
-                        }
+                        dirFilename = this.getFilename(value);
                         console.log(dirFilename);
-                        console.log(filename);
                         if (dirFilename == filename){
                             dataTSB = value.splice(1,3).toString().replace(/,/g,"");
                             value = JSON.parse(sessionStorage.getItem(dataTSB));
@@ -177,24 +192,20 @@
                 var charCode;
                 // if found
                 if(dataTSB != null){
-                    console.log("exist");
                     // modify the value
                     value = JSON.parse(sessionStorage.getItem(dataTSB));
                     var contentIndex: number = 0;
-                    var valueIndex: number;
+                    var valueIndex: number = 0;
                     var firstIndex: number;
-                    var pointer = value[1] + value[2] + value[3];
+                    var pointer: string = this.getPointer(value);
                     if (pointer == "000"){
                         valueIndex = 4;
                     } else {
-                        // if(pointer == "-1-1-1"){
-                        //     tsbUsed.push(dataTSB);
-                        // } else{
                         while(pointer!="-1-1-1"){
                             dataTSB = pointer;
                             tsbUsed.push(dataTSB);
                             value = JSON.parse(sessionStorage.getItem(dataTSB));      
-                            pointer = value[1] + value[2] + value[3];                          
+                            pointer = this.getPointer(value);                         
                         }
                             // }
                         for(var i=4; i<value.length; i++){
@@ -220,8 +231,7 @@
                                     value[k] = dataTSB.charAt(k-1);
                                 }
                                 // save current block
-                                sessionStorage.setItem(oldDataTSB, JSON.stringify(value));
-                                Control.updateDiskTable(oldDataTSB);
+                                this.updateTSB(oldDataTSB,value);
                                 // set working block to new block
                                 value = JSON.parse(sessionStorage.getItem(dataTSB));
                                 valueIndex = 4;
@@ -234,8 +244,7 @@
                                 for (var m=firstIndex; m<64; m++){
                                     value = JSON.parse(sessionStorage.getItem(firstTSB));
                                     value[m] = "00";
-                                    sessionStorage.setItem(firstTSB, JSON.stringify(value));
-                                    Control.updateDiskTable(firstTSB);
+                                    this.updateTSB(firstTSB,value);
                                 }
                                 return "File content was not written - ERROR_DISK_FULL";
                             }
@@ -251,8 +260,7 @@
                     for (var k=1; k<4; k++){
                         value[k] = "-1"; // last block indicator
                     }
-                    sessionStorage.setItem(dataTSB, JSON.stringify(value));
-                    Control.updateDiskTable(dataTSB);
+                    this.updateTSB(dataTSB,value);
                     return filename + " - SUCCESS_FILE_MODIFIED";
                 } else{
                     return "ERROR_FILE_NOT_FOUND";
@@ -270,7 +278,7 @@
                 // check if file exist
                 if (dataTSB!=null){
                     value = JSON.parse(sessionStorage.getItem(dataTSB));
-                    pointer = value[1] + value[2] + value[3];
+                    pointer = this.getPointer(value);
                     index = 4;
                     while(index<64 && value[index]!="00"){
                         // append letters to fileContent
@@ -280,7 +288,7 @@
                         // if need to read more than one block
                         if(index==64 && pointer!="-1-1-1"){
                             value = JSON.parse(sessionStorage.getItem(pointer));
-                            pointer = value[1] + value[2] + value[3];
+                            pointer = this.getPointer(value);
                             index = 4;
                         }
                     }
@@ -288,6 +296,14 @@
                 } else{
                     return "ERROR_FILE_NOT_FOUND";
                 }
+            }
+
+            public deleteHelper(tsb): string{
+                var value = JSON.parse(sessionStorage.getItem(tsb));
+                value[0]="0";
+                this.updateTSB(tsb,value);
+                var pointer = this.getPointer(value);
+                return pointer;
             }
 
             public deleteFile(filename): string{
@@ -301,33 +317,43 @@
                     for(var i=0; i<78; i++){
                         dirTSB = sessionStorage.key(i);
                         value = JSON.parse(sessionStorage.getItem(dirTSB));
-                        pointer = value[1] + value[2] + value[3];
+                        pointer = this.getPointer(value);
                         if(pointer == dataTSB){
                             value[0] = "0";
-                            sessionStorage.setItem(dirTSB, JSON.stringify(value));
+                            this.updateTSB(dirTSB,value);
                             break;
                         }
                     }
-                    //
-                    value = JSON.parse(sessionStorage.getItem(dataTSB));
-                    value[0]="0";
-                    sessionStorage.setItem(dataTSB, JSON.stringify(value));
-                    Control.updateDiskTable(dataTSB);
-                    pointer = value[1] + value[2] + value[3];
+                    // then delete data tsb
+                    pointer = this.deleteHelper(dataTSB);
                     if(pointer != "000"){
                         while(pointer != "-1-1-1"){
                             dataTSB = pointer;
-                            value = JSON.parse(sessionStorage.getItem(dataTSB));
-                            value[0]="0";
-                            sessionStorage.setItem(dataTSB, JSON.stringify(value));
-                            Control.updateDiskTable(dataTSB);
-                            pointer = value[1] + value[2] + value[3];
+                            pointer = this.deleteHelper(dataTSB);
                         }
                     }
                     return "SUCCESS_FILE_DELETED";
                 } else {
                     return "ERROR_FILE_NOT_FOUND";
                 }
+            }
+
+            public listFiles(): string[]{
+                var dirTSB: string;
+                var value = new Array<string>();
+                var dirFilename: string;
+                var files = new Array<string>();
+                for (var i=1; i<78; i++){
+                    dirTSB = sessionStorage.key(i);
+                    value = JSON.parse(sessionStorage.getItem(dirTSB));
+                    if(value[0]=="1"){
+                        dirFilename = this.getFilename(value);
+                        files.push(dirFilename);
+                        dirFilename = "";
+                    }
+                }
+                console.log(files);
+                return(files);
             }
         }
     }
