@@ -36,8 +36,11 @@ var TSOS;
                 this.memoryS1 = true;
                 baseReg = 0;
             }
-            // load user program into memory
-            if (baseReg != 999) {
+            // load user program into disk
+            if (baseReg == 999) {
+                console.log("uhoh");
+            }
+            else {
                 for (var i = 0; i < inputOpCodes.length; i++) {
                     _Memory.memory[baseReg + i] = inputOpCodes[i];
                 }

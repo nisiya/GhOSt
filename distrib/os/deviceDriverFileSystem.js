@@ -27,8 +27,13 @@ var TSOS;
             // Override the base method pointers.
             _super.call(this) || this;
             _this.driverEntry = _this.krnFSDriverEntry;
+            _this.track = 8;
+            _this.sector = 8;
+            _this.block = 8;
+            _this.blockSize = 64;
+            _this.dirTableSize = _this.sector * _this.block;
+            _this.dataTableSize = (_this.track - 1) * _this.sector * _this.block;
             return _this;
-            // this.isr = this.krnFsDispatchKeyPress;
         }
         DeviceDriverFileSystem.prototype.krnFSDriverEntry = function () {
             // Initialization routine for this, the kernel-mode File System Device Driver.
@@ -42,21 +47,18 @@ var TSOS;
                         //first byte and pointer
                         value.push("0");
                     }
-                    while (value.length < 64) {
+                    while (value.length < this.blockSize) {
                         value.push("00");
                     }
-                    for (var i = 0; i < 8; i++) {
-                        for (var j = 0; j < 78; j++) {
-                            tsb = j.toString();
-                            if (tsb.length < 2) {
-                                tsb = "0" + tsb;
+                    for (var i = 0; i < this.track; i++) {
+                        for (var j = 0; j < this.sector; j++) {
+                            for (var k = 0; k < this.block; k++) {
+                                tsb = i.toString() + j.toString() + k.toString();
+                                sessionStorage.setItem(tsb, JSON.stringify(value));
                             }
-                            tsb = i.toString() + tsb;
-                            sessionStorage.setItem(tsb, JSON.stringify(value));
                         }
                     }
                     TSOS.Control.loadDiskTable();
-                    var sessionLength = sessionStorage.length;
                 }
             }
             else {
@@ -73,8 +75,7 @@ var TSOS;
         DeviceDriverFileSystem.prototype.formatDisk = function () {
             var tsb;
             var value = new Array();
-            var sessionLength = sessionStorage.length;
-            for (var i = 0; i < sessionLength; i++) {
+            for (var i = 0; i < sessionStorage.length; i++) {
                 var tsb = sessionStorage.key(i);
                 value = JSON.parse(sessionStorage.getItem(tsb));
                 value[0] = "0";
@@ -104,8 +105,8 @@ var TSOS;
             }
             else {
                 // 000 is master boot rec
-                // 77 is index of last DIR block sector
-                for (var i = 1; i < 78; i++) {
+                // 63 is index of last DIR block sector
+                for (var i = 1; i < this.dirTableSize; i++) {
                     var dirTSB = sessionStorage.key(i);
                     value = JSON.parse(sessionStorage.getItem(dirTSB));
                     if (value[0] == "0") {
@@ -140,7 +141,7 @@ var TSOS;
         DeviceDriverFileSystem.prototype.findDataTSB = function () {
             var dataTSB;
             var value = new Array();
-            for (var i = 78; i < sessionStorage.length; i++) {
+            for (var i = this.dirTableSize; i < sessionStorage.length; i++) {
                 dataTSB = sessionStorage.key(i);
                 value = JSON.parse(sessionStorage.getItem(dataTSB));
                 if (value[0] == "0") {
@@ -154,11 +155,10 @@ var TSOS;
             return null;
         };
         DeviceDriverFileSystem.prototype.getFilename = function (value) {
-            console.log(value);
             var index = 4;
             var letter;
             var dirFilename = "";
-            while (value[index] != "00" && index < 64) {
+            while (value[index] != "00" && index < this.blockSize) {
                 letter = String.fromCharCode(parseInt(value[index], 16));
                 dirFilename = dirFilename + letter;
                 index++;
@@ -170,12 +170,11 @@ var TSOS;
             var dataTSB;
             var value = new Array();
             var dirFilename;
-            for (var i = 1; i < 78; i++) {
+            for (var i = 1; i < this.dirTableSize; i++) {
                 dirTSB = sessionStorage.key(i);
                 value = JSON.parse(sessionStorage.getItem(dirTSB));
                 if (value[0] == "1") {
                     dirFilename = this.getFilename(value);
-                    console.log(dirFilename);
                     if (dirFilename == filename) {
                         dataTSB = value.splice(1, 3).toString().replace(/,/g, "");
                         value = JSON.parse(sessionStorage.getItem(dataTSB));
@@ -223,7 +222,7 @@ var TSOS;
                 // add hex value of ascii value of fileContent
                 while (contentIndex < fileContent.length) {
                     // if more than one block needed...
-                    if (valueIndex == 64) {
+                    if (valueIndex == this.blockSize) {
                         // get new free data block
                         var oldDataTSB = dataTSB;
                         dataTSB = this.findDataTSB();
@@ -246,7 +245,7 @@ var TSOS;
                             for (var dataTSB in tsbUsed) {
                                 this.zeroFill(dataTSB);
                             }
-                            for (var m = firstIndex; m < 64; m++) {
+                            for (var m = firstIndex; m < this.blockSize; m++) {
                                 value = JSON.parse(sessionStorage.getItem(firstTSB));
                                 value[m] = "00";
                                 this.updateTSB(firstTSB, value);
@@ -285,13 +284,13 @@ var TSOS;
                 value = JSON.parse(sessionStorage.getItem(dataTSB));
                 pointer = this.getPointer(value);
                 index = 4;
-                while (index < 64 && value[index] != "00") {
+                while (index < this.blockSize && value[index] != "00") {
                     // append letters to fileContent
                     charCode = parseInt(value[index], 16);
                     fileContent = fileContent + String.fromCharCode(charCode);
                     index++;
                     // if need to read more than one block
-                    if (index == 64 && pointer != "-1-1-1") {
+                    if (index == this.blockSize && pointer != "-1-1-1") {
                         value = JSON.parse(sessionStorage.getItem(pointer));
                         pointer = this.getPointer(value);
                         index = 4;
@@ -317,7 +316,7 @@ var TSOS;
             var pointer;
             if (dataTSB != null) {
                 // delete directory first
-                for (var i = 0; i < 78; i++) {
+                for (var i = 0; i < this.dirTableSize; i++) {
                     dirTSB = sessionStorage.key(i);
                     value = JSON.parse(sessionStorage.getItem(dirTSB));
                     pointer = this.getPointer(value);
@@ -346,7 +345,7 @@ var TSOS;
             var value = new Array();
             var dirFilename;
             var files = new Array();
-            for (var i = 1; i < 78; i++) {
+            for (var i = 1; i < this.dirTableSize; i++) {
                 dirTSB = sessionStorage.key(i);
                 value = JSON.parse(sessionStorage.getItem(dirTSB));
                 if (value[0] == "1") {
@@ -355,7 +354,6 @@ var TSOS;
                     dirFilename = "";
                 }
             }
-            console.log(files);
             return (files);
         };
         return DeviceDriverFileSystem;
