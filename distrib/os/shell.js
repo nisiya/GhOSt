@@ -106,6 +106,12 @@ var TSOS;
             // format
             sc = new TSOS.ShellCommand(this.shellFormat, "format", "quick formats the drive");
             this.commandList[this.commandList.length] = sc;
+            // getschedule
+            sc = new TSOS.ShellCommand(this.shellGetSchedule, "getschedule", "get the currently selected cpu scheduling algorithm");
+            this.commandList[this.commandList.length] = sc;
+            // setschedule <string>
+            sc = new TSOS.ShellCommand(this.shellSetSchedule, "setschedule", "<string> - set CPU scheduling algorithm to rr (Round Robin), fcfs (First-come, First-serve), or priority (non-preemptive)");
+            this.commandList[this.commandList.length] = sc;
             //
             // Display the initial prompt.
             this.putPrompt();
@@ -362,6 +368,14 @@ var TSOS;
                     // format
                     case "format":
                         _StdOut.putText("Format would quick format the disk, deleting just the pointers.");
+                        break;
+                    // getschedule
+                    case "getschedule":
+                        _StdOut.putText("Get the currently seleced CPU scheduling algorithm.");
+                        break;
+                    // setschedule <string>
+                    case "setschedule":
+                        _StdOut.putText("Set CPU scheduling algorithm to rr (Round Robin), fcfs (First-come, First-serve), or priority (non-preemptive).");
                         break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
@@ -642,6 +656,13 @@ var TSOS;
             else {
                 _StdOut.putText(_krnFileSystemDriver.formatDisk());
             }
+        };
+        Shell.prototype.shellGetSchedule = function (args) {
+            _StdOut.putText("Current CPU scheduling algortithm: " + _CpuScheduler.schedule);
+        };
+        Shell.prototype.shellSetSchedule = function (args) {
+            console.log(args);
+            _StdOut.putText(_CpuScheduler.setSchedule(args));
         };
         return Shell;
     }());

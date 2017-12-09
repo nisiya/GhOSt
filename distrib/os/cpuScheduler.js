@@ -43,23 +43,32 @@ var TSOS;
                 }
             }
         };
-        CpuScheduler.prototype.setSchedule = function (schedule) {
-            switch (schedule) {
+        CpuScheduler.prototype.setSchedule = function (args) {
+            var returnMsg;
+            var newSchedule = args.toString();
+            console.log(newSchedule == "rr");
+            switch (newSchedule) {
                 case "rr":
                     this.schedule = "Round Robin";
                     this.quantum = 6;
+                    returnMsg = "CPU scheduling algorithm set to: " + this.schedule;
                     break;
                 case "fcfs":
                     this.schedule = "First-come, First-serve";
-                    this.quantum = 30;
+                    this.quantum = 1000;
+                    returnMsg = "CPU scheduling algorithm set to: " + this.schedule;
                     break;
                 case "priority":
                     this.schedule = "Non-preemptive Priority";
-                    this.quantum = 30;
+                    this.quantum = 1000;
+                    returnMsg = "CPU scheduling algorithm set to: " + this.schedule;
+                    break;
                 default:
                     this.quantum = 6;
-                    break;
+                    returnMsg = "CPU scheduling algorithm DNE";
             }
+            console.log(this.quantum);
+            return returnMsg;
         };
         return CpuScheduler;
     }());
