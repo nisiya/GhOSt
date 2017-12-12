@@ -65,9 +65,15 @@ var TSOS;
                 alert("Sorry, your browser do not support session storage.");
             }
         };
-        // public stringToAsciiHex(string): string{
-        //     var asciiHex: string;
-        // }
+        DeviceDriverFileSystem.prototype.stringToAsciiHex = function (string) {
+            var asciiHex = new Array();
+            var hexVal;
+            for (var i = string.length; i >= 0; i--) {
+                hexVal = string.charCodeAt(i).toString(16);
+                asciiHex.push(hexVal);
+            }
+            return asciiHex;
+        };
         DeviceDriverFileSystem.prototype.updateTSB = function (tsb, value) {
             sessionStorage.setItem(tsb, JSON.stringify(value));
             TSOS.Control.updateDiskTable(tsb);
@@ -188,8 +194,10 @@ var TSOS;
         DeviceDriverFileSystem.prototype.writeFile = function (filename, fileContent) {
             // look in dir for data tsb with filename
             var dataTSB = this.lookupDataTSB(filename);
+            var content = new Array();
             if (dataTSB != null) {
-                var fileCreated = this.writeToFS(dataTSB, fileContent);
+                content = this.stringToAsciiHex(fileContent);
+                var fileCreated = this.writeToFS(dataTSB, content);
                 if (fileCreated) {
                     return filename + " - SUCCESS_FILE_MODIFIED";
                 }
@@ -201,12 +209,30 @@ var TSOS;
                 return "ERROR_FILE_NOT_FOUND";
             }
         };
+        DeviceDriverFileSystem.prototype.writeProcess = function (userPrg) {
+            var dataTSB = this.findDataTSB();
+            var content = new Array();
+            if (dataTSB != null) {
+                while (userPrg.length > 0) {
+                    content.push(userPrg.pop());
+                }
+                var processLoaded = this.writeToFS(dataTSB, content);
+                if (processLoaded) {
+                    var pid = _Kernel.krnCreateProcess(999, dataTSB);
+                    return "Process id: " + pid + " is in Resident Queue";
+                }
+                else {
+                    return "ERROR_DISK_FULL";
+                }
+            }
+            else {
+                return "ERROR_DISK_FULL";
+            }
+        };
         DeviceDriverFileSystem.prototype.writeToFS = function (dataTSB, content) {
             var tsbUsed = new Array();
             var firstTSB = dataTSB;
             var value = new Array();
-            var charCode;
-            var contentIndex = 0;
             var valueIndex = 0;
             var firstIndex;
             value = JSON.parse(sessionStorage.getItem(dataTSB));
@@ -231,7 +257,7 @@ var TSOS;
             }
             firstIndex = valueIndex;
             // add hex value of ascii value of fileContent
-            while (contentIndex < content.length) {
+            while (content.length > 0) {
                 // if more than one block needed...
                 if (valueIndex == this.blockSize) {
                     // get new free data block
@@ -266,9 +292,7 @@ var TSOS;
                 }
                 else {
                     // current block has space
-                    charCode = content.charCodeAt(contentIndex);
-                    value[valueIndex] = charCode.toString(16).toUpperCase();
-                    contentIndex++;
+                    value[valueIndex] = content.pop();
                     valueIndex++;
                 }
             }

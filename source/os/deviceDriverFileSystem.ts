@@ -61,10 +61,15 @@
                 }
             }
 
-            // public stringToAsciiHex(string): string{
-            //     var asciiHex: string;
-                
-            // }
+            public stringToAsciiHex(string): string[]{
+                var asciiHex= new Array<string>();
+                var hexVal:string;
+                for(var i=string.length; i>=0; i--){
+                    hexVal = string.charCodeAt(i).toString(16);
+                    asciiHex.push(hexVal);
+                }
+                return asciiHex;
+            }
             public updateTSB(tsb, value){
                 sessionStorage.setItem(tsb,JSON.stringify(value));
                 Control.updateDiskTable(tsb);
@@ -137,6 +142,7 @@
                 var pointer: string = value[1] + value[2] + value[3];
                 return pointer;
             }
+
             public findDataTSB():string {
                 var dataTSB: string;
                 var value = new Array<string>();
@@ -190,8 +196,10 @@
             public writeFile(filename, fileContent): string{
                 // look in dir for data tsb with filename
                 var dataTSB: string = this.lookupDataTSB(filename);
+                var content = new Array<string>();
                 if(dataTSB != null){
-                    var fileCreated = this.writeToFS(dataTSB, fileContent);
+                    content = this.stringToAsciiHex(fileContent);
+                    var fileCreated = this.writeToFS(dataTSB, content);
                     if (fileCreated){
                         return filename + " - SUCCESS_FILE_MODIFIED";
                     } else{
@@ -202,12 +210,29 @@
                 }
             }
 
+            public writeProcess(userPrg): string{
+                var dataTSB: string = this.findDataTSB();
+                var content = new Array<string>();
+                if(dataTSB != null){
+                    while(userPrg.length>0){
+                        content.push(userPrg.pop());
+                    }
+                    var processLoaded = this.writeToFS(dataTSB, content);
+                    if (processLoaded){
+                        var pid: number = _Kernel.krnCreateProcess(999, dataTSB);
+                        return "Process id: " + pid + " is in Resident Queue";
+                    } else{
+                        return "ERROR_DISK_FULL";
+                    }
+                } else {
+                    return "ERROR_DISK_FULL";
+                }
+            }
+
             public writeToFS(dataTSB, content): boolean{
                 var tsbUsed: string[] = new Array<string>();
                 var firstTSB: string = dataTSB;
                 var value = new Array<string>();
-                var charCode;
-                var contentIndex: number = 0;
                 var valueIndex: number = 0;
                 var firstIndex: number;
                 value = JSON.parse(sessionStorage.getItem(dataTSB));
@@ -231,7 +256,7 @@
                 }
                 firstIndex = valueIndex;
                 // add hex value of ascii value of fileContent
-                while(contentIndex<content.length){
+                while(content.length>0){
                     // if more than one block needed...
                     if(valueIndex == this.blockSize){
                         // get new free data block
@@ -264,9 +289,7 @@
                         }
                     } else{
                         // current block has space
-                        charCode = content.charCodeAt(contentIndex);
-                        value[valueIndex] = charCode.toString(16).toUpperCase();
-                        contentIndex++;
+                        value[valueIndex] = content.pop();
                         valueIndex++;
                     }
                 }

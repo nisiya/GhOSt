@@ -167,18 +167,24 @@ var TSOS;
         // Some ideas:
         // - ReadConsole
         // - WriteConsole
-        Kernel.prototype.krnCreateProcess = function (pBase) {
-            // Creates process when it is loaded into memory
+        Kernel.prototype.krnCreateProcess = function (pBase, tsb) {
+            // Creates process when it is loaded into memory or disk
             // base register value retrieved from loading process into memory
+            // or tsb if in disk
             // pid incremented upon creation
             _PID++;
             var pid = _PID;
-            var process = new TSOS.PCB(pBase, pid, "Resident", 1);
+            var process = new TSOS.PCB(pBase, pid, "Resident", 1, tsb);
             // put process on resident queue
             _ResidentQueue.enqueue(process);
             // update process table
             TSOS.Control.addProcessTable(process);
             return pid;
+        };
+        Kernel.prototype.krnWriteProcess = function (inputOpCodes) {
+            // Write process to disk when memory is full
+            var returnMsg = _krnFileSystemDriver.writeProcess(inputOpCodes);
+            return returnMsg;
         };
         Kernel.prototype.krnExecuteProcess = function (pid) {
             var process;
@@ -293,7 +299,7 @@ var TSOS;
             // save current process to PCB
             // if process finished, dont save it
             if (_CPU.IR != "00") {
-                var currProcess = new TSOS.PCB(runningProcess.pBase, runningProcess.pid, "Ready", 1);
+                var currProcess = new TSOS.PCB(runningProcess.pBase, runningProcess.pid, "Ready", 1, null);
                 currProcess.pCounter = _CPU.PC;
                 currProcess.pAcc = _CPU.Acc;
                 currProcess.pXreg = _CPU.Xreg;

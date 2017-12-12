@@ -603,9 +603,11 @@ module TSOS {
                     // base register value from when memory was loaded
                     var baseReg: number = _MemoryManager.loadMemory(inputOpCodes);
                     if (baseReg == 999){
-                        _StdOut.putText("Memory is full. Please run process to free up space.");                    
+                        // ask kernel to load user program into disk 
+                        var returnMsg: string = _Kernel.krnWriteProcess(inputOpCodes);
+                        _StdOut.putText(returnMsg);
                     } else {
-                        var pid: number = _Kernel.krnCreateProcess(baseReg);
+                        var pid: number = _Kernel.krnCreateProcess(baseReg, null);
                         _StdOut.putText("Process id: " + pid + " is in Resident Queue");
                     }
                 }
