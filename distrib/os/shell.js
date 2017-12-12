@@ -667,6 +667,9 @@ var TSOS;
             if (_CPU.isExecuting) {
                 _StdOut.putText("Cannot format disk. A process is currently running. Use kill command to terminate process.");
             }
+            else if (!_ResidentQueue.isEmpty()) {
+                _StdOut.putText("Cannot format disk. Process have been loaded on it.");
+            }
             else {
                 if (args == "quick") {
                     _StdOut.putText(_krnFileSystemDriver.quickFormat());
