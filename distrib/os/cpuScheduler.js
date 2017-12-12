@@ -22,6 +22,33 @@ var TSOS;
             this.currCycle = 0;
             this.totalCycles = 0;
             this.runningProcess = _ReadyQueue.dequeue();
+            // if first running process is in disk (only occurs with priority)
+            // choose next process not on disk in Ready Queue to swap with
+            // note: method only for this case. other case, swap with last ran process
+            if (this.runningProcess.pBase == 999) {
+                var victim = _ReadyQueue.dequeue();
+                while (victim.pBase == 999) {
+                    _ReadyQueue.enqueue(victim);
+                    victim = _ReadyQueue.dequeue;
+                }
+                var tsb = _LazySwapper.swapProcess(this.runningProcess.tsb, victim.pBase, victim.pLimit);
+                if (tsb) {
+                    this.runningProcess.pBase = victim.pBase;
+                    this.runningProcess.pLimit = victim.pLimit;
+                    victim.tsb = tsb;
+                    victim.pBase = 999;
+                    _ReadyQueue.enqueue(victim);
+                }
+                else {
+                    // disk ran out of space
+                    // exit current process and stop CPU execution
+                    var error = "Disk and memory are full.";
+                    _KernelInterruptQueue.enqueue(new TSOS.Interrupt(PROCESS_ERROR_IRQ, error));
+                    _Kernel.krnExitProcess(_CpuScheduler.runningProcess);
+                    // reset CPU
+                    _CPU.init();
+                }
+            }
             this.runningProcess.pState = "Running";
             _CPU.isExecuting = true;
             TSOS.Control.updateProcessTable(this.runningProcess.pid, this.runningProcess.pState);
