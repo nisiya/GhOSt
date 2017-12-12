@@ -35,6 +35,7 @@ var _Memory: TSOS.Memory; // same with Memory
 var _MemoryAccessor: TSOS.MemoryAccessor; // and Memory Accessor
 var _MemoryManager: TSOS.MemoryManager; // and Memory Manager
 var _CpuScheduler: TSOS.CpuScheduler; // and CPU Scheduler
+var _LazySwapper: TSOS.LazySwapper; // and Swapper
 
 var _OSclock: number = 0;  // Page 23.
 
@@ -72,6 +73,7 @@ var _SarcasticMode: boolean = false;
 
 // Global Device Driver Objects - page 12
 var _krnKeyboardDriver; //  = null;
+var _krnFileSystemDriver;
 
 var _hardwareClockID: number = null;
 
@@ -125,7 +127,14 @@ var _KeyToChr = {
 var _SaveX = 0; // use for backspace and line wrapping for now, will improve
 
 var onDocumentLoad = function() {
-
     TSOS.Control.hostInit();
     updateTime();
+    if(sessionStorage){
+        if(sessionStorage.length != 0){ // load new file system driver only if new window
+            // create file system
+            TSOS.Control.loadDiskTable();
+        }
+    } else{
+        alert("Sorry, your browser do not support session storage.");
+    }
 };

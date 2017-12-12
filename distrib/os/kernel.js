@@ -40,6 +40,11 @@ var TSOS;
             _krnKeyboardDriver = new TSOS.DeviceDriverKeyboard(); // Construct it.
             _krnKeyboardDriver.driverEntry(); // Call the driverEntry() initialization routine.
             this.krnTrace(_krnKeyboardDriver.status);
+            // Load the File System Device Driver
+            this.krnTrace("Loading the file system device driver");
+            _krnFileSystemDriver = new TSOS.DeviceDriverFileSystem();
+            _krnFileSystemDriver.driverEntry();
+            this.krnTrace(_krnFileSystemDriver.status);
             //
             // ... more?
             // Launch memory manager
@@ -49,6 +54,8 @@ var TSOS;
             // Enable the OS Interrupts.  (Not the CPU clock interrupt, as that is done in the hardware sim.)
             this.krnTrace("Enabling the interrupts.");
             this.krnEnableInterrupts();
+            // Launch Lazy Swapper
+            _LazySwapper = new TSOS.LazySwapper();
             // Launch the shell.
             this.krnTrace("Creating and Launching the shell.");
             _OsShell = new TSOS.Shell();
@@ -90,7 +97,7 @@ var TSOS;
                     TSOS.Control.updateCPUTable();
                     // only update process if it is still running
                     if (_CPU.IR !== "00") {
-                        TSOS.Control.updateProcessTable(_CpuScheduler.runningProcess.pid, _CpuScheduler.runningProcess.pState);
+                        TSOS.Control.updateProcessTable(_CpuScheduler.runningProcess.pid, _CpuScheduler.runningProcess.pState, "Memory");
                     }
                     // check scheduler to see which process to run next and if quantum expired
                     _CpuScheduler.checkSchedule();
@@ -162,18 +169,28 @@ var TSOS;
         // Some ideas:
         // - ReadConsole
         // - WriteConsole
-        Kernel.prototype.krnCreateProcess = function (pBase) {
-            // Creates process when it is loaded into memory
+        Kernel.prototype.krnCreateProcess = function (pBase, priority, tsb) {
+            // Creates process when it is loaded into memory or disk
             // base register value retrieved from loading process into memory
+            // or tsb if in disk
             // pid incremented upon creation
             _PID++;
             var pid = _PID;
-            var process = new TSOS.PCB(pBase, pid, "Resident");
+            var process = new TSOS.PCB(pBase, pid, "Resident", priority, tsb);
+            if (tsb != null) {
+                console.log("true");
+                process.pLocation = "Disk";
+            }
             // put process on resident queue
             _ResidentQueue.enqueue(process);
             // update process table
             TSOS.Control.addProcessTable(process);
             return pid;
+        };
+        Kernel.prototype.krnWriteProcess = function (inputOpCodes) {
+            // Write process to disk when memory is full
+            var tsb = _krnFileSystemDriver.saveProcess(inputOpCodes);
+            return tsb;
         };
         Kernel.prototype.krnExecuteProcess = function (pid) {
             var process;
@@ -199,7 +216,7 @@ var TSOS;
                 _CpuScheduler.activePIDs.push(process.pid);
                 _ReadyQueue.enqueue(process);
                 // start CPU and scheduler
-                TSOS.Control.updateProcessTable(process.pid, process.pState);
+                TSOS.Control.updateProcessTable(process.pid, process.pState, process.pLocation);
                 _CpuScheduler.start();
             }
             else {
@@ -215,7 +232,7 @@ var TSOS;
                 _CpuScheduler.activePIDs.push(process.pid);
                 process.pState = "Ready";
                 _ReadyQueue.enqueue(process);
-                TSOS.Control.updateProcessTable(process.pid, process.pState);
+                TSOS.Control.updateProcessTable(process.pid, process.pState, process.pLocation);
             }
             // start CPU and scheduler
             _CpuScheduler.start();
@@ -274,9 +291,9 @@ var TSOS;
                 }
             }
         };
-        Kernel.prototype.userPrgError = function (opCode) {
+        Kernel.prototype.userPrgError = function (error) {
             // When user program entry is not a valid op ocde
-            _StdOut.putText("Error. Op code " + opCode + " does not exist.");
+            _StdOut.putText(error);
             _StdOut.advanceLine();
             _OsShell.putPrompt();
         };
@@ -285,11 +302,12 @@ var TSOS;
             _StdOut.putText(text);
         };
         Kernel.prototype.contextSwitch = function (runningProcess) {
+            var currProcess;
+            var nextProcess;
             // save current process to PCB
             // if process finished, dont save it
-            console.log("IR " + _CPU.IR);
             if (_CPU.IR != "00") {
-                var currProcess = new TSOS.PCB(runningProcess.pBase, runningProcess.pid, "Ready");
+                currProcess = new TSOS.PCB(runningProcess.pBase, runningProcess.pid, "Ready", 1, null);
                 currProcess.pCounter = _CPU.PC;
                 currProcess.pAcc = _CPU.Acc;
                 currProcess.pXreg = _CPU.Xreg;
@@ -297,12 +315,43 @@ var TSOS;
                 currProcess.pZflag = _CPU.Zflag;
                 currProcess.turnaroundTime = runningProcess.turnaroundTime;
                 _ReadyQueue.enqueue(currProcess);
-                TSOS.Control.updateProcessTable(currProcess.pid, currProcess.pState);
+                TSOS.Control.updateProcessTable(currProcess.pid, currProcess.pState, "Memory");
                 console.log("saved pid:" + currProcess.pid); // for debugging
             }
             // load next process to CPU
-            var nextProcess = _ReadyQueue.dequeue();
+            nextProcess = _ReadyQueue.dequeue();
+            if (nextProcess.pBase == 999) {
+                // if process is in disk
+                // swap with most recent process
+                var newTSB = _LazySwapper.swapProcess(nextProcess.tsb, runningProcess.pBase, runningProcess.pLimit);
+                // if swap was successfull
+                if (newTSB) {
+                    nextProcess.pBase = runningProcess.pBase;
+                    if (currProcess) {
+                        // if most recent process was saved
+                        var prevProcess = _ReadyQueue.dequeue();
+                        while (prevProcess.pid != currProcess.pid) {
+                            _ReadyQueue.enqueue(prevProcess);
+                            prevProcess = _ReadyQueue.dequeue();
+                        }
+                        prevProcess.tsb = newTSB;
+                        prevProcess.pBase = 999;
+                        TSOS.Control.updateProcessTable(prevProcess.pid, currProcess.pState, "Disk");
+                        _ReadyQueue.enqueue(prevProcess);
+                    } // if not, no update to it is needed
+                }
+                else {
+                    // disk ran out of space
+                    // exit current process and stop CPU execution
+                    var error = "Disk and memory are full.";
+                    _KernelInterruptQueue.enqueue(new TSOS.Interrupt(PROCESS_ERROR_IRQ, error));
+                    _Kernel.krnExitProcess(_CpuScheduler.runningProcess);
+                    // reset CPU
+                    _CPU.init();
+                }
+            }
             console.log("loaded pid:" + nextProcess.pid); // for debugging
+            // if no error, continue running
             _CPU.PC = nextProcess.pCounter;
             _CPU.Acc = nextProcess.pAcc;
             _CPU.Xreg = nextProcess.pXreg;
@@ -310,7 +359,7 @@ var TSOS;
             _CPU.Zflag = nextProcess.pZflag;
             nextProcess.pState = "Running";
             _CpuScheduler.runningProcess = nextProcess;
-            this.krnTrace(_CpuScheduler.algorithm + ": switching to Process id: " + nextProcess.pid);
+            this.krnTrace(_CpuScheduler.schedule + ": switching to Process id: " + nextProcess.pid);
             _CpuScheduler.currCycle = 0;
         };
         // memory out of bound error
@@ -320,10 +369,25 @@ var TSOS;
         };
         // - WaitForProcessToExit
         // - CreateFile
-        // - OpenFile
-        // - ReadFile
+        Kernel.prototype.krnCreateFile = function (filename) {
+            var returnMsg = _krnFileSystemDriver.createFile(filename);
+            _StdOut.putText(returnMsg);
+        };
         // - WriteFile
-        // - CloseFile
+        Kernel.prototype.krnWriteFile = function (filename, fileContent) {
+            var returnMsg = _krnFileSystemDriver.writeFile(filename, fileContent);
+            _StdOut.putText(returnMsg);
+        };
+        // - ReadFile
+        Kernel.prototype.krnReadFile = function (filename) {
+            var returnMsg = _krnFileSystemDriver.readFile(filename);
+            _StdOut.putText(returnMsg);
+        };
+        // - DeleteFile
+        Kernel.prototype.krnDeleteFile = function (filename) {
+            var returnMsg = _krnFileSystemDriver.deleteFile(filename);
+            _StdOut.putText(returnMsg);
+        };
         //
         // OS Utility Routines
         //

@@ -15,7 +15,7 @@
 var TSOS;
 (function (TSOS) {
     var PCB = /** @class */ (function () {
-        function PCB(pBase, pid, pState) {
+        function PCB(pBase, pid, pState, pPriority, tsb) {
             this.pCounter = 0;
             // public pIR: string = "00";
             this.pAcc = 0;
@@ -30,6 +30,8 @@ var TSOS;
             this.pBase = pBase;
             this.pLimit = 255;
             this.pState = pState;
+            this.pPriority = pPriority;
+            this.tsb = tsb;
         }
         return PCB;
     }());

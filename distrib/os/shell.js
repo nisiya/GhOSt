@@ -62,10 +62,10 @@ var TSOS;
             sc = new TSOS.ShellCommand(this.shellMeow, "meow", "- Flushes the toilet. [audio warning]");
             this.commandList[this.commandList.length] = sc;
             // load
-            sc = new TSOS.ShellCommand(this.shellLoad, "load", "- Validates and loads user program input into memory.");
+            sc = new TSOS.ShellCommand(this.shellLoad, "load", "<int> - Validates and loads user program input into memory with given or default priority of 10.");
             this.commandList[this.commandList.length] = sc;
             // run <id>
-            sc = new TSOS.ShellCommand(this.shellRun, "run", "- <pid> - Runs the process with the id.");
+            sc = new TSOS.ShellCommand(this.shellRun, "run", "<pid> - Runs the process with the id.");
             this.commandList[this.commandList.length] = sc;
             // runall
             sc = new TSOS.ShellCommand(this.shellRunall, "runall", "- Runs all loaded process.");
@@ -87,6 +87,30 @@ var TSOS;
             this.commandList[this.commandList.length] = sc;
             // clearmem
             sc = new TSOS.ShellCommand(this.shellClearmem, "clearmem", "clear all memory partition");
+            this.commandList[this.commandList.length] = sc;
+            // create <string>
+            sc = new TSOS.ShellCommand(this.shellCreate, "create", "<string> - Creates a filename with that name");
+            this.commandList[this.commandList.length] = sc;
+            // write <string> "string"
+            sc = new TSOS.ShellCommand(this.shellWrite, "write", "<string> \"string\" - Writes content in \"\" to file with that name");
+            this.commandList[this.commandList.length] = sc;
+            // read <filename>
+            sc = new TSOS.ShellCommand(this.shellRead, "read", "<string> - Reads content of file with that name");
+            this.commandList[this.commandList.length] = sc;
+            // delete <filename>
+            sc = new TSOS.ShellCommand(this.shellDelete, "delete", "<string> - deletes file with that name");
+            this.commandList[this.commandList.length] = sc;
+            // ls
+            sc = new TSOS.ShellCommand(this.shellLs, "ls", "list the files currently stored on the disk");
+            this.commandList[this.commandList.length] = sc;
+            // format <string>
+            sc = new TSOS.ShellCommand(this.shellFormat, "format", "<string> - quick or full formats the drive");
+            this.commandList[this.commandList.length] = sc;
+            // getschedule
+            sc = new TSOS.ShellCommand(this.shellGetSchedule, "getschedule", "get the currently selected cpu scheduling algorithm");
+            this.commandList[this.commandList.length] = sc;
+            // setschedule <string>
+            sc = new TSOS.ShellCommand(this.shellSetSchedule, "setschedule", "<string> - set CPU scheduling algorithm to rr (Round Robin), fcfs (First-come, First-serve), or priority (non-preemptive)");
             this.commandList[this.commandList.length] = sc;
             //
             // Display the initial prompt.
@@ -321,6 +345,38 @@ var TSOS;
                     case "clearmem":
                         _StdOut.putText("Clears all memory partitions.");
                         break;
+                    // create
+                    case "create":
+                        _StdOut.putText("Create followed by a string for filename would create a file with that name.");
+                        break;
+                    // write
+                    case "write":
+                        _StdOut.putText("Write followed by a string for filename and another string in double quotes for file contents would write the contents to the file with that name.");
+                        break;
+                    // read
+                    case "read":
+                        _StdOut.putText("Read followed by a string for filename would print the contents of the file with that name.");
+                        break;
+                    // delete
+                    case "delete":
+                        _StdOut.putText("Delete followed by a string for filename would delete the file with that name.");
+                        break;
+                    // ls
+                    case "ls":
+                        _StdOut.putText("Ls would list the files currently stored on the disk.");
+                        break;
+                    // format
+                    case "format":
+                        _StdOut.putText("Format followed by an option would quick or full format the disk. Quick = just deletes the pointers. Full = zero fills the rest of the block too.");
+                        break;
+                    // getschedule
+                    case "getschedule":
+                        _StdOut.putText("Get the currently seleced CPU scheduling algorithm.");
+                        break;
+                    // setschedule <string>
+                    case "setschedule":
+                        _StdOut.putText("Set CPU scheduling algorithm to rr (Round Robin), fcfs (First-come, First-serve), or priority (non-preemptive).");
+                        break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
                 }
@@ -390,36 +446,53 @@ var TSOS;
             audio.play();
             _StdOut.putText("He's a cat~ Meow~ Flushing the toliet~");
         };
-        // load
+        // load <string>
         Shell.prototype.shellLoad = function (args) {
-            // gets text of textarea
-            var userProgram = document.getElementById("taProgramInput").value;
-            // remove line breaks and extra spaces
-            userProgram = userProgram.replace(/(\r\n|\n|\r)/gm, "");
-            // checks if text only contains hex decimals and spaces and is not empty
-            var valText = /^[a-f\d\s]+$/i;
-            if (valText.test(userProgram)) {
-                var inputOpCodes = userProgram.split(" ");
-                if (inputOpCodes.length > 256) {
-                    _StdOut.putText("Process is too big for memory.");
+            var priority = 10;
+            var valText = /^\d*$/;
+            if (valText.test(args[0]) || args[0] == null) {
+                if (args[0] != null) {
+                    priority = args[0];
                 }
-                else {
-                    // base register value from when memory was loaded
-                    var baseReg = _MemoryManager.loadMemory(inputOpCodes);
-                    if (baseReg == 999) {
-                        _StdOut.putText("Memory is full. Please run process to free up space.");
+                // gets text of textarea
+                var userProgram = document.getElementById("taProgramInput").value;
+                // remove line breaks and extra spaces
+                userProgram = userProgram.replace(/(\r\n|\n|\r)/gm, "");
+                // checks if text only contains hex decimals and spaces and is not empty
+                var valText = /^[a-f\d\s]+$/i;
+                if (valText.test(userProgram)) {
+                    var inputOpCodes = userProgram.split(" ");
+                    if (inputOpCodes.length > 256) {
+                        _StdOut.putText("Process is too big for memory.");
                     }
                     else {
-                        var pid = _Kernel.krnCreateProcess(baseReg);
+                        // base register value from when memory was loaded
+                        var baseReg = _MemoryManager.loadMemory(inputOpCodes);
+                        if (baseReg == 999) {
+                            // ask kernel to load user program into disk 
+                            var tsb = _Kernel.krnWriteProcess(inputOpCodes);
+                            if (tsb) {
+                                var pid = _Kernel.krnCreateProcess(baseReg, priority, tsb);
+                            }
+                            else {
+                                _StdOut.putText("ERROR_DISK_FULL");
+                            }
+                        }
+                        else {
+                            var pid = _Kernel.krnCreateProcess(baseReg, priority, null);
+                        }
                         _StdOut.putText("Process id: " + pid + " is in Resident Queue");
                     }
                 }
-            }
-            else if (userProgram == "") {
-                _StdOut.putText("Please enter 6502a op codes in the input area below.");
+                else if (userProgram == "") {
+                    _StdOut.putText("Please enter 6502a op codes in the input area below.");
+                }
+                else {
+                    _StdOut.putText("Only hex digits and spaces are allowed. Please enter a new set of codes.");
+                }
             }
             else {
-                _StdOut.putText("Only hex digits and spaces are allowed. Please enter a new set of codes.");
+                _StdOut.putText("Priority must be an integer, starting from 0. Or leave it blank for default of 10. Lower number means higher priority. ");
             }
         };
         // run <pid>
@@ -507,6 +580,114 @@ var TSOS;
                     _ResidentQueue.dequeue();
                 }
             }
+        };
+        // create
+        Shell.prototype.shellCreate = function (args) {
+            var valTextReg = /^[a-z]+$/i;
+            var valTextHidden = /^\.[a-z]+$/i;
+            var filename;
+            if (args.length < 60) {
+                if (valTextReg.test(args) || valTextHidden.test(args)) {
+                    filename = args;
+                    _Kernel.krnCreateFile(filename);
+                }
+                else {
+                    _StdOut.putText("Please only use letters for filename. Place'.' in front to create hidden files.");
+                }
+            }
+            else {
+                _StdOut.putText("Maximum length for filename: 60");
+            }
+        };
+        // write
+        Shell.prototype.shellWrite = function (args) {
+            var valName = /^[a-z\d]+$/i;
+            // var valText = /^[a-z\d\s\"]+$/i;
+            var filename;
+            var fileContent;
+            if (valName.test(args[0])) {
+                filename = args[0];
+                if (args.length < 2) {
+                    _StdOut.putText("Missing argument: Please enter the content to be written in double quotes");
+                }
+                else {
+                    fileContent = args[1];
+                    for (var i = 2; i < args.length; i++) {
+                        fileContent = fileContent + " " + args[i];
+                    }
+                    if (fileContent.charAt(0) != '"' || fileContent.charAt(fileContent.length - 1) != '"') {
+                        _StdOut.putText("File content must be in double quotes");
+                        // } else if(!valText.test(fileContent)){
+                        //     _StdOut.putText("Please only use letters, numbers, and spaces for file content");
+                    }
+                    else {
+                        fileContent = fileContent.slice(1, fileContent.length - 1);
+                        _Kernel.krnWriteFile(filename, fileContent);
+                    }
+                }
+            }
+            else {
+                _StdOut.putText("Please only use letters for filename");
+            }
+        };
+        // read
+        Shell.prototype.shellRead = function (args) {
+            var valText = /^[a-z]+$/i;
+            var filename;
+            if (valText.test(args)) {
+                filename = args;
+                _Kernel.krnReadFile(filename);
+            }
+            else {
+                _StdOut.putText("Please only use letters for filename");
+            }
+        };
+        // delete
+        Shell.prototype.shellDelete = function (args) {
+            var valText = /^[a-z]+$/i;
+            var filename;
+            if (valText.test(args)) {
+                filename = args;
+                _Kernel.krnDeleteFile(filename);
+            }
+            else {
+                _StdOut.putText("Please only use letters for filename");
+            }
+        };
+        // ls
+        Shell.prototype.shellLs = function (args) {
+            var files = _krnFileSystemDriver.listFiles();
+            _StdOut.putText("Files: ");
+            for (var file in files) {
+                _StdOut.putText(files[file] + "   ");
+            }
+        };
+        // format
+        Shell.prototype.shellFormat = function (args) {
+            if (_CPU.isExecuting) {
+                _StdOut.putText("Cannot format disk. A process is currently running. Use kill command to terminate process.");
+            }
+            else {
+                if (args == "quick") {
+                    _StdOut.putText(_krnFileSystemDriver.quickFormat());
+                }
+                else if (args == "full") {
+                    _StdOut.putText(_krnFileSystemDriver.fullFormat());
+                }
+                else if (args == "") {
+                    _StdOut.putText("Please enter quick or full format after format command.");
+                    _StdOut.advanceLine();
+                    _StdOut.putText("quick = just deletes the pointers.");
+                    _StdOut.advanceLine();
+                    _StdOut.putText("full = zero fills the rest of the block too.");
+                }
+            }
+        };
+        Shell.prototype.shellGetSchedule = function (args) {
+            _StdOut.putText("Current CPU scheduling algortithm: " + _CpuScheduler.schedule);
+        };
+        Shell.prototype.shellSetSchedule = function (args) {
+            _StdOut.putText(_CpuScheduler.setSchedule(args));
         };
         return Shell;
     }());

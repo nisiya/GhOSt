@@ -37,20 +37,21 @@
    <script type="text/javascript" src="distrib/os/console.js"></script>
    <script type="text/javascript" src="distrib/os/deviceDriver.js"></script>
    <script type="text/javascript" src="distrib/os/deviceDriverKeyboard.js"></script>
+   <script type="text/javascript" src="distrib/os/deviceDriverFileSystem.js"></script>   
    <script type="text/javascript" src="distrib/os/queue.js"></script>
    <script type="text/javascript" src="distrib/os/shell.js"></script>
    <script type="text/javascript" src="distrib/os/shellCommand.js"></script>
    <script type="text/javascript" src="distrib/os/userCommand.js"></script>
    <script type="text/javascript" src="distrib/os/pcb.js"></script>
    <script type="text/javascript" src="distrib/os/memoryManager.js"></script>
-   <script type="text/javascript" src="distrib/os/CpuScheduler.js"></script>   
+   <script type="text/javascript" src="distrib/os/CpuScheduler.js"></script>
+   <script type="text/javascript" src="distrib/os/LazySwapper.js"></script>    
    <script type="text/javascript" src="distrib/os/kernel.js"></script>   
 
    <!-- Other Routines -->
    <script type="text/javascript" src="distrib/utils.js"></script>
    <!-- Uncomment the line below to enable GLaDOS testing. -->
-   <!-- <script type="text/javascript" src="http://alanclasses.github.io/TSOS/test/glados-ip3.js"></script> -->
-   
+   <!-- <script type="text/javascript" src="http://alanclasses.github.io/TSOS/test/glados-ip4.js"></script> -->
 </head>
 
 <body onload="onDocumentLoad()">
@@ -68,7 +69,7 @@
     <div id="divButtonBar" style="margin:4px;">      
       <table id="headContent">
         <tr>
-          <th>
+          <td>
               <input type="button"
                     id = "btnStartOS"
                     name="brnStartOS"
@@ -77,8 +78,8 @@
                     title="Start"
                     tabindex="0"
                     onclick="TSOS.Control.hostBtnStartOS_click(this);">
-          </th>
-          <th>
+          </td>
+          <td>
               <input type="button"
                     id = "btnHaltOS"
                     name="brnHaltOS"
@@ -88,8 +89,8 @@
                     title="Halt"
                     tabindex="1"
                     onclick="TSOS.Control.hostBtnHaltOS_click(this);">
-          </th>
-          <th>     
+          </td>
+          <td>     
             <input type="button"
                   id = "btnReset"
                   name="brnReset"
@@ -99,8 +100,8 @@
                   title="Reset"
                   tabindex="2"
                   onclick="TSOS.Control.hostBtnReset_click(this);">
-          </th>
-          <th>                   
+          </td>
+          <td>                   
             <input type="button"
                   id = "btnSingle"
                   name="btnSingle"
@@ -109,8 +110,8 @@
                   title="Single"
                   tabindex="3"
                   onclick="TSOS.Control.hostBtnSingle_click(this);">
-          </th>
-          <th> 
+          </td>
+          <td> 
             <input type="button"
                   id = "btnNext"
                   name="btnNext"
@@ -119,15 +120,15 @@
                   title="Next"
                   tabindex="4"
                   onclick="TSOS.Control.hostBtnNext_click(this);">
-          </th>
+          </td>
         </tr>
       </table>
     </div>
   </div>
-  <div id="divMain" class="table-responsive">        
+  <div id="divMain" class="table-responsive" >        
     <table id="mainContent">    
       <tr>
-        <th>
+        <td>
             <div id="divConsole" class="bg-faded p-3 my-4">
               <label>
                 Console
@@ -141,8 +142,8 @@
                 </canvas>
               </label>
             </div>                              
-        </th>
-        <th>
+        </td>
+        <td>
           <div id="divLog" class="bg-faded p-3 my-4">
             <label>
                 Host Log
@@ -150,51 +151,20 @@
                 <textarea name="taHostLog"
                           id  ="taHostLog"
                           rows="5"
-                          cols="40"
+                          cols="37"
                 ></textarea>
             </label>
           </div>
-          <div id="divCPU" class="bg-faded p-3 my-4">
-              <label>
-                CPU 
+          <div id="divMemory" class="bg-faded p-3 my-4">
+            <label>
+                Memory
                 <br>
-                <div id="cpuContainer">
-                  <table name = "tbCPU"
-                        id   = "tbCPU">
-                    <thead>
-                      <tr style="border-bottom: 1px solid #666666;">
-                        <th> PC </th>
-                        <th> IR </th>
-                        <th> ACC </th>
-                        <th> X </th>
-                        <th> Y </th>
-                        <th> Z </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td id="cPC"> 0 </td>
-                        <td id="cIR"> 0 </td>
-                        <td id="cACC"> 0 </td>
-                        <td id="cX"> 0 </td>
-                        <td id="cY"> 0 </td>
-                        <td id="cZ"> 0 </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>                
-              </label>
-            </div>
-            <div id="divMemory" class="bg-faded p-3 my-4">
-              <label>
-                  Memory
-                  <br>
-                  <div class="tableContainer" id="memoryContainer">
-                  </div>
-              </label>
-            </div>
-        </th>
-        <th>
+                <div class="tableContainer" id="memoryContainer">
+                </div>
+            </label>
+          </div>
+        </td>
+        <td>
           <div id="divUserProgramInput" class="bg-faded p-3 my-4">
             <label>
                 User Program Input
@@ -202,7 +172,7 @@
                 <textarea name="taProgramInput"
                           id  ="taProgramInput"
                           rows="5"
-                          cols="47"
+                          cols="43"
                 >A9 03 8D 41 00 A9 01 8D 40 00 AC 40 00 A2 01 FF EE 40 00 AE 40 00 EC 41 00 D0 EF A9 44 8D 42 00 A9 4F 8D 43 00 A9 4E 8D 44 00 A9 45 8D 45 00 A9 00 8D 46 00 A2 02 A0 42 FF 00</textarea>
             </label>
           </div>
@@ -212,18 +182,20 @@
                 <br>
                 <div class="tableContainer" id="pcbContainer">
                     <table name = "tbProcess"
-                          id   = "tbProcess">
+                          id   = "tbProcess"
+                          class = "tableStyle">
                     <thead>
                       <tr style="border-bottom: 1px solid #666666;">
                         <th width="10%"> PID </th>                            
                         <th> PC </th>
                         <th> IR </th>
-                        <th> ACC </th>
+                        <th width="10%"> ACC </th>
                         <th> X </th>
                         <th> Y </th>
                         <th> Z </th>
-                        <th width="20%"> State </th>
-                        <th width="25%"> Location </th>                          
+                        <th> Pr </th>
+                        <th width="25%"> State </th>
+                        <th width="22%"> Location </th>                          
                       </tr>
                     </thead>
                     <tbody id="processTbody">
@@ -232,7 +204,51 @@
                 </div>
             </label>
           </div>
-        </th>
+          <div id="divCPU" class="bg-faded p-3 my-4">
+            <label>
+              CPU 
+              <br>
+              <div id="cpuContainer">
+                <table name = "tbCPU"
+                      id   = "tbCPU">
+                  <thead>
+                    <tr style="border-bottom: 1px solid #666666;">
+                      <th> PC </th>
+                      <th> IR </th>
+                      <th> ACC </th>
+                      <th> X </th>
+                      <th> Y </th>
+                      <th> Z </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td id="cPC"> 0 </td>
+                      <td id="cIR"> 0 </td>
+                      <td id="cACC"> 0 </td>
+                      <td id="cX"> 0 </td>
+                      <td id="cY"> 0 </td>
+                      <td id="cZ"> 0 </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>    
+                <span id="scheduleAlg"><b>Round Robin</b></span>           
+            </label>
+        </div>
+        </td>
+      </tr>
+      <tr>
+          <th colspan="3">
+            <div id="divFileSystem" class="bg-faded p-3">
+                <label>
+                    Disk
+                    <br>
+                    <div class="tableContainer" id="fsContainer">
+                    </div>
+                </label>
+              </div>
+            </th>
       </tr>
     </table>
   </div>
@@ -249,7 +265,10 @@
     </div>
   </footer>
 
-<!-- Bootstrap core JavaScript -->
+<!-- <script>document.getElementsByTagName("body").onload = function() {Control.loadDiskTable()}; </script> -->
+
+  
+  <!-- Bootstrap core JavaScript -->
 <script src="style/vendor/jquery/jquery.min.js"></script>
 <script src="style/vendor/popper/popper.min.js"></script>
 <script src="style/vendor/bootstrap/js/bootstrap.min.js"></script>

@@ -82,6 +82,7 @@ module TSOS {
             var memoryTable: HTMLTableElement = <HTMLTableElement> document.createElement("table");
             memoryTable.className = "tbMemory";
             memoryTable.id = "tbMemory";
+            memoryTable.className = "tableStyle";
             var memoryTableBody: HTMLTableSectionElement = <HTMLTableSectionElement> document.createElement("tbody");
             
             // creating cells for "bytes"
@@ -137,6 +138,79 @@ module TSOS {
             }
         }
         
+        //
+        public static breakdownBlock(tsb): string[]{
+            var dataBlock = new Array<string>();
+            var value: string[] = JSON.parse(sessionStorage.getItem(tsb));
+            var dataBytes: string = value.splice(4,60).toString().replace(/,/g,"");
+            dataBlock.push(dataBytes);
+            var pointerByte: string = value.splice(1,3).toString().replace(/,/g,"");
+            dataBlock.push(pointerByte);
+            var firstByte: string = value.splice(0,1).toString();
+            dataBlock.push(firstByte);
+            return dataBlock;       
+        }
+        public static loadDiskTable(): void {
+            // load Disk table at start up
+            var diskContainer: HTMLDivElement = <HTMLDivElement> document.getElementById("fsContainer");
+            var diskTable: HTMLTableElement = <HTMLTableElement> document.createElement("table");
+            diskTable.className = "tbFS";
+            diskTable.id = "tbFS";
+            diskTable.className = "tableStyle";
+            var diskTableBody: HTMLTableSectionElement = <HTMLTableSectionElement> document.createElement("tbody");
+            var tsb:string;
+
+            // creating cells for "bytes"
+            for (var i = 0; i < sessionStorage.length; i++){
+                // create rows
+                var row: HTMLTableRowElement = <HTMLTableRowElement> document.createElement("tr");
+                tsb = sessionStorage.key(i).toString();
+                var dataBlock = this.breakdownBlock(tsb);
+                row.id = tsb;
+                var cell: HTMLTableCellElement = <HTMLTableCellElement> document.createElement("td");
+
+                // row label
+                var cellText = document.createTextNode(tsb.charAt(0) + ":" + tsb.charAt(1) + ":" +tsb.charAt(2));
+                // cell.id = 
+                cell.appendChild(cellText);
+                row.appendChild(cell);        
+                
+                // first byte
+                cell = document.createElement("td");
+                cellText = document.createTextNode(dataBlock.pop());
+                cell.appendChild(cellText);
+                row.appendChild(cell);  
+
+                // data pointer byte
+                cell = document.createElement("td");
+                cellText = document.createTextNode(dataBlock.pop());
+                cell.appendChild(cellText);
+                row.appendChild(cell); 
+
+                // rest of bytes
+                cell = document.createElement("td");
+                cellText = document.createTextNode(dataBlock.pop());
+                cell.appendChild(cellText);
+                row.appendChild(cell);            
+                diskTableBody.appendChild(row);
+            }
+            diskTable.appendChild(diskTableBody);
+            diskContainer.appendChild(diskTable);
+        }
+
+        public static updateDiskTable(tsb): void {
+            // update Memory table after new process is loaded
+            var diskTable: HTMLTableElement = <HTMLTableElement> document.getElementById("tbFS");
+
+            var dataBlock = this.breakdownBlock(tsb);            
+            diskTable.rows.namedItem(tsb).cells[1].innerHTML = dataBlock.pop();             
+
+            // data pointer byte
+            diskTable.rows.namedItem(tsb).cells[2].innerHTML = dataBlock.pop(); 
+
+            // rest of bytes
+            diskTable.rows.namedItem(tsb).cells[3].innerHTML = dataBlock.pop();
+        }
 
         //
         // updating process display
@@ -183,6 +257,11 @@ module TSOS {
             row.appendChild(cell);
             // State
             cell = document.createElement("td");            
+            cellText = document.createTextNode(process.pPriority);
+            cell.appendChild(cellText);
+            row.appendChild(cell);
+            // State
+            cell = document.createElement("td");            
             cellText = document.createTextNode(process.pState);
             cell.appendChild(cellText);
             row.appendChild(cell);
@@ -194,7 +273,7 @@ module TSOS {
             processTableBody.appendChild(row);
         } 
 
-        public static updateProcessTable(pid, pState): void{
+        public static updateProcessTable(pid, pState, pLocation): void{
             // update process display when process is running
             var processTableBody: HTMLTableSectionElement = <HTMLTableSectionElement> document.getElementById("processTbody");                
             var row: HTMLTableRowElement = <HTMLTableRowElement> document.getElementById("pid"+pid);
@@ -208,7 +287,8 @@ module TSOS {
             row.cells.item(4).innerHTML = _CPU.Xreg.toString(16).toUpperCase();
             row.cells.item(5).innerHTML = _CPU.Yreg.toString(16).toUpperCase();
             row.cells.item(6).innerHTML = _CPU.Zflag.toString(16).toUpperCase();
-            row.cells.item(7).innerHTML = pState;
+            row.cells.item(8).innerHTML = pState;
+            row.cells.item(9).innerHTML = pLocation;
         }
 
         public static removeProcessTable(pid): void{
@@ -244,6 +324,11 @@ module TSOS {
             cpuTable.rows[1].cells.namedItem("cY").innerHTML = _CPU.Yreg.toString(16).toUpperCase();            
             cpuTable.rows[1].cells.namedItem("cZ").innerHTML = _CPU.Zflag.toString(16).toUpperCase();                        
         } 
+        // update schedule algorithm on display
+        public static updateDisplaySchedule(schedule): void{
+            var scheduleDisplay: HTMLBodyElement = <HTMLBodyElement> document.getElementById("scheduleAlg");
+            scheduleDisplay.innerHTML = schedule;
+        }
 
 
         //
@@ -255,7 +340,9 @@ module TSOS {
             document.getElementById("taProgramInput").style.border = "5px solid #0101FF";            
             document.getElementById("pcbContainer").style.border = "5px solid #0101FF";
             document.getElementById("memoryContainer").style.border = "5px solid #0101FF";                        
-            document.getElementById("cpuContainer").style.border = "5px solid #0101FF";                       
+            document.getElementById("cpuContainer").style.border = "5px solid #0101FF";
+            document.getElementById("fsContainer").style.border = "5px solid #0101FF";            
+            
             
             // Disable the (passed-in) start button...
             btn.disabled = true;
@@ -326,7 +413,7 @@ module TSOS {
                 Control.updateCPUTable();
                 // only update process if it is still running
                 if (_CPU.IR!=="00") {
-                    Control.updateProcessTable(_CpuScheduler.runningProcess.pid, _CpuScheduler.runningProcess.pState);
+                    Control.updateProcessTable(_CpuScheduler.runningProcess.pid, _CpuScheduler.runningProcess.pState, "Memory");
                 }
                 // check scheduler to see which process to run next and if quantum expired
                 _CpuScheduler.checkSchedule();                    

@@ -28,14 +28,17 @@
         public pLocation: string = "Memory";
         public pBase: number;
         public pLimit: number;
+        public tsb: string;
         public turnaroundTime: number = 0;
         public waitTime: number = 0;
 
-        constructor(pBase, pid, pState) {
+        constructor(pBase, pid, pState, pPriority, tsb) {
             this.pid = pid;
             this.pBase = pBase;
             this.pLimit = 255;
             this.pState = pState;
+            this.pPriority = pPriority;
+            this.tsb = tsb;
         }
     }
 }

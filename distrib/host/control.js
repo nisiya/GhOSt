@@ -70,6 +70,7 @@ var TSOS;
             var memoryTable = document.createElement("table");
             memoryTable.className = "tbMemory";
             memoryTable.id = "tbMemory";
+            memoryTable.className = "tableStyle";
             var memoryTableBody = document.createElement("tbody");
             // creating cells for "bytes"
             for (var i = 0; i < 96; i++) {
@@ -118,6 +119,70 @@ var TSOS;
             }
         };
         //
+        Control.breakdownBlock = function (tsb) {
+            var dataBlock = new Array();
+            var value = JSON.parse(sessionStorage.getItem(tsb));
+            var dataBytes = value.splice(4, 60).toString().replace(/,/g, "");
+            dataBlock.push(dataBytes);
+            var pointerByte = value.splice(1, 3).toString().replace(/,/g, "");
+            dataBlock.push(pointerByte);
+            var firstByte = value.splice(0, 1).toString();
+            dataBlock.push(firstByte);
+            return dataBlock;
+        };
+        Control.loadDiskTable = function () {
+            // load Disk table at start up
+            var diskContainer = document.getElementById("fsContainer");
+            var diskTable = document.createElement("table");
+            diskTable.className = "tbFS";
+            diskTable.id = "tbFS";
+            diskTable.className = "tableStyle";
+            var diskTableBody = document.createElement("tbody");
+            var tsb;
+            // creating cells for "bytes"
+            for (var i = 0; i < sessionStorage.length; i++) {
+                // create rows
+                var row = document.createElement("tr");
+                tsb = sessionStorage.key(i).toString();
+                var dataBlock = this.breakdownBlock(tsb);
+                row.id = tsb;
+                var cell = document.createElement("td");
+                // row label
+                var cellText = document.createTextNode(tsb.charAt(0) + ":" + tsb.charAt(1) + ":" + tsb.charAt(2));
+                // cell.id = 
+                cell.appendChild(cellText);
+                row.appendChild(cell);
+                // first byte
+                cell = document.createElement("td");
+                cellText = document.createTextNode(dataBlock.pop());
+                cell.appendChild(cellText);
+                row.appendChild(cell);
+                // data pointer byte
+                cell = document.createElement("td");
+                cellText = document.createTextNode(dataBlock.pop());
+                cell.appendChild(cellText);
+                row.appendChild(cell);
+                // rest of bytes
+                cell = document.createElement("td");
+                cellText = document.createTextNode(dataBlock.pop());
+                cell.appendChild(cellText);
+                row.appendChild(cell);
+                diskTableBody.appendChild(row);
+            }
+            diskTable.appendChild(diskTableBody);
+            diskContainer.appendChild(diskTable);
+        };
+        Control.updateDiskTable = function (tsb) {
+            // update Memory table after new process is loaded
+            var diskTable = document.getElementById("tbFS");
+            var dataBlock = this.breakdownBlock(tsb);
+            diskTable.rows.namedItem(tsb).cells[1].innerHTML = dataBlock.pop();
+            // data pointer byte
+            diskTable.rows.namedItem(tsb).cells[2].innerHTML = dataBlock.pop();
+            // rest of bytes
+            diskTable.rows.namedItem(tsb).cells[3].innerHTML = dataBlock.pop();
+        };
+        //
         // updating process display
         Control.addProcessTable = function (process) {
             // add new process to display
@@ -162,6 +227,11 @@ var TSOS;
             row.appendChild(cell);
             // State
             cell = document.createElement("td");
+            cellText = document.createTextNode(process.pPriority);
+            cell.appendChild(cellText);
+            row.appendChild(cell);
+            // State
+            cell = document.createElement("td");
             cellText = document.createTextNode(process.pState);
             cell.appendChild(cellText);
             row.appendChild(cell);
@@ -172,7 +242,7 @@ var TSOS;
             row.appendChild(cell);
             processTableBody.appendChild(row);
         };
-        Control.updateProcessTable = function (pid, pState) {
+        Control.updateProcessTable = function (pid, pState, pLocation) {
             // update process display when process is running
             var processTableBody = document.getElementById("processTbody");
             var row = document.getElementById("pid" + pid);
@@ -186,7 +256,8 @@ var TSOS;
             row.cells.item(4).innerHTML = _CPU.Xreg.toString(16).toUpperCase();
             row.cells.item(5).innerHTML = _CPU.Yreg.toString(16).toUpperCase();
             row.cells.item(6).innerHTML = _CPU.Zflag.toString(16).toUpperCase();
-            row.cells.item(7).innerHTML = pState;
+            row.cells.item(8).innerHTML = pState;
+            row.cells.item(9).innerHTML = pLocation;
         };
         Control.removeProcessTable = function (pid) {
             var processTableBody = document.getElementById("processTbody");
@@ -219,6 +290,11 @@ var TSOS;
             cpuTable.rows[1].cells.namedItem("cY").innerHTML = _CPU.Yreg.toString(16).toUpperCase();
             cpuTable.rows[1].cells.namedItem("cZ").innerHTML = _CPU.Zflag.toString(16).toUpperCase();
         };
+        // update schedule algorithm on display
+        Control.updateDisplaySchedule = function (schedule) {
+            var scheduleDisplay = document.getElementById("scheduleAlg");
+            scheduleDisplay.innerHTML = schedule;
+        };
         //
         // Host Events
         Control.hostBtnStartOS_click = function (btn) {
@@ -229,6 +305,7 @@ var TSOS;
             document.getElementById("pcbContainer").style.border = "5px solid #0101FF";
             document.getElementById("memoryContainer").style.border = "5px solid #0101FF";
             document.getElementById("cpuContainer").style.border = "5px solid #0101FF";
+            document.getElementById("fsContainer").style.border = "5px solid #0101FF";
             // Disable the (passed-in) start button...
             btn.disabled = true;
             // .. enable the Halt, Reset, and single step buttons ...
@@ -289,7 +366,7 @@ var TSOS;
                 Control.updateCPUTable();
                 // only update process if it is still running
                 if (_CPU.IR !== "00") {
-                    Control.updateProcessTable(_CpuScheduler.runningProcess.pid, _CpuScheduler.runningProcess.pState);
+                    Control.updateProcessTable(_CpuScheduler.runningProcess.pid, _CpuScheduler.runningProcess.pState, "Memory");
                 }
                 // check scheduler to see which process to run next and if quantum expired
                 _CpuScheduler.checkSchedule();

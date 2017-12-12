@@ -31,6 +31,7 @@ var _Memory; // same with Memory
 var _MemoryAccessor; // and Memory Accessor
 var _MemoryManager; // and Memory Manager
 var _CpuScheduler; // and CPU Scheduler
+var _LazySwapper; // and Swapper
 var _OSclock = 0; // Page 23.
 var _Mode = 0; // (currently unused)  0 = Kernel Mode, 1 = User Mode.  See page 21.
 var _Canvas; // Initialized in Control.hostInit().
@@ -59,6 +60,7 @@ var _OsShell;
 var _SarcasticMode = false;
 // Global Device Driver Objects - page 12
 var _krnKeyboardDriver; //  = null;
+var _krnFileSystemDriver;
 var _hardwareClockID = null;
 // For testing (and enrichment)...
 var Glados = null; // This is the function Glados() in glados.js on Labouseur.com.
@@ -107,4 +109,13 @@ var _SaveX = 0; // use for backspace and line wrapping for now, will improve
 var onDocumentLoad = function () {
     TSOS.Control.hostInit();
     updateTime();
+    if (sessionStorage) {
+        if (sessionStorage.length != 0) {
+            // create file system
+            TSOS.Control.loadDiskTable();
+        }
+    }
+    else {
+        alert("Sorry, your browser do not support session storage.");
+    }
 };

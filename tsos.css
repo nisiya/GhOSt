@@ -119,20 +119,20 @@ table {
 }
 
 #cpuContainer {
-  width: 327px;
+  width: 400px;
   height: 60px;
   border: 2px solid black;
   background-color: white;  
 }
 
 #memoryContainer {
-  width: 330px;
-  height: 140px;
+  width: 350px;
+  height: 288px;
 }
 
 #pcbContainer{
   width: 400px;
-  height: 115px;
+  height: 110px;
 }
 
 #tbMemory{
@@ -143,14 +143,28 @@ table {
   text-align: center; 
   border-collapse: collapse;
   padding: 5px; 
-  /* border-bottom: 1px solid #666666;   */
 }
 
-table#tbMemory tr:nth-child(even) {
-  background-color: #f2f2f2;
+#fsContainer {
+  width: 1350px;
+  height: 100px;
 }
 
-table#tbProcess tr:nth-child(even) {
+#tbFS{
+  text-align: center;
+  color: black;
+  font-weight: normal;
+  font-family: Courier New, Courier, monospace;  
+  width: 100%;
+  text-align: center; 
+}
+
+table#tbFS td:last-child{
+  width: 80%;
+  padding-right: 10px;
+}
+
+table.tableStyle tr:nth-child(even) {
   background-color: #f2f2f2;
 }
 

@@ -32,14 +32,15 @@
                     this.memoryS1 = true;
                     baseReg = 0;
                 }
-                // load user program into memory
                 if(baseReg!=999){
+                     // load user program into memory
                     for (var i = 0; i <inputOpCodes.length; i++){
                         _Memory.memory[baseReg+i] = inputOpCodes[i];
                     }
-                    Control.updateMemoryTable(baseReg);               
+                    Control.updateMemoryTable(baseReg);   
                 }
-                return baseReg;
+                // if yes, return and load user program into disk
+                return baseReg; 
             }
             
             public clearPartition(baseReg) : void{

@@ -45,6 +45,11 @@ module TSOS {
             _krnKeyboardDriver.driverEntry();                    // Call the driverEntry() initialization routine.
             this.krnTrace(_krnKeyboardDriver.status);
 
+            // Load the File System Device Driver
+            this.krnTrace("Loading the file system device driver");
+            _krnFileSystemDriver = new DeviceDriverFileSystem();
+            _krnFileSystemDriver.driverEntry();
+            this.krnTrace(_krnFileSystemDriver.status);
             //
             // ... more?
             // Launch memory manager
@@ -55,6 +60,8 @@ module TSOS {
             // Enable the OS Interrupts.  (Not the CPU clock interrupt, as that is done in the hardware sim.)
             this.krnTrace("Enabling the interrupts.");
             this.krnEnableInterrupts();
+            // Launch Lazy Swapper
+            _LazySwapper = new LazySwapper();
 
             // Launch the shell.
             this.krnTrace("Creating and Launching the shell.");
@@ -101,7 +108,7 @@ module TSOS {
                     Control.updateCPUTable();
                     // only update process if it is still running
                     if (_CPU.IR!=="00"){
-                        Control.updateProcessTable(_CpuScheduler.runningProcess.pid, _CpuScheduler.runningProcess.pState);
+                        Control.updateProcessTable(_CpuScheduler.runningProcess.pid, _CpuScheduler.runningProcess.pState, "Memory");
                     }
                     // check scheduler to see which process to run next and if quantum expired
                     _CpuScheduler.checkSchedule();                        
@@ -180,18 +187,29 @@ module TSOS {
         // - ReadConsole
         // - WriteConsole
 
-        public krnCreateProcess(pBase) {
-            // Creates process when it is loaded into memory
+        public krnCreateProcess(pBase, priority, tsb) {
+            // Creates process when it is loaded into memory or disk
             // base register value retrieved from loading process into memory
+                // or tsb if in disk
             // pid incremented upon creation
             _PID++;
             var pid = _PID;            
-            var process = new PCB(pBase, pid, "Resident");
+            var process = new PCB(pBase, pid, "Resident", priority, tsb);
+            if(tsb!=null){
+                console.log("true");
+                process.pLocation = "Disk";
+            }
             // put process on resident queue
             _ResidentQueue.enqueue(process);
             // update process table
             Control.addProcessTable(process);
             return pid;
+        }
+
+        public krnWriteProcess(inputOpCodes): string{
+            // Write process to disk when memory is full
+            var tsb:string = _krnFileSystemDriver.saveProcess(inputOpCodes);
+            return tsb;
         }
 
         public krnExecuteProcess(pid){
@@ -220,7 +238,7 @@ module TSOS {
                 _CpuScheduler.activePIDs.push(process.pid);                
                 _ReadyQueue.enqueue(process);
                 // start CPU and scheduler
-                Control.updateProcessTable(process.pid, process.pState);                
+                Control.updateProcessTable(process.pid, process.pState, process.pLocation);                
                 _CpuScheduler.start();    
             } else {
                 _StdOut.putText("No process with id: " + pid); 
@@ -236,7 +254,7 @@ module TSOS {
                 _CpuScheduler.activePIDs.push(process.pid);
                 process.pState = "Ready";
                 _ReadyQueue.enqueue(process);
-                Control.updateProcessTable(process.pid, process.pState);                
+                Control.updateProcessTable(process.pid, process.pState, process.pLocation);                
             }
             // start CPU and scheduler
             _CpuScheduler.start();
@@ -295,9 +313,9 @@ module TSOS {
             }
         }
 
-        public userPrgError(opCode){
+        public userPrgError(error){
             // When user program entry is not a valid op ocde
-            _StdOut.putText("Error. Op code " + opCode + " does not exist.");
+            _StdOut.putText(error);
             _StdOut.advanceLine();
             _OsShell.putPrompt();
         }
@@ -308,11 +326,12 @@ module TSOS {
         }
 
         public contextSwitch(runningProcess){
+            var currProcess;
+            var nextProcess;
             // save current process to PCB
             // if process finished, dont save it
-            console.log("IR " + _CPU.IR);
             if (_CPU.IR != "00"){
-                var currProcess = new PCB(runningProcess.pBase, runningProcess.pid, "Ready");
+                currProcess = new PCB(runningProcess.pBase, runningProcess.pid, "Ready", 1, null);
                 currProcess.pCounter = _CPU.PC;
                 currProcess.pAcc = _CPU.Acc;
                 currProcess.pXreg = _CPU.Xreg;
@@ -320,13 +339,42 @@ module TSOS {
                 currProcess.pZflag = _CPU.Zflag;
                 currProcess.turnaroundTime = runningProcess.turnaroundTime;
                 _ReadyQueue.enqueue(currProcess);
-                Control.updateProcessTable(currProcess.pid, currProcess.pState);
+                Control.updateProcessTable(currProcess.pid, currProcess.pState, "Memory");
                 console.log("saved pid:" + currProcess.pid); // for debugging
             }
-
             // load next process to CPU
-            var nextProcess = _ReadyQueue.dequeue();   
+            nextProcess = _ReadyQueue.dequeue();
+            if (nextProcess.pBase == 999){
+                // if process is in disk
+                // swap with most recent process
+                var newTSB: string = _LazySwapper.swapProcess(nextProcess.tsb, runningProcess.pBase, runningProcess.pLimit);
+                // if swap was successfull
+                if (newTSB){
+                    nextProcess.pBase = runningProcess.pBase;
+                    if(currProcess){
+                        // if most recent process was saved
+                        var prevProcess = _ReadyQueue.dequeue();
+                        while(prevProcess.pid!=currProcess.pid){
+                            _ReadyQueue.enqueue(prevProcess);
+                            prevProcess = _ReadyQueue.dequeue();
+                        }
+                        prevProcess.tsb = newTSB;
+                        prevProcess.pBase = 999;
+                        Control.updateProcessTable(prevProcess.pid, currProcess.pState, "Disk");
+                        _ReadyQueue.enqueue(prevProcess);
+                    } // if not, no update to it is needed
+                } else{
+                    // disk ran out of space
+                    // exit current process and stop CPU execution
+                    var error = "Disk and memory are full."
+                    _KernelInterruptQueue.enqueue(new Interrupt(PROCESS_ERROR_IRQ, error));
+                    _Kernel.krnExitProcess(_CpuScheduler.runningProcess);
+                    // reset CPU
+                    _CPU.init();
+                }
+            } 
             console.log("loaded pid:" + nextProcess.pid); // for debugging
+            // if no error, continue running
             _CPU.PC = nextProcess.pCounter;
             _CPU.Acc = nextProcess.pAcc;
             _CPU.Xreg = nextProcess.pXreg;
@@ -334,8 +382,8 @@ module TSOS {
             _CPU.Zflag = nextProcess.pZflag;
             nextProcess.pState = "Running";
             _CpuScheduler.runningProcess = nextProcess; 
-            this.krnTrace(_CpuScheduler.algorithm + ": switching to Process id: " + nextProcess.pid);  
-            _CpuScheduler.currCycle = 0;      
+            this.krnTrace(_CpuScheduler.schedule + ": switching to Process id: " + nextProcess.pid);  
+            _CpuScheduler.currCycle = 0; 
         }
 
         // memory out of bound error
@@ -345,12 +393,31 @@ module TSOS {
         }
 
         // - WaitForProcessToExit
+        
         // - CreateFile
-        // - OpenFile
-        // - ReadFile
-        // - WriteFile
-        // - CloseFile
+        public krnCreateFile(filename){
+            var returnMsg:string = _krnFileSystemDriver.createFile(filename);
+            _StdOut.putText(returnMsg);
+        }
 
+        // - WriteFile
+        public krnWriteFile(filename, fileContent){
+            var returnMsg = _krnFileSystemDriver.writeFile(filename, fileContent);
+            _StdOut.putText(returnMsg);
+        }
+
+        // - ReadFile
+        public krnReadFile(filename){
+            var returnMsg = _krnFileSystemDriver.readFile(filename);
+            _StdOut.putText(returnMsg);
+        }
+
+        // - DeleteFile
+        public krnDeleteFile(filename){
+            var returnMsg = _krnFileSystemDriver.deleteFile(filename);
+            _StdOut.putText(returnMsg);
+        }
+        
 
         //
         // OS Utility Routines
