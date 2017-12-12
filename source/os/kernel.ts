@@ -108,7 +108,7 @@ module TSOS {
                     Control.updateCPUTable();
                     // only update process if it is still running
                     if (_CPU.IR!=="00"){
-                        Control.updateProcessTable(_CpuScheduler.runningProcess.pid, _CpuScheduler.runningProcess.pState);
+                        Control.updateProcessTable(_CpuScheduler.runningProcess.pid, _CpuScheduler.runningProcess.pState, "Memory");
                     }
                     // check scheduler to see which process to run next and if quantum expired
                     _CpuScheduler.checkSchedule();                        
@@ -195,6 +195,10 @@ module TSOS {
             _PID++;
             var pid = _PID;            
             var process = new PCB(pBase, pid, "Resident", priority, tsb);
+            if(tsb!=null){
+                console.log("true");
+                process.pLocation = "Disk";
+            }
             // put process on resident queue
             _ResidentQueue.enqueue(process);
             // update process table
@@ -234,7 +238,7 @@ module TSOS {
                 _CpuScheduler.activePIDs.push(process.pid);                
                 _ReadyQueue.enqueue(process);
                 // start CPU and scheduler
-                Control.updateProcessTable(process.pid, process.pState);                
+                Control.updateProcessTable(process.pid, process.pState, process.pLocation);                
                 _CpuScheduler.start();    
             } else {
                 _StdOut.putText("No process with id: " + pid); 
@@ -250,7 +254,7 @@ module TSOS {
                 _CpuScheduler.activePIDs.push(process.pid);
                 process.pState = "Ready";
                 _ReadyQueue.enqueue(process);
-                Control.updateProcessTable(process.pid, process.pState);                
+                Control.updateProcessTable(process.pid, process.pState, process.pLocation);                
             }
             // start CPU and scheduler
             _CpuScheduler.start();
@@ -326,7 +330,6 @@ module TSOS {
             var nextProcess;
             // save current process to PCB
             // if process finished, dont save it
-
             if (_CPU.IR != "00"){
                 currProcess = new PCB(runningProcess.pBase, runningProcess.pid, "Ready", 1, null);
                 currProcess.pCounter = _CPU.PC;
@@ -336,19 +339,20 @@ module TSOS {
                 currProcess.pZflag = _CPU.Zflag;
                 currProcess.turnaroundTime = runningProcess.turnaroundTime;
                 _ReadyQueue.enqueue(currProcess);
-                Control.updateProcessTable(currProcess.pid, currProcess.pState);
+                Control.updateProcessTable(currProcess.pid, currProcess.pState, "Memory");
                 console.log("saved pid:" + currProcess.pid); // for debugging
             }
             // load next process to CPU
             nextProcess = _ReadyQueue.dequeue();
             if (nextProcess.pBase == 999){
-                // process is in disk
-                // swap with last ran process
+                // if process is in disk
+                // swap with most recent process
                 var newTSB: string = _LazySwapper.swapProcess(nextProcess.tsb, runningProcess.pBase, runningProcess.pLimit);
                 // if swap was successfull
                 if (newTSB){
                     nextProcess.pBase = runningProcess.pBase;
                     if(currProcess){
+                        // if most recent process was saved
                         var prevProcess = _ReadyQueue.dequeue();
                         while(prevProcess.pid!=currProcess.pid){
                             _ReadyQueue.enqueue(prevProcess);
@@ -356,8 +360,9 @@ module TSOS {
                         }
                         prevProcess.tsb = newTSB;
                         prevProcess.pBase = 999;
+                        Control.updateProcessTable(prevProcess.pid, currProcess.pState, "Disk");
                         _ReadyQueue.enqueue(prevProcess);
-                    }
+                    } // if not, no update to it is needed
                 } else{
                     // disk ran out of space
                     // exit current process and stop CPU execution
@@ -369,6 +374,7 @@ module TSOS {
                 }
             } 
             console.log("loaded pid:" + nextProcess.pid); // for debugging
+            // if no error, continue running
             _CPU.PC = nextProcess.pCounter;
             _CPU.Acc = nextProcess.pAcc;
             _CPU.Xreg = nextProcess.pXreg;

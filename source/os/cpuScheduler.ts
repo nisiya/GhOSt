@@ -15,7 +15,7 @@
             public runningProcess; // track running process
             
             public start(): void {
-                // run first process normally
+                // check if sorting is needed
                 if(this.schedule == "Non-preemptive Priority" && _ReadyQueue.getSize()>1){
                     this.sortPriority();
                 }
@@ -32,7 +32,7 @@
                         victim = _ReadyQueue.dequeue;
                     }
                     var tsb = _LazySwapper.swapProcess(this.runningProcess.tsb, victim.pBase, victim.pLimit);
-                    if (tsb){
+                    if (tsb){ // if swap was successful, put victim back on queue with disk location
                         this.runningProcess.pBase = victim.pBase;
                         this.runningProcess.pLimit = victim.pLimit;
                         victim.tsb = tsb;
@@ -48,13 +48,14 @@
                     _CPU.init();
                     }
                 }
-                    this.runningProcess.pState = "Running";
+                this.runningProcess.pState = "Running";
                 _CPU.isExecuting = true;
-                Control.updateProcessTable(this.runningProcess.pid, this.runningProcess.pState);
+                Control.updateProcessTable(this.runningProcess.pid, this.runningProcess.pState, "Memory");
             }
 
             // check if time is up and if context switch is needed
             public checkSchedule(): void {
+                // check if sorting is needed first
                 if(this.schedule == "Non-preemptive Priority" && _ReadyQueue.getSize()>1){
                     this.sortPriority();
                 }
@@ -78,11 +79,12 @@
             }
 
             public sortPriority(){
-                    // put highest (lowest number) priorty first
+                    // look for process with highest (lowest number) priorty
                     var firstProcess = _ReadyQueue.dequeue();
                     var secondProcess;
                     var comparison = 0;
                     while(comparison<_ReadyQueue.getSize()){
+                        // put lower priority process back on queue
                         secondProcess = _ReadyQueue.dequeue();
                         if(secondProcess.pPriority < firstProcess.pPriority){
                             _ReadyQueue.enqueue(firstProcess);
@@ -92,7 +94,7 @@
                         }
                         comparison++;
                     }
-                    // reorder so highest priority is first
+                    // need to reorder so highest priority is first
                     _ReadyQueue.enqueue(firstProcess);
                     for(var i=0; i<_ReadyQueue.getSize()-1; i++){
                         _ReadyQueue.enqueue(_ReadyQueue.dequeue());
@@ -122,6 +124,7 @@
                         this.quantum = 6;
                         returnMsg = "CPU scheduling algorithm DNE";
                 }
+                Control.updateDisplaySchedule(this.schedule);
                 return returnMsg;
             }
         }

@@ -17,7 +17,6 @@ var TSOS;
             // save last ran process to disk
             var saveUserPrg = _MemoryAccessor.readPartition(baseReg, limitReg);
             saveUserPrg = this.trimUserPrg(saveUserPrg);
-            console.log("Save " + saveUserPrg.length);
             var newTSB = _krnFileSystemDriver.saveProcess(saveUserPrg);
             // if successfully written to disk
             if (newTSB) {
@@ -26,7 +25,6 @@ var TSOS;
                 // bring needed process from disk to memory
                 loadUserPrg = _krnFileSystemDriver.retrieveProcess(tsb);
                 loadUserPrg = this.trimUserPrg(loadUserPrg);
-                console.log("load " + loadUserPrg.length);
                 for (var j = 0; j < loadUserPrg.length; j++) {
                     _MemoryAccessor.writePartition(baseReg, baseReg + j, loadUserPrg[j]);
                 }
@@ -37,11 +35,13 @@ var TSOS;
                 return null;
             }
         };
+        // remove excess "00" at end of code
         LazySwapper.prototype.trimUserPrg = function (userPrg) {
             var opCode = userPrg.pop();
             while (opCode == "00") {
                 opCode = userPrg.pop();
             }
+            // make sure to put back last break "00"
             userPrg.push(opCode);
             return userPrg;
         };

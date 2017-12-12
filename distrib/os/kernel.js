@@ -97,7 +97,7 @@ var TSOS;
                     TSOS.Control.updateCPUTable();
                     // only update process if it is still running
                     if (_CPU.IR !== "00") {
-                        TSOS.Control.updateProcessTable(_CpuScheduler.runningProcess.pid, _CpuScheduler.runningProcess.pState);
+                        TSOS.Control.updateProcessTable(_CpuScheduler.runningProcess.pid, _CpuScheduler.runningProcess.pState, "Memory");
                     }
                     // check scheduler to see which process to run next and if quantum expired
                     _CpuScheduler.checkSchedule();
@@ -177,6 +177,10 @@ var TSOS;
             _PID++;
             var pid = _PID;
             var process = new TSOS.PCB(pBase, pid, "Resident", priority, tsb);
+            if (tsb != null) {
+                console.log("true");
+                process.pLocation = "Disk";
+            }
             // put process on resident queue
             _ResidentQueue.enqueue(process);
             // update process table
@@ -212,7 +216,7 @@ var TSOS;
                 _CpuScheduler.activePIDs.push(process.pid);
                 _ReadyQueue.enqueue(process);
                 // start CPU and scheduler
-                TSOS.Control.updateProcessTable(process.pid, process.pState);
+                TSOS.Control.updateProcessTable(process.pid, process.pState, process.pLocation);
                 _CpuScheduler.start();
             }
             else {
@@ -228,7 +232,7 @@ var TSOS;
                 _CpuScheduler.activePIDs.push(process.pid);
                 process.pState = "Ready";
                 _ReadyQueue.enqueue(process);
-                TSOS.Control.updateProcessTable(process.pid, process.pState);
+                TSOS.Control.updateProcessTable(process.pid, process.pState, process.pLocation);
             }
             // start CPU and scheduler
             _CpuScheduler.start();
@@ -311,19 +315,20 @@ var TSOS;
                 currProcess.pZflag = _CPU.Zflag;
                 currProcess.turnaroundTime = runningProcess.turnaroundTime;
                 _ReadyQueue.enqueue(currProcess);
-                TSOS.Control.updateProcessTable(currProcess.pid, currProcess.pState);
+                TSOS.Control.updateProcessTable(currProcess.pid, currProcess.pState, "Memory");
                 console.log("saved pid:" + currProcess.pid); // for debugging
             }
             // load next process to CPU
             nextProcess = _ReadyQueue.dequeue();
             if (nextProcess.pBase == 999) {
-                // process is in disk
-                // swap with last ran process
+                // if process is in disk
+                // swap with most recent process
                 var newTSB = _LazySwapper.swapProcess(nextProcess.tsb, runningProcess.pBase, runningProcess.pLimit);
                 // if swap was successfull
                 if (newTSB) {
                     nextProcess.pBase = runningProcess.pBase;
                     if (currProcess) {
+                        // if most recent process was saved
                         var prevProcess = _ReadyQueue.dequeue();
                         while (prevProcess.pid != currProcess.pid) {
                             _ReadyQueue.enqueue(prevProcess);
@@ -331,8 +336,9 @@ var TSOS;
                         }
                         prevProcess.tsb = newTSB;
                         prevProcess.pBase = 999;
+                        TSOS.Control.updateProcessTable(prevProcess.pid, currProcess.pState, "Disk");
                         _ReadyQueue.enqueue(prevProcess);
-                    }
+                    } // if not, no update to it is needed
                 }
                 else {
                     // disk ran out of space
@@ -345,6 +351,7 @@ var TSOS;
                 }
             }
             console.log("loaded pid:" + nextProcess.pid); // for debugging
+            // if no error, continue running
             _CPU.PC = nextProcess.pCounter;
             _CPU.Acc = nextProcess.pAcc;
             _CPU.Xreg = nextProcess.pXreg;

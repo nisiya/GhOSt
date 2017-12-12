@@ -227,6 +227,11 @@ var TSOS;
             row.appendChild(cell);
             // State
             cell = document.createElement("td");
+            cellText = document.createTextNode(process.pPriority);
+            cell.appendChild(cellText);
+            row.appendChild(cell);
+            // State
+            cell = document.createElement("td");
             cellText = document.createTextNode(process.pState);
             cell.appendChild(cellText);
             row.appendChild(cell);
@@ -237,7 +242,7 @@ var TSOS;
             row.appendChild(cell);
             processTableBody.appendChild(row);
         };
-        Control.updateProcessTable = function (pid, pState) {
+        Control.updateProcessTable = function (pid, pState, pLocation) {
             // update process display when process is running
             var processTableBody = document.getElementById("processTbody");
             var row = document.getElementById("pid" + pid);
@@ -251,7 +256,8 @@ var TSOS;
             row.cells.item(4).innerHTML = _CPU.Xreg.toString(16).toUpperCase();
             row.cells.item(5).innerHTML = _CPU.Yreg.toString(16).toUpperCase();
             row.cells.item(6).innerHTML = _CPU.Zflag.toString(16).toUpperCase();
-            row.cells.item(7).innerHTML = pState;
+            row.cells.item(8).innerHTML = pState;
+            row.cells.item(9).innerHTML = pLocation;
         };
         Control.removeProcessTable = function (pid) {
             var processTableBody = document.getElementById("processTbody");
@@ -283,6 +289,11 @@ var TSOS;
             cpuTable.rows[1].cells.namedItem("cX").innerHTML = _CPU.Xreg.toString(16).toUpperCase();
             cpuTable.rows[1].cells.namedItem("cY").innerHTML = _CPU.Yreg.toString(16).toUpperCase();
             cpuTable.rows[1].cells.namedItem("cZ").innerHTML = _CPU.Zflag.toString(16).toUpperCase();
+        };
+        // update schedule algorithm on display
+        Control.updateDisplaySchedule = function (schedule) {
+            var scheduleDisplay = document.getElementById("scheduleAlg");
+            scheduleDisplay.innerHTML = schedule;
         };
         //
         // Host Events
@@ -355,7 +366,7 @@ var TSOS;
                 Control.updateCPUTable();
                 // only update process if it is still running
                 if (_CPU.IR !== "00") {
-                    Control.updateProcessTable(_CpuScheduler.runningProcess.pid, _CpuScheduler.runningProcess.pState);
+                    Control.updateProcessTable(_CpuScheduler.runningProcess.pid, _CpuScheduler.runningProcess.pState, "Memory");
                 }
                 // check scheduler to see which process to run next and if quantum expired
                 _CpuScheduler.checkSchedule();

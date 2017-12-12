@@ -15,7 +15,7 @@ var TSOS;
             this.totalCycles = 0; // track total throughput
         }
         CpuScheduler.prototype.start = function () {
-            // run first process normally
+            // check if sorting is needed
             if (this.schedule == "Non-preemptive Priority" && _ReadyQueue.getSize() > 1) {
                 this.sortPriority();
             }
@@ -51,10 +51,11 @@ var TSOS;
             }
             this.runningProcess.pState = "Running";
             _CPU.isExecuting = true;
-            TSOS.Control.updateProcessTable(this.runningProcess.pid, this.runningProcess.pState);
+            TSOS.Control.updateProcessTable(this.runningProcess.pid, this.runningProcess.pState, "Memory");
         };
         // check if time is up and if context switch is needed
         CpuScheduler.prototype.checkSchedule = function () {
+            // check if sorting is needed first
             if (this.schedule == "Non-preemptive Priority" && _ReadyQueue.getSize() > 1) {
                 this.sortPriority();
             }
@@ -78,11 +79,12 @@ var TSOS;
             }
         };
         CpuScheduler.prototype.sortPriority = function () {
-            // put highest (lowest number) priorty first
+            // look for process with highest (lowest number) priorty
             var firstProcess = _ReadyQueue.dequeue();
             var secondProcess;
             var comparison = 0;
             while (comparison < _ReadyQueue.getSize()) {
+                // put lower priority process back on queue
                 secondProcess = _ReadyQueue.dequeue();
                 if (secondProcess.pPriority < firstProcess.pPriority) {
                     _ReadyQueue.enqueue(firstProcess);
@@ -93,7 +95,7 @@ var TSOS;
                 }
                 comparison++;
             }
-            // reorder so highest priority is first
+            // need to reorder so highest priority is first
             _ReadyQueue.enqueue(firstProcess);
             for (var i = 0; i < _ReadyQueue.getSize() - 1; i++) {
                 _ReadyQueue.enqueue(_ReadyQueue.dequeue());
@@ -122,6 +124,7 @@ var TSOS;
                     this.quantum = 6;
                     returnMsg = "CPU scheduling algorithm DNE";
             }
+            TSOS.Control.updateDisplaySchedule(this.schedule);
             return returnMsg;
         };
         return CpuScheduler;

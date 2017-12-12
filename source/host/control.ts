@@ -257,6 +257,11 @@ module TSOS {
             row.appendChild(cell);
             // State
             cell = document.createElement("td");            
+            cellText = document.createTextNode(process.pPriority);
+            cell.appendChild(cellText);
+            row.appendChild(cell);
+            // State
+            cell = document.createElement("td");            
             cellText = document.createTextNode(process.pState);
             cell.appendChild(cellText);
             row.appendChild(cell);
@@ -268,7 +273,7 @@ module TSOS {
             processTableBody.appendChild(row);
         } 
 
-        public static updateProcessTable(pid, pState): void{
+        public static updateProcessTable(pid, pState, pLocation): void{
             // update process display when process is running
             var processTableBody: HTMLTableSectionElement = <HTMLTableSectionElement> document.getElementById("processTbody");                
             var row: HTMLTableRowElement = <HTMLTableRowElement> document.getElementById("pid"+pid);
@@ -282,7 +287,8 @@ module TSOS {
             row.cells.item(4).innerHTML = _CPU.Xreg.toString(16).toUpperCase();
             row.cells.item(5).innerHTML = _CPU.Yreg.toString(16).toUpperCase();
             row.cells.item(6).innerHTML = _CPU.Zflag.toString(16).toUpperCase();
-            row.cells.item(7).innerHTML = pState;
+            row.cells.item(8).innerHTML = pState;
+            row.cells.item(9).innerHTML = pLocation;
         }
 
         public static removeProcessTable(pid): void{
@@ -318,6 +324,11 @@ module TSOS {
             cpuTable.rows[1].cells.namedItem("cY").innerHTML = _CPU.Yreg.toString(16).toUpperCase();            
             cpuTable.rows[1].cells.namedItem("cZ").innerHTML = _CPU.Zflag.toString(16).toUpperCase();                        
         } 
+        // update schedule algorithm on display
+        public static updateDisplaySchedule(schedule): void{
+            var scheduleDisplay: HTMLBodyElement = <HTMLBodyElement> document.getElementById("scheduleAlg");
+            scheduleDisplay.innerHTML = schedule;
+        }
 
 
         //
@@ -402,7 +413,7 @@ module TSOS {
                 Control.updateCPUTable();
                 // only update process if it is still running
                 if (_CPU.IR!=="00") {
-                    Control.updateProcessTable(_CpuScheduler.runningProcess.pid, _CpuScheduler.runningProcess.pState);
+                    Control.updateProcessTable(_CpuScheduler.runningProcess.pid, _CpuScheduler.runningProcess.pState, "Memory");
                 }
                 // check scheduler to see which process to run next and if quantum expired
                 _CpuScheduler.checkSchedule();                    

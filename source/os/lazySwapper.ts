@@ -16,7 +16,6 @@
                 // save last ran process to disk
                 var saveUserPrg: string[] = _MemoryAccessor.readPartition(baseReg, limitReg);
                 saveUserPrg = this.trimUserPrg(saveUserPrg);
-                console.log("Save " + saveUserPrg.length);
                 var newTSB:string = _krnFileSystemDriver.saveProcess(saveUserPrg);
                 // if successfully written to disk
                 if (newTSB){
@@ -25,7 +24,6 @@
                     // bring needed process from disk to memory
                     loadUserPrg = _krnFileSystemDriver.retrieveProcess(tsb);
                     loadUserPrg = this.trimUserPrg(loadUserPrg);
-                    console.log("load " + loadUserPrg.length);
                     for(var j=0; j<loadUserPrg.length; j++){
                         _MemoryAccessor.writePartition(baseReg, baseReg+j, loadUserPrg[j]);
                     }
@@ -36,11 +34,13 @@
                 }
             }
 
+            // remove excess "00" at end of code
             public trimUserPrg(userPrg): string[]{
                 var opCode = userPrg.pop();
                 while (opCode == "00"){
                     opCode = userPrg.pop();
                 }
+                // make sure to put back last break "00"
                 userPrg.push(opCode);
                 return userPrg;
             }
