@@ -60,6 +60,8 @@ module TSOS {
             // Enable the OS Interrupts.  (Not the CPU clock interrupt, as that is done in the hardware sim.)
             this.krnTrace("Enabling the interrupts.");
             this.krnEnableInterrupts();
+            // Launch Lazy Swapper
+            _LazySwapper = new LazySwapper();
 
             // Launch the shell.
             this.krnTrace("Creating and Launching the shell.");
@@ -202,8 +204,8 @@ module TSOS {
 
         public krnWriteProcess(inputOpCodes): string{
             // Write process to disk when memory is full
-            var returnMsg:string = _krnFileSystemDriver.writeProcess(inputOpCodes);
-            return returnMsg;
+            var tsb:string = _krnFileSystemDriver.saveProcess(inputOpCodes);
+            return tsb;
         }
 
         public krnExecuteProcess(pid){
@@ -320,10 +322,13 @@ module TSOS {
         }
 
         public contextSwitch(runningProcess){
+            var currProcess;
+            var nextProcess;
             // save current process to PCB
             // if process finished, dont save it
+
             if (_CPU.IR != "00"){
-                var currProcess = new PCB(runningProcess.pBase, runningProcess.pid, "Ready", 1,null);
+                currProcess = new PCB(runningProcess.pBase, runningProcess.pid, "Ready", 1, null);
                 currProcess.pCounter = _CPU.PC;
                 currProcess.pAcc = _CPU.Acc;
                 currProcess.pXreg = _CPU.Xreg;
@@ -334,9 +339,30 @@ module TSOS {
                 Control.updateProcessTable(currProcess.pid, currProcess.pState);
                 console.log("saved pid:" + currProcess.pid); // for debugging
             }
-
             // load next process to CPU
-            var nextProcess = _ReadyQueue.dequeue();   
+            nextProcess = _ReadyQueue.dequeue();
+            if (nextProcess.pBase == 999){
+                // process is in disk
+                // swap with last ran process
+                var newTSB: string = _LazySwapper.swapProcess(nextProcess.tsb, runningProcess.pBase, runningProcess.pLimit);
+                // if swap was successfull
+                if (newTSB){
+                    nextProcess.pBase = runningProcess.pBase;
+                    if(currProcess){
+                        var prevProcess = _ReadyQueue.dequeue();
+                        while(prevProcess.pid!=currProcess.pid){
+                            _ReadyQueue.enqueue(prevProcess);
+                            prevProcess = _ReadyQueue.dequeue();
+                        }
+                        prevProcess.tsb = newTSB;
+                        prevProcess.pBase = 999;
+                        _ReadyQueue.enqueue(prevProcess);
+                    }
+                } else{
+                    // disk ran out of space
+                    console.log("ERROR_DISK_FULL");
+                }
+            } 
             console.log("loaded pid:" + nextProcess.pid); // for debugging
             _CPU.PC = nextProcess.pCounter;
             _CPU.Acc = nextProcess.pAcc;
@@ -346,7 +372,12 @@ module TSOS {
             nextProcess.pState = "Running";
             _CpuScheduler.runningProcess = nextProcess; 
             this.krnTrace(_CpuScheduler.schedule + ": switching to Process id: " + nextProcess.pid);  
-            _CpuScheduler.currCycle = 0;      
+            _CpuScheduler.currCycle = 0; 
+            // var error = "Disk and memory are full."
+            // _KernelInterruptQueue.enqueue(new Interrupt(PROCESS_ERROR_IRQ, opCode));
+            // _Kernel.krnExitProcess(_CpuScheduler.runningProcess);
+            // // reset CPU
+            // this.init();
         }
 
         // memory out of bound error

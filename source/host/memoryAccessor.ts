@@ -47,6 +47,16 @@
                     }
                 }
 
+                public retreiveMemory(index){
+                    var value = _Memory.memory[index];
+                    return value;
+                }
+
+                public appendMemory(baseReg,index,data){
+                    _Memory.memory[index] = data.toString(16).toUpperCase();
+                    Control.updateMemoryTable(baseReg);
+                }
+
             }
         }
         

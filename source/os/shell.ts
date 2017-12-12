@@ -604,12 +604,16 @@ module TSOS {
                     var baseReg: number = _MemoryManager.loadMemory(inputOpCodes);
                     if (baseReg == 999){
                         // ask kernel to load user program into disk 
-                        var returnMsg: string = _Kernel.krnWriteProcess(inputOpCodes);
-                        _StdOut.putText(returnMsg);
+                        var tsb: string = _Kernel.krnWriteProcess(inputOpCodes);
+                        if (tsb){
+                            var pid: number = _Kernel.krnCreateProcess(baseReg,tsb);
+                        } else {
+                            _StdOut.putText("ERROR_DISK_FULL");
+                        }
                     } else {
                         var pid: number = _Kernel.krnCreateProcess(baseReg, null);
-                        _StdOut.putText("Process id: " + pid + " is in Resident Queue");
                     }
+                    _StdOut.putText("Process id: " + pid + " is in Resident Queue");
                 }
             } else if(userProgram == ""){
                 _StdOut.putText("Please enter 6502a op codes in the input area below.");
@@ -735,10 +739,6 @@ module TSOS {
                     for (var i=2; i<args.length; i++){
                         fileContent = fileContent + " " + args[i];
                     }
-                    console.log("content " + fileContent);
-                    console.log("first " + fileContent.charAt(0) + "last " + fileContent.charAt(fileContent.length-1));
-                    console.log(fileContent.charAt(0)!='"');
-                    console.log(fileContent.charAt(fileContent.length-1)!='"');
                     if(fileContent.charAt(0)!='"' || fileContent.charAt(fileContent.length-1)!='"'){
                         _StdOut.putText("File content must be in double quotes");
                     // } else if(!valText.test(fileContent)){

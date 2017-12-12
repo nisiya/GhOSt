@@ -35,6 +35,7 @@ var _Memory: TSOS.Memory; // same with Memory
 var _MemoryAccessor: TSOS.MemoryAccessor; // and Memory Accessor
 var _MemoryManager: TSOS.MemoryManager; // and Memory Manager
 var _CpuScheduler: TSOS.CpuScheduler; // and CPU Scheduler
+var _LazySwapper: TSOS.LazySwapper; // and Swapper
 
 var _OSclock: number = 0;  // Page 23.
 

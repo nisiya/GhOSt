@@ -54,6 +54,8 @@ var TSOS;
             // Enable the OS Interrupts.  (Not the CPU clock interrupt, as that is done in the hardware sim.)
             this.krnTrace("Enabling the interrupts.");
             this.krnEnableInterrupts();
+            // Launch Lazy Swapper
+            _LazySwapper = new TSOS.LazySwapper();
             // Launch the shell.
             this.krnTrace("Creating and Launching the shell.");
             _OsShell = new TSOS.Shell();
@@ -183,8 +185,8 @@ var TSOS;
         };
         Kernel.prototype.krnWriteProcess = function (inputOpCodes) {
             // Write process to disk when memory is full
-            var returnMsg = _krnFileSystemDriver.writeProcess(inputOpCodes);
-            return returnMsg;
+            var tsb = _krnFileSystemDriver.saveProcess(inputOpCodes);
+            return tsb;
         };
         Kernel.prototype.krnExecuteProcess = function (pid) {
             var process;
@@ -296,10 +298,12 @@ var TSOS;
             _StdOut.putText(text);
         };
         Kernel.prototype.contextSwitch = function (runningProcess) {
+            var currProcess;
+            var nextProcess;
             // save current process to PCB
             // if process finished, dont save it
             if (_CPU.IR != "00") {
-                var currProcess = new TSOS.PCB(runningProcess.pBase, runningProcess.pid, "Ready", 1, null);
+                currProcess = new TSOS.PCB(runningProcess.pBase, runningProcess.pid, "Ready", 1, null);
                 currProcess.pCounter = _CPU.PC;
                 currProcess.pAcc = _CPU.Acc;
                 currProcess.pXreg = _CPU.Xreg;
@@ -311,7 +315,30 @@ var TSOS;
                 console.log("saved pid:" + currProcess.pid); // for debugging
             }
             // load next process to CPU
-            var nextProcess = _ReadyQueue.dequeue();
+            nextProcess = _ReadyQueue.dequeue();
+            if (nextProcess.pBase == 999) {
+                // process is in disk
+                // swap with last ran process
+                var newTSB = _LazySwapper.swapProcess(nextProcess.tsb, runningProcess.pBase, runningProcess.pLimit);
+                // if swap was successfull
+                if (newTSB) {
+                    nextProcess.pBase = runningProcess.pBase;
+                    if (currProcess) {
+                        var prevProcess = _ReadyQueue.dequeue();
+                        while (prevProcess.pid != currProcess.pid) {
+                            _ReadyQueue.enqueue(prevProcess);
+                            prevProcess = _ReadyQueue.dequeue();
+                        }
+                        prevProcess.tsb = newTSB;
+                        prevProcess.pBase = 999;
+                        _ReadyQueue.enqueue(prevProcess);
+                    }
+                }
+                else {
+                    // disk ran out of space
+                    console.log("ERROR_DISK_FULL");
+                }
+            }
             console.log("loaded pid:" + nextProcess.pid); // for debugging
             _CPU.PC = nextProcess.pCounter;
             _CPU.Acc = nextProcess.pAcc;
@@ -322,6 +349,11 @@ var TSOS;
             _CpuScheduler.runningProcess = nextProcess;
             this.krnTrace(_CpuScheduler.schedule + ": switching to Process id: " + nextProcess.pid);
             _CpuScheduler.currCycle = 0;
+            // var error = "Disk and memory are full."
+            // _KernelInterruptQueue.enqueue(new Interrupt(PROCESS_ERROR_IRQ, opCode));
+            // _Kernel.krnExitProcess(_CpuScheduler.runningProcess);
+            // // reset CPU
+            // this.init();
         };
         // memory out of bound error
         Kernel.prototype.memoryAccessError = function (pid) {

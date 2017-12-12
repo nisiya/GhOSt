@@ -68,9 +68,9 @@ var TSOS;
         DeviceDriverFileSystem.prototype.stringToAsciiHex = function (string) {
             var asciiHex = new Array();
             var hexVal;
-            for (var i = string.length; i >= 0; i--) {
+            for (var i = string.length - 1; i >= 0; i--) {
                 hexVal = string.charCodeAt(i).toString(16);
-                asciiHex.push(hexVal);
+                asciiHex.push(hexVal.toUpperCase());
             }
             return asciiHex;
         };
@@ -209,24 +209,29 @@ var TSOS;
                 return "ERROR_FILE_NOT_FOUND";
             }
         };
-        DeviceDriverFileSystem.prototype.writeProcess = function (userPrg) {
+        DeviceDriverFileSystem.prototype.saveProcess = function (userPrg) {
+            // check for empty block
             var dataTSB = this.findDataTSB();
             var content = new Array();
             if (dataTSB != null) {
+                // writeToFS will pop from the array
                 while (userPrg.length > 0) {
                     content.push(userPrg.pop());
                 }
+                // write process to disk if data block available
                 var processLoaded = this.writeToFS(dataTSB, content);
                 if (processLoaded) {
-                    var pid = _Kernel.krnCreateProcess(999, dataTSB);
-                    return "Process id: " + pid + " is in Resident Queue";
+                    return dataTSB;
+                    // create process and put in resident queue
                 }
                 else {
-                    return "ERROR_DISK_FULL";
+                    // occur when process takes up more than one block 
+                    // and no additional ones are available
+                    return null;
                 }
             }
             else {
-                return "ERROR_DISK_FULL";
+                return null;
             }
         };
         DeviceDriverFileSystem.prototype.writeToFS = function (dataTSB, content) {
@@ -332,6 +337,42 @@ var TSOS;
             else {
                 return "ERROR_FILE_NOT_FOUND";
             }
+        };
+        DeviceDriverFileSystem.prototype.retrieveProcess = function (tsb) {
+            var value = JSON.parse(sessionStorage.getItem(tsb));
+            var userPrg = new Array();
+            var pointer = this.getPointer(value);
+            var index = 4;
+            var opCode;
+            // if program is more than one block
+            while (pointer != "-1-1-1") {
+                while (index < value.length) {
+                    // get bytes 
+                    opCode = value[index];
+                    userPrg.push(opCode);
+                    index++;
+                }
+                // make block available
+                value[0] = "0";
+                this.updateTSB(tsb, value);
+                value = JSON.parse(sessionStorage.getItem(pointer));
+                pointer = this.getPointer(value);
+                index = 4;
+            }
+            // add the last block
+            while (index < value.length) {
+                opCode = value[index];
+                userPrg.push(opCode);
+                index++;
+            }
+            // make block available
+            value[0] = "0";
+            this.updateTSB(tsb, value);
+            // trim since max program length is 256
+            if (userPrg.length > 256) {
+                userPrg.splice(256, (userPrg.length - 256));
+            }
+            return userPrg;
         };
         DeviceDriverFileSystem.prototype.deleteHelper = function (tsb) {
             var value = JSON.parse(sessionStorage.getItem(tsb));

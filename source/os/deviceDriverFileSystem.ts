@@ -64,12 +64,13 @@
             public stringToAsciiHex(string): string[]{
                 var asciiHex= new Array<string>();
                 var hexVal:string;
-                for(var i=string.length; i>=0; i--){
+                for(var i=string.length-1; i>=0; i--){
                     hexVal = string.charCodeAt(i).toString(16);
-                    asciiHex.push(hexVal);
+                    asciiHex.push(hexVal.toUpperCase());
                 }
                 return asciiHex;
             }
+
             public updateTSB(tsb, value){
                 sessionStorage.setItem(tsb,JSON.stringify(value));
                 Control.updateDiskTable(tsb);
@@ -210,22 +211,27 @@
                 }
             }
 
-            public writeProcess(userPrg): string{
+            public saveProcess(userPrg): string{
+                // check for empty block
                 var dataTSB: string = this.findDataTSB();
                 var content = new Array<string>();
                 if(dataTSB != null){
+                    // writeToFS will pop from the array
                     while(userPrg.length>0){
                         content.push(userPrg.pop());
                     }
+                    // write process to disk if data block available
                     var processLoaded = this.writeToFS(dataTSB, content);
                     if (processLoaded){
-                        var pid: number = _Kernel.krnCreateProcess(999, dataTSB);
-                        return "Process id: " + pid + " is in Resident Queue";
+                        return dataTSB;
+                        // create process and put in resident queue
                     } else{
-                        return "ERROR_DISK_FULL";
+                        // occur when process takes up more than one block 
+                            // and no additional ones are available
+                        return null;
                     }
                 } else {
-                    return "ERROR_DISK_FULL";
+                    return null;
                 }
             }
 
@@ -330,6 +336,44 @@
                 } else{
                     return "ERROR_FILE_NOT_FOUND";
                 }
+            }
+
+            public retrieveProcess(tsb): string[]{
+                var value:string[] = JSON.parse(sessionStorage.getItem(tsb));
+                var userPrg = new Array<string>();
+                var pointer: string = this.getPointer(value);
+                var index: number = 4;
+                var opCode: string;
+                // if program is more than one block
+                while (pointer!="-1-1-1"){
+                    
+                    while (index<value.length){
+                        // get bytes 
+                        opCode = value[index];
+                        userPrg.push(opCode);
+                        index++;
+                    }
+                    // make block available
+                    value[0] = "0";
+                    this.updateTSB(tsb, value);
+                    value = JSON.parse(sessionStorage.getItem(pointer));
+                    pointer = this.getPointer(value);
+                    index = 4;
+                }
+                // add the last block
+                while (index<value.length){
+                    opCode = value[index];
+                    userPrg.push(opCode);
+                    index++;
+                }
+                // make block available
+                value[0] = "0";
+                this.updateTSB(tsb, value);
+                // trim since max program length is 256
+                if (userPrg.length > 256){
+                    userPrg.splice(256,(userPrg.length-256));
+                }
+                return userPrg;
             }
 
             public deleteHelper(tsb): string{
