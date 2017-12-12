@@ -8,7 +8,7 @@
      module TSOS {
         export class CpuScheduler {
             public schedule = "Non-preemptive Priority";
-            public quantum = 6;
+            public quantum = 1000;
             public currCycle = 0; // track run time
             public activePIDs = new Array<number>(); // for listing
             public totalCycles = 0; // track total throughput
@@ -16,11 +16,11 @@
             
             public start(): void {
                 // run first process normally
+                if(this.schedule == "Non-preemptive Priority" && _ReadyQueue.getSize()>1){
+                    this.sortPriority();
+                }
                 this.currCycle = 0;
                 this.totalCycles = 0;
-                if(this.schedule == "Non-preemptive Priority" && _ReadyQueue.getSize()>1){
-                    // this.sortPriority();
-                }
                 this.runningProcess = _ReadyQueue.dequeue();
                 this.runningProcess.pState = "Running";
                 _CPU.isExecuting = true;
@@ -29,6 +29,9 @@
 
             // check if time is up and if context switch is needed
             public checkSchedule(): void {
+                if(this.schedule == "Non-preemptive Priority" && _ReadyQueue.getSize()>1){
+                    this.sortPriority();
+                }
                 if (this.activePIDs.length == 0){
                     _CPU.init();
                 } else {
@@ -40,9 +43,6 @@
                         // if there are processes waiting in Ready queue, context switch
                         if (!_ReadyQueue.isEmpty()){
                             // console.log(_ReadyQueue.getSize());
-                            if(this.schedule == "Non-preemptive Priority" && _ReadyQueue.getSize()>1){
-                                // this.sortPriority();
-                            }
                             _KernelInterruptQueue.enqueue(new Interrupt(CONTEXT_SWITCH_IRQ, this.runningProcess));
                         }
                         // for running single process, scheduler just gives another round of executions
@@ -54,15 +54,18 @@
             public sortPriority(){
                     // put highest priorty first
                     var firstProcess = _ReadyQueue.dequeue();
-                    // console.log(firstProcess.pPriority);
+                    console.log(firstProcess.pid + " out");
                     var secondProcess;
                     var comparison = 0;
                     while(comparison<_ReadyQueue.getSize()){
                         secondProcess = _ReadyQueue.dequeue();
+                        console.log(secondProcess.pid + " out");
                         if(secondProcess.pPriority < firstProcess.pPriority){
-                            _ReadyQueue.enqueue(secondProcess);
+                            console.log(firstProcess.pid + " in");
+                            _ReadyQueue.enqueue(firstProcess);
                             firstProcess = secondProcess;
                         } else{
+                            console.log(secondProcess.pid + " in");
                             _ReadyQueue.enqueue(secondProcess);
                         }
                         comparison++;

@@ -16,6 +16,7 @@ var TSOS;
             var opCode;
             // save last ran process to disk
             var saveUserPrg = _MemoryAccessor.readPartition(baseReg, limitReg);
+            console.log(saveUserPrg.length);
             var newTSB = _krnFileSystemDriver.saveProcess(saveUserPrg);
             // if successfully written to disk
             if (newTSB) {

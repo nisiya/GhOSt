@@ -14,7 +14,8 @@
                 var loadUserPrg = new Array<string>();
                 var opCode: string;
                 // save last ran process to disk
-                var saveUserPrg: string[] = _MemoryAccessor.readPartition(baseReg, limitReg)
+                var saveUserPrg: string[] = _MemoryAccessor.readPartition(baseReg, limitReg);
+                console.log(saveUserPrg.length);
                 var newTSB:string = _krnFileSystemDriver.saveProcess(saveUserPrg);
                 // if successfully written to disk
                 if (newTSB){

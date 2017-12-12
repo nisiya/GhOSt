@@ -9,18 +9,18 @@ var TSOS;
     var CpuScheduler = /** @class */ (function () {
         function CpuScheduler() {
             this.schedule = "Non-preemptive Priority";
-            this.quantum = 6;
+            this.quantum = 1000;
             this.currCycle = 0; // track run time
             this.activePIDs = new Array(); // for listing
             this.totalCycles = 0; // track total throughput
         }
         CpuScheduler.prototype.start = function () {
             // run first process normally
+            if (this.schedule == "Non-preemptive Priority" && _ReadyQueue.getSize() > 1) {
+                this.sortPriority();
+            }
             this.currCycle = 0;
             this.totalCycles = 0;
-            if (this.schedule == "Non-preemptive Priority" && _ReadyQueue.getSize() > 1) {
-                // this.sortPriority();
-            }
             this.runningProcess = _ReadyQueue.dequeue();
             this.runningProcess.pState = "Running";
             _CPU.isExecuting = true;
@@ -28,6 +28,9 @@ var TSOS;
         };
         // check if time is up and if context switch is needed
         CpuScheduler.prototype.checkSchedule = function () {
+            if (this.schedule == "Non-preemptive Priority" && _ReadyQueue.getSize() > 1) {
+                this.sortPriority();
+            }
             if (this.activePIDs.length == 0) {
                 _CPU.init();
             }
@@ -40,9 +43,6 @@ var TSOS;
                     // if there are processes waiting in Ready queue, context switch
                     if (!_ReadyQueue.isEmpty()) {
                         // console.log(_ReadyQueue.getSize());
-                        if (this.schedule == "Non-preemptive Priority" && _ReadyQueue.getSize() > 1) {
-                            // this.sortPriority();
-                        }
                         _KernelInterruptQueue.enqueue(new TSOS.Interrupt(CONTEXT_SWITCH_IRQ, this.runningProcess));
                     }
                     // for running single process, scheduler just gives another round of executions
@@ -53,16 +53,19 @@ var TSOS;
         CpuScheduler.prototype.sortPriority = function () {
             // put highest priorty first
             var firstProcess = _ReadyQueue.dequeue();
-            // console.log(firstProcess.pPriority);
+            console.log(firstProcess.pid + " out");
             var secondProcess;
             var comparison = 0;
             while (comparison < _ReadyQueue.getSize()) {
                 secondProcess = _ReadyQueue.dequeue();
+                console.log(secondProcess.pid + " out");
                 if (secondProcess.pPriority < firstProcess.pPriority) {
-                    _ReadyQueue.enqueue(secondProcess);
+                    console.log(firstProcess.pid + " in");
+                    _ReadyQueue.enqueue(firstProcess);
                     firstProcess = secondProcess;
                 }
                 else {
+                    console.log(secondProcess.pid + " in");
                     _ReadyQueue.enqueue(secondProcess);
                 }
                 comparison++;
