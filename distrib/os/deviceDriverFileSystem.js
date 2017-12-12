@@ -219,8 +219,6 @@ var TSOS;
                     content.push(userPrg.pop());
                 }
                 // write process to disk if data block available
-                console.log(content);
-                console.log(content.length);
                 var processLoaded = this.writeToFS(dataTSB, content);
                 if (processLoaded) {
                     return dataTSB;
@@ -365,21 +363,16 @@ var TSOS;
             while (index < value.length) {
                 opCode = value[index];
                 userPrg.push(opCode);
-                if (opCode == "00" && value[index + 1] == "00") {
-                    break;
-                }
-                else {
-                    index++;
-                }
+                index++;
             }
             // make block available
             value[0] = "0";
             this.updateTSB(tsb, value);
             // trim since max program length is 256
-            // if (userPrg.length > 256){
-            //     userPrg.splice(256,(userPrg.length-256));
-            // }
-            // console.log(userPrg.length);
+            if (userPrg.length > 256) {
+                userPrg.splice(256, (userPrg.length - 256));
+            }
+            console.log(userPrg.length);
             return userPrg;
         };
         DeviceDriverFileSystem.prototype.deleteHelper = function (tsb) {

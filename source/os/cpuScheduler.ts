@@ -7,8 +7,8 @@
      ------------ */
      module TSOS {
         export class CpuScheduler {
-            public schedule = "Non-preemptive Priority";
-            public quantum = 1000;
+            public schedule = "Round Robin";
+            public quantum = 6;
             public currCycle = 0; // track run time
             public activePIDs = new Array<number>(); // for listing
             public totalCycles = 0; // track total throughput
@@ -78,30 +78,25 @@
             }
 
             public sortPriority(){
-                    // put highest priorty first
+                    // put highest (lowest number) priorty first
                     var firstProcess = _ReadyQueue.dequeue();
-                    console.log(firstProcess.pid + " out");
                     var secondProcess;
                     var comparison = 0;
                     while(comparison<_ReadyQueue.getSize()){
                         secondProcess = _ReadyQueue.dequeue();
-                        console.log(secondProcess.pid + " out");
                         if(secondProcess.pPriority < firstProcess.pPriority){
-                            console.log(firstProcess.pid + " in");
                             _ReadyQueue.enqueue(firstProcess);
                             firstProcess = secondProcess;
                         } else{
-                            console.log(secondProcess.pid + " in");
                             _ReadyQueue.enqueue(secondProcess);
                         }
                         comparison++;
                     }
-                    console.log(firstProcess.pPriority);
+                    // reorder so highest priority is first
                     _ReadyQueue.enqueue(firstProcess);
                     for(var i=0; i<_ReadyQueue.getSize()-1; i++){
                         _ReadyQueue.enqueue(_ReadyQueue.dequeue());
                     }
-                    // console.log(_ReadyQueue.getSize());
             }
 
             public setSchedule(args): string{

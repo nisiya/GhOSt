@@ -15,7 +15,8 @@
                 var opCode: string;
                 // save last ran process to disk
                 var saveUserPrg: string[] = _MemoryAccessor.readPartition(baseReg, limitReg);
-                console.log(saveUserPrg.length);
+                saveUserPrg = this.trimUserPrg(saveUserPrg);
+                console.log("Save " + saveUserPrg.length);
                 var newTSB:string = _krnFileSystemDriver.saveProcess(saveUserPrg);
                 // if successfully written to disk
                 if (newTSB){
@@ -23,6 +24,8 @@
                     _MemoryManager.clearPartition(baseReg);
                     // bring needed process from disk to memory
                     loadUserPrg = _krnFileSystemDriver.retrieveProcess(tsb);
+                    loadUserPrg = this.trimUserPrg(loadUserPrg);
+                    console.log("load " + loadUserPrg.length);
                     for(var j=0; j<loadUserPrg.length; j++){
                         _MemoryAccessor.writePartition(baseReg, baseReg+j, loadUserPrg[j]);
                     }
@@ -31,6 +34,15 @@
                     // if disk ran out of space
                     return null;
                 }
+            }
+
+            public trimUserPrg(userPrg): string[]{
+                var opCode = userPrg.pop();
+                while (opCode == "00"){
+                    opCode = userPrg.pop();
+                }
+                userPrg.push(opCode);
+                return userPrg;
             }
         }
     }

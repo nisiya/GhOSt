@@ -48,15 +48,6 @@ var TSOS;
         };
         MemoryAccessor.prototype.readPartition = function (baseReg, limitReg) {
             var value = _Memory.memory.slice(baseReg, (baseReg + limitReg + 1));
-            // var value = new Array<string>();
-            // var opCodes:string;
-            // for (var i=0; i<limitReg; i++){
-            //     opCodes = _Memory.memory[baseReg+i];
-            //     value.push(opCodes);
-            //     if(opCodes=="00" && _Memory.memory[baseReg+i+1]=="00"){
-            //         break;
-            //     }
-            // }
             return value;
         };
         MemoryAccessor.prototype.writePartition = function (baseReg, index, data) {
