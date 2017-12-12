@@ -200,7 +200,8 @@ var TSOS;
                         break;
                     default:
                         // call Kernel to print error message if op code does not exist
-                        _KernelInterruptQueue.enqueue(new TSOS.Interrupt(PROCESS_ERROR_IRQ, opCode));
+                        var error = "Error. Op code " + opCode + " does not exist.";
+                        _KernelInterruptQueue.enqueue(new TSOS.Interrupt(PROCESS_ERROR_IRQ, error));
                         _Kernel.krnExitProcess(_CpuScheduler.runningProcess);
                         // reset CPU
                         this.init();

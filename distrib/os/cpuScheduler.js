@@ -18,6 +18,9 @@ var TSOS;
             // run first process normally
             this.currCycle = 0;
             this.totalCycles = 0;
+            if (this.schedule == "Non-preemptive Priority" && _ReadyQueue.getSize() > 1) {
+                this.sortPriority();
+            }
             this.runningProcess = _ReadyQueue.dequeue();
             this.runningProcess.pState = "Running";
             _CPU.isExecuting = true;
@@ -36,6 +39,9 @@ var TSOS;
                 if (this.currCycle >= this.quantum) {
                     // if there are processes waiting in Ready queue, context switch
                     if (!_ReadyQueue.isEmpty()) {
+                        if (this.schedule == "Non-preemptive Priority" && _ReadyQueue.getSize() > 1) {
+                            this.sortPriority();
+                        }
                         _KernelInterruptQueue.enqueue(new TSOS.Interrupt(CONTEXT_SWITCH_IRQ, this.runningProcess));
                     }
                     // for running single process, scheduler just gives another round of executions
@@ -43,10 +49,33 @@ var TSOS;
                 }
             }
         };
+        CpuScheduler.prototype.sortPriority = function () {
+            // put highest priorty first
+            var firstProcess = _ReadyQueue.dequeue();
+            // console.log(firstProcess.pPriority);
+            var secondProcess;
+            var comparison = 1;
+            while (comparison < _ReadyQueue.getSize()) {
+                secondProcess = _ReadyQueue.dequeue();
+                if (secondProcess.pPriority < firstProcess.pPriority) {
+                    _ReadyQueue.enqueue(secondProcess);
+                    firstProcess = secondProcess;
+                }
+                else {
+                    _ReadyQueue.enqueue(secondProcess);
+                }
+                comparison++;
+            }
+            // console.log(firstProcess.pPriority);
+            _ReadyQueue.enqueue(firstProcess);
+            for (var i = 0; i < _ReadyQueue.getSize() - 1; i++) {
+                _ReadyQueue.enqueue(_ReadyQueue.dequeue());
+            }
+            console.log(_ReadyQueue.getSize());
+        };
         CpuScheduler.prototype.setSchedule = function (args) {
             var returnMsg;
             var newSchedule = args.toString();
-            console.log(newSchedule == "rr");
             switch (newSchedule) {
                 case "rr":
                     this.schedule = "Round Robin";
@@ -67,7 +96,6 @@ var TSOS;
                     this.quantum = 6;
                     returnMsg = "CPU scheduling algorithm DNE";
             }
-            console.log(this.quantum);
             return returnMsg;
         };
         return CpuScheduler;

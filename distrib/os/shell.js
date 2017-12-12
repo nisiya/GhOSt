@@ -446,43 +446,53 @@ var TSOS;
             audio.play();
             _StdOut.putText("He's a cat~ Meow~ Flushing the toliet~");
         };
-        // load
+        // load <string>
         Shell.prototype.shellLoad = function (args) {
-            // gets text of textarea
-            var userProgram = document.getElementById("taProgramInput").value;
-            // remove line breaks and extra spaces
-            userProgram = userProgram.replace(/(\r\n|\n|\r)/gm, "");
-            // checks if text only contains hex decimals and spaces and is not empty
-            var valText = /^[a-f\d\s]+$/i;
-            if (valText.test(userProgram)) {
-                var inputOpCodes = userProgram.split(" ");
-                if (inputOpCodes.length > 256) {
-                    _StdOut.putText("Process is too big for memory.");
+            var priority = 10;
+            var valText = /^\d*$/;
+            if (valText.test(args[0]) || args[0] == null) {
+                if (args[0] != null) {
+                    priority = args[0];
                 }
-                else {
-                    // base register value from when memory was loaded
-                    var baseReg = _MemoryManager.loadMemory(inputOpCodes);
-                    if (baseReg == 999) {
-                        // ask kernel to load user program into disk 
-                        var tsb = _Kernel.krnWriteProcess(inputOpCodes);
-                        if (tsb) {
-                            var pid = _Kernel.krnCreateProcess(baseReg, tsb);
-                        }
-                        else {
-                            _StdOut.putText("ERROR_DISK_FULL");
-                        }
+                // gets text of textarea
+                var userProgram = document.getElementById("taProgramInput").value;
+                // remove line breaks and extra spaces
+                userProgram = userProgram.replace(/(\r\n|\n|\r)/gm, "");
+                // checks if text only contains hex decimals and spaces and is not empty
+                var valText = /^[a-f\d\s]+$/i;
+                if (valText.test(userProgram)) {
+                    var inputOpCodes = userProgram.split(" ");
+                    if (inputOpCodes.length > 256) {
+                        _StdOut.putText("Process is too big for memory.");
                     }
                     else {
-                        var pid = _Kernel.krnCreateProcess(baseReg, null);
+                        // base register value from when memory was loaded
+                        var baseReg = _MemoryManager.loadMemory(inputOpCodes);
+                        if (baseReg == 999) {
+                            // ask kernel to load user program into disk 
+                            var tsb = _Kernel.krnWriteProcess(inputOpCodes);
+                            if (tsb) {
+                                var pid = _Kernel.krnCreateProcess(baseReg, priority, tsb);
+                            }
+                            else {
+                                _StdOut.putText("ERROR_DISK_FULL");
+                            }
+                        }
+                        else {
+                            var pid = _Kernel.krnCreateProcess(baseReg, priority, null);
+                        }
+                        _StdOut.putText("Process id: " + pid + " is in Resident Queue");
                     }
-                    _StdOut.putText("Process id: " + pid + " is in Resident Queue");
+                }
+                else if (userProgram == "") {
+                    _StdOut.putText("Please enter 6502a op codes in the input area below.");
+                }
+                else {
+                    _StdOut.putText("Only hex digits and spaces are allowed. Please enter a new set of codes.");
                 }
             }
-            else if (userProgram == "") {
-                _StdOut.putText("Please enter 6502a op codes in the input area below.");
-            }
             else {
-                _StdOut.putText("Only hex digits and spaces are allowed. Please enter a new set of codes.");
+                _StdOut.putText("Priority must be a number between 0 and 10");
             }
         };
         // run <pid>
@@ -664,7 +674,6 @@ var TSOS;
             _StdOut.putText("Current CPU scheduling algortithm: " + _CpuScheduler.schedule);
         };
         Shell.prototype.shellSetSchedule = function (args) {
-            console.log(args);
             _StdOut.putText(_CpuScheduler.setSchedule(args));
         };
         return Shell;

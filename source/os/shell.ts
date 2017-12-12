@@ -587,38 +587,47 @@ module TSOS {
             _StdOut.putText("He's a cat~ Meow~ Flushing the toliet~");
         }
 
-        // load
+        // load <string>
         public shellLoad(args) {
-            // gets text of textarea
-            var userProgram: string = (<HTMLInputElement> document.getElementById("taProgramInput")).value;
-            // remove line breaks and extra spaces
-            userProgram = userProgram.replace(/(\r\n|\n|\r)/gm,"");              
-            // checks if text only contains hex decimals and spaces and is not empty
-            var valText = /^[a-f\d\s]+$/i;
-            if (valText.test(userProgram)) {
-                var inputOpCodes: string[] = userProgram.split(" ");
-                if (inputOpCodes.length > 256){
-                    _StdOut.putText("Process is too big for memory.");
-                } else {
-                    // base register value from when memory was loaded
-                    var baseReg: number = _MemoryManager.loadMemory(inputOpCodes);
-                    if (baseReg == 999){
-                        // ask kernel to load user program into disk 
-                        var tsb: string = _Kernel.krnWriteProcess(inputOpCodes);
-                        if (tsb){
-                            var pid: number = _Kernel.krnCreateProcess(baseReg,tsb);
-                        } else {
-                            _StdOut.putText("ERROR_DISK_FULL");
-                        }
-                    } else {
-                        var pid: number = _Kernel.krnCreateProcess(baseReg, null);
-                    }
-                    _StdOut.putText("Process id: " + pid + " is in Resident Queue");
+            var priority:number = 10;
+            var valText = /^\d*$/;
+            if(valText.test(args[0]) || args[0]==null){
+                if(args[0]!=null){
+                    priority = args[0];
                 }
-            } else if(userProgram == ""){
-                _StdOut.putText("Please enter 6502a op codes in the input area below.");
-            } else {
-                _StdOut.putText("Only hex digits and spaces are allowed. Please enter a new set of codes.");
+                // gets text of textarea
+                var userProgram: string = (<HTMLInputElement> document.getElementById("taProgramInput")).value;
+                // remove line breaks and extra spaces
+                userProgram = userProgram.replace(/(\r\n|\n|\r)/gm,"");              
+                // checks if text only contains hex decimals and spaces and is not empty
+                var valText = /^[a-f\d\s]+$/i;
+                if (valText.test(userProgram)) {
+                    var inputOpCodes: string[] = userProgram.split(" ");
+                    if (inputOpCodes.length > 256){
+                        _StdOut.putText("Process is too big for memory.");
+                    } else {
+                        // base register value from when memory was loaded
+                        var baseReg: number = _MemoryManager.loadMemory(inputOpCodes);
+                        if (baseReg == 999){
+                            // ask kernel to load user program into disk 
+                            var tsb: string = _Kernel.krnWriteProcess(inputOpCodes);
+                            if (tsb){
+                                var pid: number = _Kernel.krnCreateProcess(baseReg, priority ,tsb);
+                            } else {
+                                _StdOut.putText("ERROR_DISK_FULL");
+                            }
+                        } else {
+                            var pid: number = _Kernel.krnCreateProcess(baseReg, priority ,null);
+                        }
+                        _StdOut.putText("Process id: " + pid + " is in Resident Queue");
+                    }
+                } else if(userProgram == ""){
+                    _StdOut.putText("Please enter 6502a op codes in the input area below.");
+                } else {
+                    _StdOut.putText("Only hex digits and spaces are allowed. Please enter a new set of codes.");
+                }
+            } else{
+                _StdOut.putText("Priority must be a number between 0 and 10");
             }
         }
 
@@ -800,7 +809,6 @@ module TSOS {
         }
 
         public shellSetSchedule(args){
-            console.log(args);
             _StdOut.putText(_CpuScheduler.setSchedule(args));
         }
     }

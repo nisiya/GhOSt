@@ -46,11 +46,11 @@ var TSOS;
                 return value;
             }
         };
-        MemoryAccessor.prototype.retreiveMemory = function (index) {
-            var value = _Memory.memory[index];
+        MemoryAccessor.prototype.readPartition = function (baseReg, limitReg) {
+            var value = _Memory.memory.slice(baseReg, (baseReg + limitReg + 1));
             return value;
         };
-        MemoryAccessor.prototype.appendMemory = function (baseReg, index, data) {
+        MemoryAccessor.prototype.writePartition = function (baseReg, index, data) {
             _Memory.memory[index] = data.toString(16).toUpperCase();
             TSOS.Control.updateMemoryTable(baseReg);
         };

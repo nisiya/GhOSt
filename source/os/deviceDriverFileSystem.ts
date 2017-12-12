@@ -346,7 +346,6 @@
                 var opCode: string;
                 // if program is more than one block
                 while (pointer!="-1-1-1"){
-                    
                     while (index<value.length){
                         // get bytes 
                         opCode = value[index];
@@ -364,7 +363,7 @@
                 while (index<value.length){
                     opCode = value[index];
                     userPrg.push(opCode);
-                    index++;
+                    index++;                        
                 }
                 // make block available
                 value[0] = "0";

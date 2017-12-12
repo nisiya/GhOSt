@@ -169,14 +169,14 @@ var TSOS;
         // Some ideas:
         // - ReadConsole
         // - WriteConsole
-        Kernel.prototype.krnCreateProcess = function (pBase, tsb) {
+        Kernel.prototype.krnCreateProcess = function (pBase, priority, tsb) {
             // Creates process when it is loaded into memory or disk
             // base register value retrieved from loading process into memory
             // or tsb if in disk
             // pid incremented upon creation
             _PID++;
             var pid = _PID;
-            var process = new TSOS.PCB(pBase, pid, "Resident", 1, tsb);
+            var process = new TSOS.PCB(pBase, pid, "Resident", priority, tsb);
             // put process on resident queue
             _ResidentQueue.enqueue(process);
             // update process table
@@ -287,9 +287,9 @@ var TSOS;
                 }
             }
         };
-        Kernel.prototype.userPrgError = function (opCode) {
+        Kernel.prototype.userPrgError = function (error) {
             // When user program entry is not a valid op ocde
-            _StdOut.putText("Error. Op code " + opCode + " does not exist.");
+            _StdOut.putText(error);
             _StdOut.advanceLine();
             _OsShell.putPrompt();
         };
@@ -336,7 +336,12 @@ var TSOS;
                 }
                 else {
                     // disk ran out of space
-                    console.log("ERROR_DISK_FULL");
+                    // exit current process and stop CPU execution
+                    var error = "Disk and memory are full.";
+                    _KernelInterruptQueue.enqueue(new TSOS.Interrupt(PROCESS_ERROR_IRQ, error));
+                    _Kernel.krnExitProcess(_CpuScheduler.runningProcess);
+                    // reset CPU
+                    _CPU.init();
                 }
             }
             console.log("loaded pid:" + nextProcess.pid); // for debugging
@@ -349,11 +354,6 @@ var TSOS;
             _CpuScheduler.runningProcess = nextProcess;
             this.krnTrace(_CpuScheduler.schedule + ": switching to Process id: " + nextProcess.pid);
             _CpuScheduler.currCycle = 0;
-            // var error = "Disk and memory are full."
-            // _KernelInterruptQueue.enqueue(new Interrupt(PROCESS_ERROR_IRQ, opCode));
-            // _Kernel.krnExitProcess(_CpuScheduler.runningProcess);
-            // // reset CPU
-            // this.init();
         };
         // memory out of bound error
         Kernel.prototype.memoryAccessError = function (pid) {

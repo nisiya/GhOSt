@@ -11,15 +11,12 @@ var TSOS;
         }
         LazySwapper.prototype.swapProcess = function (tsb, baseReg, limitReg) {
             var newLocs = new Array();
-            var saveUserPrg = new Array();
+            // var saveUserPrg = new Array<string>();
             var loadUserPrg = new Array();
             var opCode;
             // save last ran process to disk
-            for (var i = 0; i < limitReg; i++) {
-                opCode = _MemoryAccessor.retreiveMemory(baseReg + i);
-                saveUserPrg.push(opCode);
-            }
-            var newTSB = _krnFileSystemDriver.writeProcess(saveUserPrg);
+            var saveUserPrg = _MemoryAccessor.readPartition(baseReg, limitReg);
+            var newTSB = _krnFileSystemDriver.saveProcess(saveUserPrg);
             // if successfully written to disk
             if (newTSB) {
                 // clear memory partition
@@ -27,7 +24,7 @@ var TSOS;
                 // bring needed process from disk to memory
                 loadUserPrg = _krnFileSystemDriver.retrieveProcess(tsb);
                 for (var j = 0; j < loadUserPrg.length; j++) {
-                    _MemoryAccessor.appendMemory(baseReg, baseReg + j, loadUserPrg[j]);
+                    _MemoryAccessor.writePartition(baseReg, baseReg + j, loadUserPrg[j]);
                 }
                 return newTSB;
             }
