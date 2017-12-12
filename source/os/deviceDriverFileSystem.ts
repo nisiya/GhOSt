@@ -61,6 +61,7 @@
                 }
             }
 
+            // convert string to array of ascii value in hex
             public stringToAsciiHex(string): string[]{
                 var asciiHex= new Array<string>();
                 var hexVal:string;
@@ -68,14 +69,17 @@
                     hexVal = string.charCodeAt(i).toString(16);
                     asciiHex.push(hexVal.toUpperCase());
                 }
+                console.log(asciiHex);
                 return asciiHex;
             }
 
+            // update block in session and display
             public updateTSB(tsb, value){
                 sessionStorage.setItem(tsb,JSON.stringify(value));
                 Control.updateDiskTable(tsb);
             }
 
+            // removed pointers
             public quickFormat(): string{
                 var tsb: string;
                 var value = new Array<string>();
@@ -88,6 +92,7 @@
                 return "SUCCESS_DISK_QUICK_FORMATTED";
             }
 
+            // zero fills all blocks
             public fullFormat(): string{
                 var tsb: string;
                 var value = new Array<string>();
@@ -98,6 +103,7 @@
                 return "SUCCESS_DISK_FULL_FORMATTED";
             }
 
+            // zero fills one block
             public zeroFill(tsb){
                 var value = value = JSON.parse(sessionStorage.getItem(tsb));
                 for (var i=0; i<4; i++){
@@ -113,7 +119,7 @@
                 var createdFile:boolean = false;
                 var dirTSB: string;
                 var value = new Array<string>();
-                var asciiFilename: string;
+                var asciiFilename = new Array<string>();
                 // make sure no duplicate filename
                 var existFilename = this.lookupDataTSB(filename);
                 if (existFilename != null){
@@ -134,12 +140,19 @@
                                     // pointer in dir 
                                     value[k] = dataTSB.charAt(k-1);
                                 }
-                                asciiFilename = filename.toString();
-                                for (var j=0; j<asciiFilename.length; j++){
-                                    value[j+4] = asciiFilename.charCodeAt(j).toString(16).toUpperCase();
+                                asciiFilename = this.stringToAsciiHex(filename.toString());
+                                var index = 4;
+                                // add filename
+                                while (asciiFilename.length>0){    
+                                    value[index] = asciiFilename.pop();
+                                    index++;
                                 }
                                 this.updateTSB(dirTSB,value);
-                                return filename + " - SUCCESS_FILE_CREATED";
+                                if (value[4] == "2E"){
+                                    return filename + " - SUCCESS_HIDDEN_FILE_CREATED";
+                                } else {
+                                    return filename + " - SUCCESS_FILE_CREATED";
+                                }
                             } else {
                                 return "ERROR_DISK_FULL";
                             }
@@ -434,7 +447,7 @@
                 for (var i=1; i<this.dirTableSize; i++){
                     dirTSB = sessionStorage.key(i);
                     value = JSON.parse(sessionStorage.getItem(dirTSB));
-                    if(value[0]=="1"){
+                    if(value[0]=="1" && value[4]!="2E"){
                         dirFilename = this.getFilename(value);
                         files.push(dirFilename);
                         dirFilename = "";

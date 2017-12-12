@@ -583,19 +583,20 @@ var TSOS;
         };
         // create
         Shell.prototype.shellCreate = function (args) {
-            var valText = /^[a-z]+$/i;
+            var valTextReg = /^[a-z]+$/i;
+            var valTextHidden = /^\.[a-z]+$/i;
             var filename;
-            if (valText.test(args)) {
-                filename = args;
-                if (filename.length < 60) {
+            if (args.length < 60) {
+                if (valTextReg.test(args) || valTextHidden.test(args)) {
+                    filename = args;
                     _Kernel.krnCreateFile(filename);
                 }
                 else {
-                    _StdOut.putText("Maximum length for filename: 60");
+                    _StdOut.putText("Please only use letters for filename. Place'.' in front to create hidden files.");
                 }
             }
             else {
-                _StdOut.putText("Please only use letters for filename");
+                _StdOut.putText("Maximum length for filename: 60");
             }
         };
         // write
