@@ -36,16 +36,14 @@ var TSOS;
                 this.memoryS1 = true;
                 baseReg = 0;
             }
-            // load user program into disk
-            if (baseReg == 999) {
-                console.log("uhoh");
-            }
-            else {
+            if (baseReg != 999) {
+                // load user program into memory
                 for (var i = 0; i < inputOpCodes.length; i++) {
                     _Memory.memory[baseReg + i] = inputOpCodes[i];
                 }
                 TSOS.Control.updateMemoryTable(baseReg);
             }
+            // if yes, return and load user program into disk
             return baseReg;
         };
         MemoryManager.prototype.clearPartition = function (baseReg) {

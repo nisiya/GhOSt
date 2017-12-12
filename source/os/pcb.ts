@@ -28,6 +28,7 @@
         public pLocation: string = "Memory";
         public pBase: number;
         public pLimit: number;
+        public tsb: string;
         public turnaroundTime: number = 0;
         public waitTime: number = 0;
 

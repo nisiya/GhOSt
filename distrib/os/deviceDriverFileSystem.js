@@ -187,90 +187,97 @@ var TSOS;
         };
         DeviceDriverFileSystem.prototype.writeFile = function (filename, fileContent) {
             // look in dir for data tsb with filename
-            var tsbUsed = new Array();
             var dataTSB = this.lookupDataTSB(filename);
-            var firstTSB = dataTSB;
-            var value = new Array();
-            var charCode;
-            // if found
             if (dataTSB != null) {
-                // modify the value
-                value = JSON.parse(sessionStorage.getItem(dataTSB));
-                var contentIndex = 0;
-                var valueIndex = 0;
-                var firstIndex;
-                var pointer = this.getPointer(value);
-                if (pointer == "000") {
-                    valueIndex = 4;
+                var fileCreated = this.writeToFS(dataTSB, fileContent);
+                if (fileCreated) {
+                    return filename + " - SUCCESS_FILE_MODIFIED";
                 }
                 else {
-                    while (pointer != "-1-1-1") {
-                        dataTSB = pointer;
-                        tsbUsed.push(dataTSB);
-                        value = JSON.parse(sessionStorage.getItem(dataTSB));
-                        pointer = this.getPointer(value);
-                    }
-                    // }
-                    for (var i = 4; i < value.length; i++) {
-                        if (value[i] == "00") {
-                            valueIndex = i;
-                            break;
-                        }
-                    }
+                    return "ERROR_DISK_FULL";
                 }
-                firstIndex = valueIndex;
-                // add hex value of ascii value of fileContent
-                while (contentIndex < fileContent.length) {
-                    // if more than one block needed...
-                    if (valueIndex == this.blockSize) {
-                        // get new free data block
-                        var oldDataTSB = dataTSB;
-                        dataTSB = this.findDataTSB();
-                        tsbUsed.push(dataTSB);
-                        // free block obtained
-                        if (dataTSB != null) {
-                            // add pointer to new block in current block
-                            for (var k = 1; k < 4; k++) {
-                                value[k] = dataTSB.charAt(k - 1);
-                            }
-                            // save current block
-                            this.updateTSB(oldDataTSB, value);
-                            // set working block to new block
-                            value = JSON.parse(sessionStorage.getItem(dataTSB));
-                            valueIndex = 4;
-                        }
-                        else {
-                            // no free block available
-                            // undo all file modifications
-                            for (var dataTSB in tsbUsed) {
-                                this.zeroFill(dataTSB);
-                            }
-                            for (var m = firstIndex; m < this.blockSize; m++) {
-                                value = JSON.parse(sessionStorage.getItem(firstTSB));
-                                value[m] = "00";
-                                this.updateTSB(firstTSB, value);
-                            }
-                            return "File content was not written - ERROR_DISK_FULL";
-                        }
-                    }
-                    else {
-                        // current block has space
-                        charCode = fileContent.charCodeAt(contentIndex);
-                        value[valueIndex] = charCode.toString(16).toUpperCase();
-                        contentIndex++;
-                        valueIndex++;
-                    }
-                }
-                // save last block
-                for (var k = 1; k < 4; k++) {
-                    value[k] = "-1"; // last block indicator
-                }
-                this.updateTSB(dataTSB, value);
-                return filename + " - SUCCESS_FILE_MODIFIED";
             }
             else {
                 return "ERROR_FILE_NOT_FOUND";
             }
+        };
+        DeviceDriverFileSystem.prototype.writeToFS = function (dataTSB, content) {
+            var tsbUsed = new Array();
+            var firstTSB = dataTSB;
+            var value = new Array();
+            var charCode;
+            var contentIndex = 0;
+            var valueIndex = 0;
+            var firstIndex;
+            value = JSON.parse(sessionStorage.getItem(dataTSB));
+            var pointer = this.getPointer(value);
+            if (pointer == "000") {
+                valueIndex = 4;
+            }
+            else {
+                while (pointer != "-1-1-1") {
+                    dataTSB = pointer;
+                    tsbUsed.push(dataTSB);
+                    value = JSON.parse(sessionStorage.getItem(dataTSB));
+                    pointer = this.getPointer(value);
+                }
+                // find where previous content ends
+                for (var i = 4; i < value.length; i++) {
+                    if (value[i] == "00") {
+                        valueIndex = i;
+                        break;
+                    }
+                }
+            }
+            firstIndex = valueIndex;
+            // add hex value of ascii value of fileContent
+            while (contentIndex < content.length) {
+                // if more than one block needed...
+                if (valueIndex == this.blockSize) {
+                    // get new free data block
+                    var oldDataTSB = dataTSB;
+                    dataTSB = this.findDataTSB();
+                    tsbUsed.push(dataTSB);
+                    // free block obtained
+                    if (dataTSB != null) {
+                        // add pointer to new block in current block
+                        for (var k = 1; k < 4; k++) {
+                            value[k] = dataTSB.charAt(k - 1);
+                        }
+                        // save current block
+                        this.updateTSB(oldDataTSB, value);
+                        // set working block to new block
+                        value = JSON.parse(sessionStorage.getItem(dataTSB));
+                        valueIndex = 4;
+                    }
+                    else {
+                        // no free block available
+                        // undo all file modifications
+                        for (var tsb in tsbUsed) {
+                            this.zeroFill(tsb);
+                        }
+                        for (var m = firstIndex; m < this.blockSize; m++) {
+                            value = JSON.parse(sessionStorage.getItem(firstTSB));
+                            value[m] = "00";
+                            this.updateTSB(firstTSB, value);
+                        }
+                        return false;
+                    }
+                }
+                else {
+                    // current block has space
+                    charCode = content.charCodeAt(contentIndex);
+                    value[valueIndex] = charCode.toString(16).toUpperCase();
+                    contentIndex++;
+                    valueIndex++;
+                }
+            }
+            // save last block
+            for (var k = 1; k < 4; k++) {
+                value[k] = "-1"; // last block indicator
+            }
+            this.updateTSB(dataTSB, value);
+            return true;
         };
         DeviceDriverFileSystem.prototype.readFile = function (filename) {
             var fileContent = filename + ": ";
