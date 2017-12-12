@@ -106,13 +106,13 @@ module TSOS {
             // load
             sc = new ShellCommand(this.shellLoad,
                 "load",
-                "- Validates and loads user program input into memory.");
+                "<int> - Validates and loads user program input into memory with given or default priority of 10.");
             this.commandList[this.commandList.length] = sc;
 
             // run <id>
             sc = new ShellCommand(this.shellRun,
                 "run",
-                "- <pid> - Runs the process with the id.");
+                "<pid> - Runs the process with the id.");
             this.commandList[this.commandList.length] = sc;
 
             // runall
@@ -189,10 +189,10 @@ module TSOS {
                 "list the files currently stored on the disk");
             this.commandList[this.commandList.length] = sc;
             
-            // format
+            // format <string>
             sc = new ShellCommand(this.shellFormat,
                 "format",
-                "quick formats the drive");
+                "<string> - quick or full formats the drive");
             this.commandList[this.commandList.length] = sc;
 
             // getschedule
@@ -501,7 +501,7 @@ module TSOS {
                     
                     // format
                     case "format":
-                    _StdOut.putText("Format would quick format the disk, deleting just the pointers.");
+                    _StdOut.putText("Format followed by an option would quick or full format the disk. Quick = just deletes the pointers. Full = zero fills the rest of the block too.");
                     break;
 
                     // getschedule
@@ -627,7 +627,7 @@ module TSOS {
                     _StdOut.putText("Only hex digits and spaces are allowed. Please enter a new set of codes.");
                 }
             } else{
-                _StdOut.putText("Priority must be a number between 0 and 10");
+                _StdOut.putText("Priority must be an integer, starting from 0. Or leave it blank for default of 10. Lower number means higher priority. ");
             }
         }
 
@@ -800,7 +800,18 @@ module TSOS {
             if(_CPU.isExecuting){
                 _StdOut.putText("Cannot format disk. A process is currently running. Use kill command to terminate process.");
             } else{
-                _StdOut.putText(_krnFileSystemDriver.formatDisk());
+                if(args == "quick"){
+                    _StdOut.putText(_krnFileSystemDriver.quickFormat());
+                } else if(args == "full"){
+                    _StdOut.putText(_krnFileSystemDriver.fullFormat());
+                } else if(args == ""){
+                    _StdOut.putText("Please enter quick or full format after format command.");
+                    _StdOut.advanceLine();
+                    _StdOut.putText("quick = just deletes the pointers."); 
+                    _StdOut.advanceLine();
+                    _StdOut.putText("full = zero fills the rest of the block too.");
+                }
+                
             }
         }
 

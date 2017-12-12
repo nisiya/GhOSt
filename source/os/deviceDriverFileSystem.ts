@@ -76,7 +76,7 @@
                 Control.updateDiskTable(tsb);
             }
 
-            public formatDisk(): string{
+            public quickFormat(): string{
                 var tsb: string;
                 var value = new Array<string>();
                 for (var i=0; i<sessionStorage.length;i++){
@@ -85,7 +85,17 @@
                     value[0] = "0"
                     this.updateTSB(tsb,value);
                 }
-                return "SUCCESS_DISK_FORMATTED";
+                return "SUCCESS_DISK_QUICK_FORMATTED";
+            }
+
+            public fullFormat(): string{
+                var tsb: string;
+                var value = new Array<string>();
+                for (var i=0; i<sessionStorage.length;i++){
+                    var tsb = sessionStorage.key(i);
+                    this.zeroFill(tsb);
+                }
+                return "SUCCESS_DISK_FULL_FORMATTED";
             }
 
             public zeroFill(tsb){

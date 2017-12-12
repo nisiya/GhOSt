@@ -78,7 +78,7 @@ var TSOS;
             sessionStorage.setItem(tsb, JSON.stringify(value));
             TSOS.Control.updateDiskTable(tsb);
         };
-        DeviceDriverFileSystem.prototype.formatDisk = function () {
+        DeviceDriverFileSystem.prototype.quickFormat = function () {
             var tsb;
             var value = new Array();
             for (var i = 0; i < sessionStorage.length; i++) {
@@ -87,7 +87,16 @@ var TSOS;
                 value[0] = "0";
                 this.updateTSB(tsb, value);
             }
-            return "SUCCESS_DISK_FORMATTED";
+            return "SUCCESS_DISK_QUICK_FORMATTED";
+        };
+        DeviceDriverFileSystem.prototype.fullFormat = function () {
+            var tsb;
+            var value = new Array();
+            for (var i = 0; i < sessionStorage.length; i++) {
+                var tsb = sessionStorage.key(i);
+                this.zeroFill(tsb);
+            }
+            return "SUCCESS_DISK_FULL_FORMATTED";
         };
         DeviceDriverFileSystem.prototype.zeroFill = function (tsb) {
             var value = value = JSON.parse(sessionStorage.getItem(tsb));

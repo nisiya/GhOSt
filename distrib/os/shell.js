@@ -62,10 +62,10 @@ var TSOS;
             sc = new TSOS.ShellCommand(this.shellMeow, "meow", "- Flushes the toilet. [audio warning]");
             this.commandList[this.commandList.length] = sc;
             // load
-            sc = new TSOS.ShellCommand(this.shellLoad, "load", "- Validates and loads user program input into memory.");
+            sc = new TSOS.ShellCommand(this.shellLoad, "load", "<int> - Validates and loads user program input into memory with given or default priority of 10.");
             this.commandList[this.commandList.length] = sc;
             // run <id>
-            sc = new TSOS.ShellCommand(this.shellRun, "run", "- <pid> - Runs the process with the id.");
+            sc = new TSOS.ShellCommand(this.shellRun, "run", "<pid> - Runs the process with the id.");
             this.commandList[this.commandList.length] = sc;
             // runall
             sc = new TSOS.ShellCommand(this.shellRunall, "runall", "- Runs all loaded process.");
@@ -103,8 +103,8 @@ var TSOS;
             // ls
             sc = new TSOS.ShellCommand(this.shellLs, "ls", "list the files currently stored on the disk");
             this.commandList[this.commandList.length] = sc;
-            // format
-            sc = new TSOS.ShellCommand(this.shellFormat, "format", "quick formats the drive");
+            // format <string>
+            sc = new TSOS.ShellCommand(this.shellFormat, "format", "<string> - quick or full formats the drive");
             this.commandList[this.commandList.length] = sc;
             // getschedule
             sc = new TSOS.ShellCommand(this.shellGetSchedule, "getschedule", "get the currently selected cpu scheduling algorithm");
@@ -367,7 +367,7 @@ var TSOS;
                         break;
                     // format
                     case "format":
-                        _StdOut.putText("Format would quick format the disk, deleting just the pointers.");
+                        _StdOut.putText("Format followed by an option would quick or full format the disk. Quick = just deletes the pointers. Full = zero fills the rest of the block too.");
                         break;
                     // getschedule
                     case "getschedule":
@@ -492,7 +492,7 @@ var TSOS;
                 }
             }
             else {
-                _StdOut.putText("Priority must be a number between 0 and 10");
+                _StdOut.putText("Priority must be an integer, starting from 0. Or leave it blank for default of 10. Lower number means higher priority. ");
             }
         };
         // run <pid>
@@ -667,7 +667,19 @@ var TSOS;
                 _StdOut.putText("Cannot format disk. A process is currently running. Use kill command to terminate process.");
             }
             else {
-                _StdOut.putText(_krnFileSystemDriver.formatDisk());
+                if (args == "quick") {
+                    _StdOut.putText(_krnFileSystemDriver.quickFormat());
+                }
+                else if (args == "full") {
+                    _StdOut.putText(_krnFileSystemDriver.fullFormat());
+                }
+                else if (args == "") {
+                    _StdOut.putText("Please enter quick or full format after format command.");
+                    _StdOut.advanceLine();
+                    _StdOut.putText("quick = just deletes the pointers.");
+                    _StdOut.advanceLine();
+                    _StdOut.putText("full = zero fills the rest of the block too.");
+                }
             }
         };
         Shell.prototype.shellGetSchedule = function (args) {
