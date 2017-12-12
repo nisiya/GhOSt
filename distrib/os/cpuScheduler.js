@@ -8,7 +8,7 @@ var TSOS;
 (function (TSOS) {
     var CpuScheduler = /** @class */ (function () {
         function CpuScheduler() {
-            this.schedule = "Round Robin";
+            this.schedule = "Non-preemptive Priority";
             this.quantum = 6;
             this.currCycle = 0; // track run time
             this.activePIDs = new Array(); // for listing
@@ -19,7 +19,7 @@ var TSOS;
             this.currCycle = 0;
             this.totalCycles = 0;
             if (this.schedule == "Non-preemptive Priority" && _ReadyQueue.getSize() > 1) {
-                this.sortPriority();
+                // this.sortPriority();
             }
             this.runningProcess = _ReadyQueue.dequeue();
             this.runningProcess.pState = "Running";
@@ -39,8 +39,9 @@ var TSOS;
                 if (this.currCycle >= this.quantum) {
                     // if there are processes waiting in Ready queue, context switch
                     if (!_ReadyQueue.isEmpty()) {
+                        // console.log(_ReadyQueue.getSize());
                         if (this.schedule == "Non-preemptive Priority" && _ReadyQueue.getSize() > 1) {
-                            this.sortPriority();
+                            // this.sortPriority();
                         }
                         _KernelInterruptQueue.enqueue(new TSOS.Interrupt(CONTEXT_SWITCH_IRQ, this.runningProcess));
                     }
@@ -54,7 +55,7 @@ var TSOS;
             var firstProcess = _ReadyQueue.dequeue();
             // console.log(firstProcess.pPriority);
             var secondProcess;
-            var comparison = 1;
+            var comparison = 0;
             while (comparison < _ReadyQueue.getSize()) {
                 secondProcess = _ReadyQueue.dequeue();
                 if (secondProcess.pPriority < firstProcess.pPriority) {
@@ -66,12 +67,12 @@ var TSOS;
                 }
                 comparison++;
             }
-            // console.log(firstProcess.pPriority);
+            console.log(firstProcess.pPriority);
             _ReadyQueue.enqueue(firstProcess);
             for (var i = 0; i < _ReadyQueue.getSize() - 1; i++) {
                 _ReadyQueue.enqueue(_ReadyQueue.dequeue());
             }
-            console.log(_ReadyQueue.getSize());
+            // console.log(_ReadyQueue.getSize());
         };
         CpuScheduler.prototype.setSchedule = function (args) {
             var returnMsg;

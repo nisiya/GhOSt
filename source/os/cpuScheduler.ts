@@ -7,7 +7,7 @@
      ------------ */
      module TSOS {
         export class CpuScheduler {
-            public schedule = "Round Robin";
+            public schedule = "Non-preemptive Priority";
             public quantum = 6;
             public currCycle = 0; // track run time
             public activePIDs = new Array<number>(); // for listing
@@ -19,7 +19,7 @@
                 this.currCycle = 0;
                 this.totalCycles = 0;
                 if(this.schedule == "Non-preemptive Priority" && _ReadyQueue.getSize()>1){
-                    this.sortPriority();
+                    // this.sortPriority();
                 }
                 this.runningProcess = _ReadyQueue.dequeue();
                 this.runningProcess.pState = "Running";
@@ -39,8 +39,9 @@
                     if (this.currCycle >= this.quantum){
                         // if there are processes waiting in Ready queue, context switch
                         if (!_ReadyQueue.isEmpty()){
+                            // console.log(_ReadyQueue.getSize());
                             if(this.schedule == "Non-preemptive Priority" && _ReadyQueue.getSize()>1){
-                                this.sortPriority();
+                                // this.sortPriority();
                             }
                             _KernelInterruptQueue.enqueue(new Interrupt(CONTEXT_SWITCH_IRQ, this.runningProcess));
                         }
@@ -55,7 +56,7 @@
                     var firstProcess = _ReadyQueue.dequeue();
                     // console.log(firstProcess.pPriority);
                     var secondProcess;
-                    var comparison = 1;
+                    var comparison = 0;
                     while(comparison<_ReadyQueue.getSize()){
                         secondProcess = _ReadyQueue.dequeue();
                         if(secondProcess.pPriority < firstProcess.pPriority){
@@ -66,12 +67,12 @@
                         }
                         comparison++;
                     }
-                    // console.log(firstProcess.pPriority);
+                    console.log(firstProcess.pPriority);
                     _ReadyQueue.enqueue(firstProcess);
                     for(var i=0; i<_ReadyQueue.getSize()-1; i++){
                         _ReadyQueue.enqueue(_ReadyQueue.dequeue());
                     }
-                    console.log(_ReadyQueue.getSize());
+                    // console.log(_ReadyQueue.getSize());
             }
 
             public setSchedule(args): string{
